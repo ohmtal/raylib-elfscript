@@ -1,0 +1,36 @@
+#include "raylib.h"
+#include "main/engineGlue.h"
+#include "console/script.h"
+#include "console/engineAPI.h"
+
+bool gShutDownRequest = false;
+
+int main(void)
+{
+    engineGlue::init(nullptr, ""); //fixme logfunc
+
+    if (!Con::executeFile("assets/main.cs")) { //fixme with command line
+        Con::errorf("main script not found.");
+        return 1;
+    }
+
+    if (!Con::executef("MainInit")) {
+        Con::errorf("init failed");
+        return 1;
+    }
+
+    // --------- advance time for scheduler this should be placed in the main loop
+    while (!WindowShouldClose())    // Detect window close button or ESC key
+    {
+
+        engineGlue::process(0);
+        Con::executef("MainUpdate");
+        if (gShutDownRequest) break;
+    }
+
+    Con::executef("MainShutdown");
+    // -------- finallize
+    engineGlue::shutDown();
+
+    return 0;
+}
