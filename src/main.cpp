@@ -26,7 +26,7 @@ int main(void)
         return 1;
     }
 
-    SetTraceLogCallback(CustomTraceLog);
+    //FIXME arguments are scrambled.... SetTraceLogCallback(CustomTraceLog);
     ConsoleValue initResult = Con::executef("MainInit");
     if (initResult.getBool() == false) {
         Con::errorf("init failed");

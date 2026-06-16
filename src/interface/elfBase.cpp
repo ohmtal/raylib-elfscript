@@ -8,6 +8,8 @@
 // -----------------------------------------------------------------------------
 // TraceLog raylib log to Con::.. log.
 // -----------------------------------------------------------------------------
+//FIXME what it that ? =>
+//  TEXTURE: [ID 125595416] Texture loaded successfully (125595416x-2118071736 | UH��H�� �}�H�u�H�U��}�tn�}��� | -2118068406 mipmaps)
 void CustomTraceLog(int msgType, const char *text, va_list args)
 {
     switch (msgType)
