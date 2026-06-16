@@ -14,8 +14,14 @@
 
 #include "raylib.h"
 
-DECLARE_STRUCT_R(Color);
+DECLARE_STRUCT(Color);
 DefineConsoleType( TypeColor, Color )
+
+DECLARE_STRUCT( Vector2 );
+DefineConsoleType( TypeVector2, Vector2 )
+
+DECLARE_STRUCT( Vector3 );
+DefineConsoleType( TypeVector3, Vector3 )
 
 // DECLARE_STRUCT_R(Point2I);
 // DefineConsoleType( TypePoint2I, Point2I )
@@ -23,10 +29,10 @@ DefineConsoleType( TypeColor, Color )
 // DECLARE_STRUCT( RectI );
 // DECLARE_STRUCT( RectF );
 // DECLARE_STRUCT( Point2F );
-// DECLARE_STRUCT( Point3F );
+
 //
 // DefineConsoleType( TypeRectI, RectI )
 // DefineConsoleType( TypeRectF, RectF )
-// DefineConsoleType( TypePoint2F, Point2F )
-// DefineConsoleType( TypePoint3F, Point3F )
+
+
 

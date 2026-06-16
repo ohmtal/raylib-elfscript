@@ -1,38 +1,3 @@
-# raylib-elfscript (WiP) 
- 
-Raylib binding of Elf(Torque)Script.
-
-2026-06-16: I just started and it's far away from complete.
-
-## Setup: 
-
-I usually have the TorqueScript Source in "/opt/TorqueScript" which is set as default in CMake. 
-But you can also put it somewhere else and need to add the path to cmake like:
-
-    git pull https://github.com/ohmtal/TorqueScript.git
-
-and then
-
-    cmake -S . -B build -DELFSCRIPT_PATH="/whereIHaveMySource/TorqueScript"
-    cmake --build build
-    ./raylib-elfscript
-
-    
-## First Script assets/main.cs
-
-If you wonder why the the script file ends with .cs. This is not CSharp it's CScript (back from 1999).
-
-![Basic Window](./docu/Screenshot_2026-06-16_02-47-32.png)
-
-There are three functions called from the C Code to get it working:
-
-    - function MainInit() {}
-    - function MainUpdate() {}
-    - function MainShutDown() {}
-    
-The Script is:
-
-```
 function MainInit() {
     // Initialization
     //--------------------------------------------------------------------------------------
@@ -52,6 +17,7 @@ function MainShutDown() {
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 }
+
 
 function MainUpdate()
 {
@@ -73,6 +39,3 @@ function MainUpdate()
 
     return 0;
 }
-
-```
-    

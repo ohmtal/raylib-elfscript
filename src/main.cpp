@@ -4,13 +4,20 @@
 #include "console/engineAPI.h"
 
 bool gShutDownRequest = false;
+extern void initEnum();
 
 int main(void)
 {
     engineGlue::init(nullptr, ""); //fixme logfunc
+    initEnum();
 
     if (!Con::executeFile("assets/main.cs")) { //fixme with command line
         Con::errorf("main script not found.");
+        return 1;
+    }
+
+    if (!Con::isFunction("MainUpdate")) {
+        Con::errorf("MainUpdate function is missing!");
         return 1;
     }
 
@@ -22,9 +29,8 @@ int main(void)
     // --------- advance time for scheduler this should be placed in the main loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
-
-        engineGlue::process(0);
         Con::executef("MainUpdate");
+        engineGlue::process(GetFrameTime());
         if (gShutDownRequest) break;
     }
 
