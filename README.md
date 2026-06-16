@@ -1,6 +1,6 @@
-# raylib-elfscript
-
-Raylib binding of  Elf(Torque)Script.
+# raylib-elfscript (WiP) 
+ 
+Raylib binding of Elf(Torque)Script.
 
 ##Setup: 
 
