@@ -1,3 +1,7 @@
+//-----------------------------------------------------------------------------
+// Copyright (c) 2026 Thomas Hühn (XXTH)
+// SPDX-License-Identifier: MIT
+//-----------------------------------------------------------------------------
 #include "raylib.h"
 #include "main/engineGlue.h"
 #include "console/script.h"
