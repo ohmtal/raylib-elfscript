@@ -1,7 +1,10 @@
 #include "raylib.h"
 #include "ConsoleTypes.h"
 #include <console/console.h>
+#include <console/engineAPI.h>
 #include <core/strings/stringUnit.h>
+
+
 
 // -----------------------------------------------------------------------------
 // TypeColor
@@ -134,6 +137,44 @@ ConsoleSetType( TypeVector3 )
     else
         Con::printf("Vector3 must be set as { x, y, z } or \"x y z\"");
 }
+//-----------------------------------------------------------------------------
+// TypeRectangle
+//-----------------------------------------------------------------------------
+IMPLEMENT_STRUCT( Rectangle,
+                  Rectangle, ,
+                  "" )
+
+FIELD( x, x, 1, "Rectangle top-left corner position x" )
+FIELD( y, y, 1, " Rectangle top-left corner position y" )
+FIELD( width, width, 1, "Rectangle width." )
+FIELD( height, height, 1, "Rectangle height." )
+
+END_IMPLEMENT_STRUCT;
+
+ConsoleType(Rectangle, TypeRectangle, Rectangle, "")
+ImplementConsoleTypeCasters( TypeRectangle, Rectangle )
+
+ConsoleGetType( TypeRectangle )
+{
+    Rectangle *rect = (Rectangle *) dptr;
+    static const U32 bufSize = 256;
+    char* returnBuffer = Con::getReturnBuffer(bufSize);
+    dSprintf(returnBuffer, bufSize, "%g %g %g %g", rect->x, rect->y,
+             rect->width, rect->height);
+    return returnBuffer;
+}
+
+ConsoleSetType( TypeRectangle )
+{
+    if(argc == 1)
+        dSscanf(argv[0], "%g %g %g %g", &((Rectangle *) dptr)->x, &((Rectangle *) dptr)->y,
+                &((Rectangle *) dptr)->width, &((Rectangle *) dptr)->height);
+        else if(argc == 4)
+            *((Rectangle *) dptr) = Rectangle(dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2]), dAtof(argv[3]));
+    else
+        Con::printf("Rectangle must be set as { x, y, w, h } or \"x y w h\"");
+}
+
 
 
 // // -----------------------------------------------------------------------------
@@ -192,8 +233,8 @@ ConsoleSetType( TypeVector3 )
 //                   RectI, ,
 //                   "" )
 // END_IMPLEMENT_STRUCT;
-// IMPLEMENT_STRUCT( RectF,
-//                   RectF, ,
+// IMPLEMENT_STRUCT( Rectangle,
+//                   Rectangle, ,
 //                   "" )
 // END_IMPLEMENT_STRUCT;
 //
@@ -226,14 +267,14 @@ ConsoleSetType( TypeVector3 )
 // }
 //
 // //-----------------------------------------------------------------------------
-// // TypeRectF
+// // TypeRectangle
 // //-----------------------------------------------------------------------------
-// ConsoleType(RectF, TypeRectF, RectF, "")
-// ImplementConsoleTypeCasters( TypeRectF, RectF )
+// ConsoleType(Rectangle, TypeRectangle, Rectangle, "")
+// ImplementConsoleTypeCasters( TypeRectangle, Rectangle )
 //
-// ConsoleGetType( TypeRectF )
+// ConsoleGetType( TypeRectangle )
 // {
-//     RectF *rect = (RectF *) dptr;
+//     Rectangle *rect = (Rectangle *) dptr;
 //     static const U32 bufSize = 256;
 //     char* returnBuffer = Con::getReturnBuffer(bufSize);
 //     dSprintf(returnBuffer, bufSize, "%g %g %g %g", rect->x, rect->y,
@@ -241,15 +282,15 @@ ConsoleSetType( TypeVector3 )
 //     return returnBuffer;
 // }
 //
-// ConsoleSetType( TypeRectF )
+// ConsoleSetType( TypeRectangle )
 // {
 //     if(argc == 1)
-//         dSscanf(argv[0], "%g %g %g %g", &((RectF *) dptr)->x, &((RectF *) dptr)->y,
-//                 &((RectF *) dptr)->w, &((RectF *) dptr)->h);
+//         dSscanf(argv[0], "%g %g %g %g", &((Rectangle *) dptr)->x, &((Rectangle *) dptr)->y,
+//                 &((Rectangle *) dptr)->w, &((Rectangle *) dptr)->h);
 //         else if(argc == 4)
-//             *((RectF *) dptr) = RectF(dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2]), dAtof(argv[3]));
+//             *((Rectangle *) dptr) = Rectangle(dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2]), dAtof(argv[3]));
 //     else
-//         Con::printf("RectF must be set as { x, y, w, h } or \"x y w h\"");
+//         Con::printf("Rectangle must be set as { x, y, w, h } or \"x y w h\"");
 // }
 //
 

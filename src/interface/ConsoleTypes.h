@@ -23,6 +23,10 @@ DefineConsoleType( TypeVector2, Vector2 )
 DECLARE_STRUCT( Vector3 );
 DefineConsoleType( TypeVector3, Vector3 )
 
+
+DECLARE_STRUCT( Rectangle );
+DefineConsoleType( TypeRectangle, Rectangle )
+
 // DECLARE_STRUCT_R(Point2I);
 // DefineConsoleType( TypePoint2I, Point2I )
 //

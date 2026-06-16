@@ -3,13 +3,18 @@
 #include "console/script.h"
 #include "console/engineAPI.h"
 
+
+
+
 bool gShutDownRequest = false;
 extern void initEnum();
+extern void CustomTraceLog(int msgType, const char *text, va_list args);
 
 int main(void)
 {
     engineGlue::init(nullptr, ""); //fixme logfunc
     initEnum();
+
 
     if (!Con::executeFile("assets/main.cs")) { //fixme with command line
         Con::errorf("main script not found.");
@@ -21,7 +26,9 @@ int main(void)
         return 1;
     }
 
-    if (!Con::executef("MainInit")) {
+    SetTraceLogCallback(CustomTraceLog);
+    ConsoleValue initResult = Con::executef("MainInit");
+    if (initResult.getBool() == false) {
         Con::errorf("init failed");
         return 1;
     }

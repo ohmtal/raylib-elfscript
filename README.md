@@ -3,6 +3,8 @@
 Raylib binding of Elf(Torque)Script.
 
 2026-06-16: I just started and it's far away from complete.
+            NOTE: Before I continue i need a console for testing ;) (ImGui)
+            
 
 ## Setup: 
 
@@ -26,7 +28,7 @@ If you wonder why the the script file ends with .cs. This is not CSharp it's CSc
 
 There are three functions called from the C Code to get it working:
 
-    - function MainInit() {}
+    - function MainInit() { return true;}
     - function MainUpdate() {}
     - function MainShutDown() {}
     
@@ -55,21 +57,21 @@ function MainShutDown() {
 
 function MainUpdate()
 {
-        // Update
-        //----------------------------------------------------------------------------------
-        // TODO: Update your variables here
-        //----------------------------------------------------------------------------------
+    // Update
+    //----------------------------------------------------------------------------------
+    // TODO: Update your variables here
+    //----------------------------------------------------------------------------------
 
-        // Draw
-        //----------------------------------------------------------------------------------
-        BeginDrawing();
+    // Draw
+    //----------------------------------------------------------------------------------
+    BeginDrawing();
 
-        ClearBackground("20 60 20");
+    ClearBackground("20 60 20");
 
-        DrawText("Congrats! You created your first window!", 190, 200, 20, "200 200 200 255");
+    DrawText("Congrats! You created your first window!", 190, 200, 20, "200 200 200 255");
 
-        EndDrawing();
-        //----------------------------------------------------------------------------------
+    EndDrawing();
+    //----------------------------------------------------------------------------------
 
     return 0;
 }

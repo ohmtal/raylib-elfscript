@@ -22,6 +22,8 @@ $BLUE = "0 0 255 255";
 $DARKGRAY = "64 64 64 255";
 
 function MainInit() {
+
+
     $screenWidth = 800;
     $screenHeight = 450;
 
@@ -30,8 +32,13 @@ function MainInit() {
     $currentFps = 60;
 
     // Store the position for the both of the circles
-    $deltaCircle = 0 SPC $screenHeight / 3.0 ;
-    $frameCircle = 0 SPC $screenHeight * 2.0 / 3.0 ;
+    //NOTE: using Stuct helper class
+    $deltaCircle = new Struct() {
+        Vector2 = 0 SPC $screenHeight / 3.0 ;
+    };
+    $frameCircle = new Struct() {
+        Vector2 = 0 SPC $screenHeight * 2.0 / 3.0 ;
+    };
 
     // The speed applied to both circles
     $speed = 10.0;
@@ -67,29 +74,44 @@ function MainUpdate() {
         // Multiply by 6.0 (an arbitrary value) in order to make the speed
         // visually closer to the other circle (at 60 fps), for comparison
 
-        // NOTE this is the good and the ugly .... Vector2 is a string
-
-        %dcX = getword( $deltaCircle, 0);
-        %fcX = getword( $frameCircle, 0);
 
 
-        %dcX += GetFrameTime() * 6.0 * $speed;
-        // This circle can move faster or slower visually depending on the FPS
-        %fcX += 0.1 * $speed;
+        $deltaCircle.Vector2.x += GetFrameTime() * 6.0 * $speed;
+        $frameCircle.Vector2.x += 0.1 * $speed;
 
-        // If either circle is off the screen, reset it back to the start
-        if (%dcX > $screenWidth) %dcX= 0;
-        if (%fcX> $screenWidth) %fcX = 0;
+        if ($deltaCircle.Vector2.x > $screenWidth) $deltaCircle.Vector2.x = 0;
+        if ($frameCircle.Vector2.x > $screenWidth) $frameCircle.Vector2.x = 0;
 
-        // Reset both circles positions
         if (IsKeyPressed($KEY_R))
         {
-            %dcX = 0;
-            %fcX = 0;
+            $deltaCircle.Vector2.x = 0;
+            $frameCircle.Vector2.x = 0;
         }
 
-         $deltaCircle = setword( $deltaCircle, 0, %dcX);
-         $frameCircle = setWord( $frameCircle, 0, %fcX );
+
+        // NOTE this is the good and the ugly of typeless variables:
+        // but i added a class Struct to get around this :)
+        // %dcX = getword( $deltaCircle, 0);
+        // %fcX = getword( $frameCircle, 0);
+        //
+        //
+        // %dcX += GetFrameTime() * 6.0 * $speed;
+        // // This circle can move faster or slower visually depending on the FPS
+        // %fcX += 0.1 * $speed;
+        //
+        // // If either circle is off the screen, reset it back to the start
+        // if (%dcX > $screenWidth) %dcX= 0;
+        // if (%fcX> $screenWidth) %fcX = 0;
+        //
+        // // Reset both circles positions
+        // if (IsKeyPressed($KEY_R))
+        // {
+        //     %dcX = 0;
+        //     %fcX = 0;
+        // }
+        //
+        //  $deltaCircle = setword( $deltaCircle, 0, %dcX);
+        //  $frameCircle = setWord( $frameCircle, 0, %fcX );
         //----------------------------------------------------------------------------------
 
         // Draw
@@ -98,8 +120,8 @@ function MainUpdate() {
         ClearBackground($RAYWHITE);
 
         // Draw both circles to the screen
-        DrawCircleV($deltaCircle, $circleRadius, $RED);
-        DrawCircleV($frameCircle, $circleRadius, $BLUE);
+        DrawCircleV($deltaCircle.Vector2, $circleRadius, $RED);
+        DrawCircleV($frameCircle.Vector2, $circleRadius, $BLUE);
 
         // Draw the help text
         // Determine what help text to show depending on the current FPS target
