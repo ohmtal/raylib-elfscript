@@ -5,7 +5,8 @@ cmake_minimum_required(VERSION 3.24)
 project(raylib-elfscript)
 set(PROJECT_SRC
     src/main.cpp
-    src/interface/platformProcess.cc
+    src/interface/defaultMain.cpp
+    src/interface/platformProcess.cpp
     src/interface/ConsoleTypes.cpp
     src/interface/elfBase.cpp
 )
