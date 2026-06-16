@@ -98,10 +98,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	# 	-DCMAKE_TOOLCHAIN_FILE=/usr/lib/emscripten/cmake/Modules/Platform/Emscripten.cmake \
 	# 	-DCMAKE_BUILD_TYPE=Debug \
 	# 	-DPLATFORM=Web
-	# cmake --build web_debug -j 24
+	# cmake --build build_webdebug -j 4
 # Web Run: (bash)
 #  source /etc/profile.d/emscripten.sh
-#  emrun RayTalDemo.html
+#  emrun raylib-elfscript.html
 if ("${PLATFORM}" STREQUAL "Web")
 
     set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html")

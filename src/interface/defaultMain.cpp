@@ -2,6 +2,9 @@
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
+// FIXME emscripten loop
+// FIXME commandline parameter for path and script
+//-----------------------------------------------------------------------------
 #include "raylib.h"
 #include "main/engineGlue.h"
 #include "console/script.h"
@@ -16,7 +19,7 @@ extern void CustomTraceLog(int msgType, const char *text, va_list args);
 
 int defaultMain(void)
 {
-    engineGlue::init(nullptr, GetApplicationDirectory()); //fixme logfunc + command line path
+    engineGlue::init(nullptr, GetApplicationDirectory()); // command line path
     initEnum();
 
 
