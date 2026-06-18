@@ -136,27 +136,27 @@ void outputDebugString(const char *string, ...) {
 
 }
 /// File IO.
-StringTableEntry getWorkingDirectory()
-{
+// StringTableEntry getWorkingDirectory()
+// {
+//
+//    return StringTable->insert( GetWorkingDirectory()) ;
+// }
+//
+// bool setWorkingDirectory(StringTableEntry newDir)
+// {
+//    return ChangeDirectory(newDir);
+//
+// }
 
-   return StringTable->insert( GetWorkingDirectory()) ;
-}
-
-bool setWorkingDirectory(StringTableEntry newDir)
-{
-   return ChangeDirectory(newDir);
-
-}
-
-StringTableEntry getCurrentDirectory()
-{
-   return getWorkingDirectory();
-}
-
-bool setCurrentDirectory(StringTableEntry newDir)
-{
-   return setWorkingDirectory(newDir);
-}
+// StringTableEntry getCurrentDirectory()
+// {
+//    return getWorkingDirectory();
+// }
+//
+// bool setCurrentDirectory(StringTableEntry newDir)
+// {
+//    return setWorkingDirectory(newDir);
+// }
 
 StringTableEntry getExecutableName()
 {

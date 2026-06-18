@@ -12,7 +12,7 @@
  ********************************************************************************************/
 $RAYWHITE = "255 255 255 255";
 $RED = "255 0 0 255";
-$BLUE = "0 0 255 255";
+$BLUE = "0 0 255 128";
 $DARKGRAY = "64 64 64 255";
 
 function MainInit() {
@@ -29,6 +29,8 @@ function MainInit() {
     $Game.addTypeField("deltaCircle", "TypeVector2", 0 SPC $Game.screenHeight / 3.0 );
     $Game.addTypeField("frameCircle", "TypeVector2", 0 SPC $Game.screenHeight * 2.0 / 3.0 );
 
+    // test layer
+    $game.frameCircle = $game.deltaCircle;
 
     // $game.dump();
     // echo($Game.deltaCircle SPC $Game.frameCircle);
@@ -80,6 +82,11 @@ function MainUpdate() {
             $Game.currentFps = 60;
             SetTargetFPS($Game.currentFps);
         }
+        if (IsKeyPressed($KEY_U))
+        {
+            $Game.currentFps = 0;
+            SetTargetFPS($Game.currentFps);
+        }
 
         // Draw
         //----------------------------------------------------------------------------------
@@ -87,7 +94,7 @@ function MainUpdate() {
         ClearBackground($RAYWHITE);
 
         // Draw both circles to the screen
-        DrawCircleV($Game.deltaCircle, $Game.circleRadius, $RED);
+        DrawCircleV($Game.deltaCircle, $Game.circleRadius + 2, $RED);
         DrawCircleV($Game.frameCircle, $Game.circleRadius, $BLUE);
 
         // Draw the help text
@@ -97,7 +104,7 @@ function MainUpdate() {
         else %fpsText = "FPS: " SPC GetFPS() SPC "target: " SPC $Game.currentFps;
         DrawText(%fpsText, 10, 10, 20, $DARKGRAY);
         DrawText(strFormat("Frame time: %02.02f ms", GetFrameTime()), 10, 30, 20, $DARKGRAY);
-        DrawText("Use the scroll wheel to change the fps limit, r to reset", 10, 50, 20, $DARKGRAY);
+        DrawText("Use the scroll wheel to change the fps limit, r to reset, u for unlimited", 10, 50, 20, $DARKGRAY);
 
         // Draw the text above the circles
         DrawText("FUNC: x += GetFrameTime()*speed", 10, 90, 20, $RED);
