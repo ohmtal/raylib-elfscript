@@ -7,6 +7,11 @@
 #include "console/script.h"
 #include "console/engineAPI.h"
 #include "ConsoleTypes.h"
+
+//the lazy (long build time) way or define KeyboardKey (348)
+// #define MAGIC_ENUM_RANGE_MIN 0
+// #define MAGIC_ENUM_RANGE_MAX 348
+// compile takes ages! #define MAGIC_ENUM_RANGE_MAX 65536
 #include "console/consoleExtras.h" // registerEnum
 
 // -----------------------------------------------------------------------------
@@ -27,40 +32,315 @@ void CustomTraceLog(int msgType, const char *text, va_list args)
     }
 }
 // -----------------------------------------------------------------------------
-// ENUM
-// -----------------------------------------------------------------------------
-void initEnum() {
-   Con::registerEnumS32<KeyboardKey>("");
-   Con::registerEnumS32<ConfigFlags>("");
-   Con::registerEnumS32<TraceLogLevel>("");
-   Con::registerEnumS32<MouseButton>("");
-   Con::registerEnumS32<MouseCursor>("");
-   Con::registerEnumS32<GamepadButton>("");
-   Con::registerEnumS32<GamepadAxis>("");
-   Con::registerEnumS32<MaterialMapIndex>("");
-   Con::registerEnumS32<ShaderLocationIndex>("");
-   Con::registerEnumS32<ShaderUniformDataType>("");
-   Con::registerEnumS32<ShaderAttributeDataType>("");
-   Con::registerEnumS32<PixelFormat>("");
-   Con::registerEnumS32<TextureFilter>("");
-   Con::registerEnumS32<TextureWrap>("");
-   Con::registerEnumS32<CubemapLayout>("");
-   Con::registerEnumS32<FontType>("");
-   Con::registerEnumS32<BlendMode>("");
-   Con::registerEnumS32<Gesture>("");
-   Con::registerEnumS32<CameraMode>("");
-   Con::registerEnumS32<CameraProjection>("");
-   Con::registerEnumS32<NPatchLayout>("");
-}
-// -----------------------------------------------------------------------------
 // Window-related functions
 // -----------------------------------------------------------------------------
 DefineEngineFunction(InitWindow, void, (S32 width, S32 height, String title),,"Initialize window and OpenGL context"){
     InitWindow(width, height, title);
 }
+// RLAPI void CloseWindow(void);                                     // Close window and unload OpenGL context
 DefineEngineFunction(CloseWindow, void, (),,"Close window and unload OpenGL context"){
     CloseWindow();
 }
+// RLAPI bool WindowShouldClose(void);                               // Check if application should close (KEY_ESCAPE pressed or windows close icon clicked)
+DefineEngineFunction(WindowShouldClose, bool, (), , "Check if application should close (KEY_ESCAPE pressed or windows close icon clicked)"){
+    return WindowShouldClose();
+}
+
+// RLAPI bool IsWindowReady(void);                                   // Check if window has been initialized successfully
+DefineEngineFunction(IsWindowReady, bool, (), , "Check if window has been initialized successfully"){
+    return IsWindowReady();
+}
+
+// RLAPI bool IsWindowFullscreen(void);                              // Check if window is currently fullscreen
+DefineEngineFunction(IsWindowFullscreen, bool, (), , "Check if window is currently fullscreen"){
+    return IsWindowFullscreen();
+}
+
+// RLAPI bool IsWindowHidden(void);                                  // Check if window is currently hidden
+DefineEngineFunction(IsWindowHidden, bool, (), , "Check if window is currently hidden"){
+    return IsWindowHidden();
+}
+
+// RLAPI bool IsWindowMinimized(void);                               // Check if window is currently minimized
+DefineEngineFunction(IsWindowMinimized, bool, (), , "Check if window is currently minimized"){
+    return IsWindowMinimized();
+}
+
+// RLAPI bool IsWindowMaximized(void);                               // Check if window is currently maximized
+DefineEngineFunction(IsWindowMaximized, bool, (), , "Check if window is currently maximized"){
+    return IsWindowMaximized();
+}
+
+// RLAPI bool IsWindowFocused(void);                                 // Check if window is currently focused
+DefineEngineFunction(IsWindowFocused, bool, (), , "Check if window is currently focused"){
+    return IsWindowFocused();
+}
+
+// RLAPI bool IsWindowResized(void);                                 // Check if window has been resized last frame
+DefineEngineFunction(IsWindowResized, bool, (), , "Check if window has been resized last frame"){
+    return IsWindowResized();
+}
+
+// RLAPI bool IsWindowState(unsigned int flag);                      // Check if one specific window flag is enabled
+DefineEngineFunction(IsWindowState, bool, (unsigned int flag), , "Check if one specific window flag is enabled"){
+    return IsWindowState(flag);
+}
+
+// RLAPI void SetWindowState(unsigned int flags);                    // Set window configuration state using flags
+DefineEngineFunction(SetWindowState, void, (unsigned int flags), , "Set window configuration state using flags"){
+    SetWindowState(flags);
+}
+
+// RLAPI void ClearWindowState(unsigned int flags);                  // Clear window configuration state flags
+DefineEngineFunction(ClearWindowState, void, (unsigned int flags), , "Clear window configuration state flags"){
+    ClearWindowState(flags);
+}
+
+// RLAPI void ToggleFullscreen(void);                                // Toggle window state: fullscreen/windowed, resizes monitor to match window resolution
+DefineEngineFunction(ToggleFullscreen, void, (), , "Toggle window state: fullscreen/windowed, resizes monitor to match window resolution"){
+    ToggleFullscreen();
+}
+
+// RLAPI void ToggleBorderlessWindowed(void);                        // Toggle window state: borderless windowed, resizes window to match monitor resolution
+DefineEngineFunction(ToggleBorderlessWindowed, void, (), , "Toggle window state: borderless windowed, resizes window to match monitor resolution"){
+    ToggleBorderlessWindowed();
+}
+
+// RLAPI void MaximizeWindow(void);                                  // Set window state: maximized, if resizable
+DefineEngineFunction(MaximizeWindow, void, (), , "Set window state: maximized, if resizable"){
+    MaximizeWindow();
+}
+
+// RLAPI void MinimizeWindow(void);                                  // Set window state: minimized, if resizable
+DefineEngineFunction(MinimizeWindow, void, (), , "Set window state: minimized, if resizable"){
+    MinimizeWindow();
+}
+
+// RLAPI void RestoreWindow(void);                                   // Restore window from being minimized/maximized
+DefineEngineFunction(RestoreWindow, void, (), , "Restore window from being minimized/maximized"){
+    RestoreWindow();
+}
+
+// RLAPI void SetWindowIcon(Image image);                            // Set icon for window (single image, RGBA 32bit)
+// FIXME
+// DefineEngineFunction(SetWindowIcon, void, (Image image), , "Set icon for window (single image, RGBA 32bit)"){
+//     SetWindowIcon(image);
+// }
+
+// RLAPI void SetWindowIcons(Image *images, int count);              // Set icon for window (multiple images, RGBA 32bit)
+// FIXME
+// DefineEngineFunction(SetWindowIcons, void, (Image *images, int count), , "Set icon for window (multiple images, RGBA 32bit)"){
+//     SetWindowIcons(images, count);
+// }
+
+// RLAPI void SetWindowTitle(const char *title);                     // Set title for window
+DefineEngineFunction(SetWindowTitle, void, (const char *title), , "Set title for window"){
+    SetWindowTitle(title);
+}
+
+// RLAPI void SetWindowPosition(int x, int y);                       // Set window position on screen
+DefineEngineFunction(SetWindowPosition, void, (int x, int y), , "Set window position on screen"){
+    SetWindowPosition(x, y);
+}
+
+// RLAPI void SetWindowMonitor(int monitor);                         // Set monitor for the current window
+DefineEngineFunction(SetWindowMonitor, void, (int monitor), , "Set monitor for the current window"){
+    SetWindowMonitor(monitor);
+}
+
+// RLAPI void SetWindowMinSize(int width, int height);               // Set window minimum dimensions (for FLAG_WINDOW_RESIZABLE)
+DefineEngineFunction(SetWindowMinSize, void, (int width, int height), , "Set window minimum dimensions (for FLAG_WINDOW_RESIZABLE)"){
+    SetWindowMinSize(width, height);
+}
+
+// RLAPI void SetWindowMaxSize(int width, int height);               // Set window maximum dimensions (for FLAG_WINDOW_RESIZABLE)
+DefineEngineFunction(SetWindowMaxSize, void, (int width, int height), , "Set window maximum dimensions (for FLAG_WINDOW_RESIZABLE)"){
+    SetWindowMaxSize(width, height);
+}
+
+// RLAPI void SetWindowSize(int width, int height);                  // Set window dimensions
+DefineEngineFunction(SetWindowSize, void, (int width, int height), , "Set window dimensions"){
+    SetWindowSize(width, height);
+}
+
+// RLAPI void SetWindowOpacity(float opacity);                       // Set window opacity [0.0f..1.0f]
+DefineEngineFunction(SetWindowOpacity, void, (float opacity), , "Set window opacity [0.0f..1.0f]"){
+    SetWindowOpacity(opacity);
+}
+
+// RLAPI void SetWindowFocused(void);                                // Set window focused
+DefineEngineFunction(SetWindowFocused, void, (), , "Set window focused"){
+    SetWindowFocused();
+}
+
+// RLAPI void *GetWindowHandle(void);                                // Get native window handle
+// FIXME
+// DefineEngineFunction(GetWindowHandle, void *, (), , "Get native window handle"){
+//     return GetWindowHandle();
+// }
+
+
+// RLAPI int GetScreenWidth(void);                                   // Get current screen width
+DefineEngineFunction(GetScreenWidth, int, (), , "Get current screen width"){
+    return GetScreenWidth();
+}
+
+// RLAPI int GetScreenHeight(void);                                  // Get current screen height
+DefineEngineFunction(GetScreenHeight, int, (), , "Get current screen height"){
+    return GetScreenHeight();
+}
+
+// RLAPI int GetRenderWidth(void);                                   // Get current render width (it considers HiDPI)
+DefineEngineFunction(GetRenderWidth, int, (), , "Get current render width (it considers HiDPI)"){
+    return GetRenderWidth();
+}
+
+// RLAPI int GetRenderHeight(void);                                  // Get current render height (it considers HiDPI)
+DefineEngineFunction(GetRenderHeight, int, (), , "Get current render height (it considers HiDPI)"){
+    return GetRenderHeight();
+}
+
+// RLAPI int GetMonitorCount(void);                                  // Get number of connected monitors
+DefineEngineFunction(GetMonitorCount, int, (), , "Get number of connected monitors"){
+    return GetMonitorCount();
+}
+
+// RLAPI int GetCurrentMonitor(void);                                // Get current monitor where window is placed
+DefineEngineFunction(GetCurrentMonitor, int, (), , "Get current monitor where window is placed"){
+    return GetCurrentMonitor();
+}
+
+// RLAPI Vector2 GetMonitorPosition(int monitor);                    // Get specified monitor position
+DefineEngineFunction(GetMonitorPosition, Vector2, (int monitor), , "Get specified monitor position"){
+    return GetMonitorPosition(monitor);
+}
+
+// RLAPI int GetMonitorWidth(int monitor);                           // Get specified monitor width (current video mode used by monitor)
+DefineEngineFunction(GetMonitorWidth, int, (int monitor), , "Get specified monitor width (current video mode used by monitor)"){
+    return GetMonitorWidth(monitor);
+}
+
+// RLAPI int GetMonitorHeight(int monitor);                          // Get specified monitor height (current video mode used by monitor)
+DefineEngineFunction(GetMonitorHeight, int, (int monitor), , "Get specified monitor height (current video mode used by monitor)"){
+    return GetMonitorHeight(monitor);
+}
+
+// RLAPI int GetMonitorPhysicalWidth(int monitor);                   // Get specified monitor physical width in millimetres
+DefineEngineFunction(GetMonitorPhysicalWidth, int, (int monitor), , "Get specified monitor physical width in millimetres"){
+    return GetMonitorPhysicalWidth(monitor);
+}
+
+// RLAPI int GetMonitorPhysicalHeight(int monitor);                  // Get specified monitor physical height in millimetres
+DefineEngineFunction(GetMonitorPhysicalHeight, int, (int monitor), , "Get specified monitor physical height in millimetres"){
+    return GetMonitorPhysicalHeight(monitor);
+}
+
+// RLAPI int GetMonitorRefreshRate(int monitor);                     // Get specified monitor refresh rate
+DefineEngineFunction(GetMonitorRefreshRate, int, (int monitor), , "Get specified monitor refresh rate"){
+    return GetMonitorRefreshRate(monitor);
+}
+
+// RLAPI Vector2 GetWindowPosition(void);                            // Get window position XY on monitor
+DefineEngineFunction(GetWindowPosition, Vector2, (), , "Get window position XY on monitor"){
+    return GetWindowPosition();
+}
+
+// RLAPI Vector2 GetWindowScaleDPI(void);                            // Get window scale DPI factor
+DefineEngineFunction(GetWindowScaleDPI, Vector2, (), , "Get window scale DPI factor"){
+    return GetWindowScaleDPI();
+}
+
+// RLAPI const char *GetMonitorName(int monitor);                    // Get the human-readable, UTF-8 encoded name of the specified monitor
+DefineEngineFunction(GetMonitorName, const char *, (int monitor), , "Get the human-readable, UTF-8 encoded name of the specified monitor"){
+    return GetMonitorName(monitor);
+}
+
+// RLAPI void SetClipboardText(const char *text);                    // Set clipboard text content
+DefineEngineFunction(SetClipboardText, void, (const char *text), , "Set clipboard text content"){
+    SetClipboardText(text);
+}
+
+// RLAPI const char *GetClipboardText(void);                         // Get clipboard text content
+DefineEngineFunction(GetClipboardText, const char *, (), , "Get clipboard text content"){
+    return GetClipboardText();
+}
+
+// RLAPI Image GetClipboardImage(void);                              // Get clipboard image content
+// FIXME
+// DefineEngineFunction(GetClipboardImage, Image, (), , "Get clipboard image content"){
+//     return GetClipboardImage();
+// }
+
+// RLAPI void EnableEventWaiting(void);                              // Enable waiting for events on EndDrawing(), no automatic event polling
+DefineEngineFunction(EnableEventWaiting, void, (), , "Enable waiting for events on EndDrawing(), no automatic event polling"){
+    EnableEventWaiting();
+}
+
+// RLAPI void DisableEventWaiting(void);                             // Disable waiting for events on EndDrawing(), automatic events polling
+DefineEngineFunction(DisableEventWaiting, void, (), , "Disable waiting for events on EndDrawing(), automatic events polling"){
+    DisableEventWaiting();
+}
+
+// -----------------------------------------------------------------------------
+// Custom frame control functions
+// -----------------------------------------------------------------------------
+
+// RLAPI void SwapScreenBuffer(void);                      // Swap back buffer with front buffer (screen drawing)
+DefineEngineFunction(SwapScreenBuffer, void, (), , "Swap back buffer with front buffer (screen drawing)"){
+    SwapScreenBuffer();
+}
+
+// RLAPI void PollInputEvents(void);                       // Register all input events
+DefineEngineFunction(PollInputEvents, void, (), , "Register all input events"){
+    PollInputEvents();
+}
+
+// RLAPI void WaitTime(double seconds);                    // Wait for some time (halt program execution)
+DefineEngineFunction(WaitTime, void, (double seconds), , "Wait for some time (halt program execution)"){
+    WaitTime(seconds);
+}
+// -----------------------------------------------------------------------------
+// Random values generation functions
+// -----------------------------------------------------------------------------
+// RLAPI void SetRandomSeed(unsigned int seed);            // Set the seed for the random number generator
+DefineEngineFunction(SetRandomSeed, void, (unsigned int seed), , "Set the seed for the random number generator"){
+    SetRandomSeed(seed);
+}
+
+// RLAPI int GetRandomValue(int min, int max);             // Get a random value between min and max (both included)
+DefineEngineFunction(GetRandomValue, int, (int min, int max), , "Get a random value between min and max (both included)"){
+    return GetRandomValue(min, max);
+}
+
+// RLAPI int *LoadRandomSequence(unsigned int count, int min, int max); // Load random values sequence, no values repeated
+// FIXME
+// DefineEngineFunction(LoadRandomSequence, int *, (unsigned int count, int min, int max), , "Load random values sequence, no values repeated"){
+//     return LoadRandomSequence(count, min, max);
+// }
+
+// RLAPI void UnloadRandomSequence(int *sequence);         // Unload random values sequence
+// FIXME
+// DefineEngineFunction(UnloadRandomSequence, void, (int *sequence), , "Unload random values sequence"){
+//     UnloadRandomSequence(sequence);
+// }
+// -----------------------------------------------------------------------------
+// Misc. functions
+// -----------------------------------------------------------------------------
+// RLAPI void TakeScreenshot(const char *fileName);                // Takes a screenshot of current screen (filename extension defines format)
+DefineEngineFunction(TakeScreenshot, void, (const char *fileName), , "Takes a screenshot of current screen (filename extension defines format)"){
+    TakeScreenshot(fileName);
+}
+
+// RLAPI void SetConfigFlags(unsigned int flags);                  // Set up init configuration flags (view FLAGS)
+DefineEngineFunction(SetConfigFlags, void, (unsigned int flags), , "Set up init configuration flags (view FLAGS)"){
+    SetConfigFlags(flags);
+}
+
+// RLAPI void OpenURL(const char *url);                            // Open URL with default system browser (if available)
+DefineEngineFunction(OpenURL, void, (const char *url), , "Open URL with default system browser (if available)"){
+    OpenURL(url);
+}
+
 // -----------------------------------------------------------------------------
 // Timing-related functions
 // -----------------------------------------------------------------------------

@@ -10,6 +10,9 @@
 #include "console/script.h"
 #include "console/engineAPI.h"
 
+#if defined(__unix__)
+#include <addons/shellConsole/POSIXStdConsole.h>
+#endif
 
 
 
@@ -40,10 +43,20 @@ int defaultMain(void)
         return 1;
     }
 
+    #if defined(__unix__)
+    // console test:
+    StdConsole::create();
+    stdConsole->enable(!gShutDownRequest);
+    stdConsole->enableInput(!gShutDownRequest);
+    #endif
+
     // --------- advance time for scheduler this should be placed in the main loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         Con::executef("MainUpdate");
+        #if defined(__unix__)
+        stdConsole->process();
+        #endif
         engineGlue::process(GetFrameTime());
         if (gShutDownRequest) break;
     }

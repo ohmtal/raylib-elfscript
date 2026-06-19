@@ -10,10 +10,11 @@
  *         - variables start with % are local like  %mouseWheel
  *
  ********************************************************************************************/
-$RAYWHITE = "255 255 255 255";
-$RED = "255 0 0 255";
-$BLUE = "0 0 255 128";
-$DARKGRAY = "64 64 64 255";
+// now defined in c
+// $RAYWHITE = "255 255 255 255";
+// $RED = "255 0 0 255";
+// $BLUE = "0 0 255 128";
+// $DARKGRAY = "64 64 64 255";
 
 function MainInit() {
 
@@ -36,6 +37,20 @@ function MainInit() {
     // echo($Game.deltaCircle SPC $Game.frameCircle);
     // return false;
 
+    %flags = $FLAG_WINDOW_RESIZABLE; // | $FLAG_WINDOW_MAXIMIZED;
+
+    echo( "undecorated:" SPC $FLAG_WINDOW_UNDECORATED
+          SPC "hidden:" SPC $FLAG_WINDOW_HIDDEN SPC "mini" SPC $FLAG_WINDOW_MINIMIZED
+          SPC  "resize:" SPC  $FLAG_WINDOW_RESIZABLE SPC "max:"
+          SPC  $FLAG_WINDOW_MAXIMIZED SPC "flags:" SPC %flags);
+
+    echo("KEY_KP_0:" SPC $KEY_KP_0
+        SPC "GAMEPAD_BUTTON_RIGHT_THUMB" SPC $GAMEPAD_BUTTON_RIGHT_THUMB
+        SPC "MOUSE_BUTTON_BACK" SPC $MOUSE_BUTTON_BACK
+    );
+    // return;
+
+    SetConfigFlags(%flags );
 
     InitWindow($Game.screenWidth, $Game.screenHeight,  "raylib [core] example - delta time");
     SetTargetFPS($Game.currentFps);

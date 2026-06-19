@@ -1,7 +1,8 @@
 //-----------------------------------------------------------------------------
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
-//-----------------------------------------------------------------------------#pragma once
+//-----------------------------------------------------------------------------
+#pragma once
 #include "math/mMathFn.h"
 #ifndef _DYNAMIC_CONSOLETYPES_H_
 #include "console/dynamicTypes.h"

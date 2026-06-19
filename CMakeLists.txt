@@ -9,7 +9,10 @@ set(PROJECT_SRC
     src/interface/platformProcess.cpp
     src/interface/ConsoleTypes.cpp
     src/interface/elfBase.cpp
+    src/interface/elfEnum.cpp
 )
+
+
 
 set (ASSET_PATH ${CMAKE_CURRENT_LIST_DIR}/assets@assets)
 # -----------------------------------------------------------------------------
@@ -39,7 +42,6 @@ if(NOT EXISTS "${RAYLIB_DIR}/CMakeLists.txt")
     "\n ********** RayLib not found! *************"
   )
 else()
-
   add_subdirectory("${RAYLIB_DIR}" "${CMAKE_BINARY_DIR}/raylib_build")
 endif()
 
@@ -64,6 +66,14 @@ else()
   set (ELFSCRIPT_INCLUDES
    ${ELF_MODULE}
   )
+
+
+  if(WIN32)
+
+  elseif(UNIX)
+      list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/shellConsole/POSIXConsole.cpp)
+  endif()
+
 endif()
 
 
