@@ -542,56 +542,45 @@ namespace ElfResource {
     // ------------------------------------------------------------------------
     // Triangle Fan und Strip mit String-Parsing for PointData
     // ------------------------------------------------------------------------
-
     // RLAPI void ImageDrawTriangleFan(Image *dst, const Vector2 *points, int pointCount, Color color);
-    DefineEngineFunction(ImageDrawTriangleFan, void, (S32 dstId, String pointsStr, S32 pointCount, Color color), ,
-                        "Draw a triangle fan defined by points within an image (pointsStr format: 'x1 y1 x2 y2 ...')") {
+    DefineEngineFunction(ImageDrawTriangleFan, void, (S32 dstId, Vector<F32> pointValues, S32 pointCount, Color color), ,
+                        "Draw a triangle fan defined by points within an image (pointsValues format: 'x1 y1 x2 y2 ...')") {
         Image* dst = ImageMap.get(dstId);
         if (!dst || pointCount <= 0) return;
+
+        if (pointValues.size() != (size_t)(pointCount * 2)) {
+            Con::errorf("PointValues size (%d) does not match pointCount * 2 (%d)!", (int)pointValues.size(), pointCount * 2);
+            return;
+        }
 
         std::vector<Vector2> points;
         points.reserve(pointCount);
 
-        S32 currentElement = 0;
         for (S32 i = 0; i < pointCount; ++i) {
-            const char* xStr = StringUnit::getUnit(pointsStr.c_str(), currentElement++, " ");
-            const char* yStr = StringUnit::getUnit(pointsStr.c_str(), currentElement++, " ");
-
-            if (!xStr || !yStr || *xStr == '\0' || *yStr == '\0') {
-                Con::errorf("ImageDrawTriangleFan: Missing Points you gave me only: %d !", pointCount);
-                return;
-            }
-
-            points.push_back(Vector2{ dAtof(xStr), dAtof(yStr) });
+            points.push_back( { pointValues[i*2], pointValues[i*2+1] });
         }
-
         ImageDrawTriangleFan(dst, points.data(), pointCount, color);
     }
 
-    // RLAPI void ImageDrawTriangleStrip(Image *dst, const Vector2 *points, int pointCount, Color color);
-    DefineEngineFunction(ImageDrawTriangleStrip, void, (S32 dstId, String pointsStr, S32 pointCount, Color color), ,
-                        "Draw a triangle strip defined by points within an image (pointsStr format: 'x1 y1 x2 y2 ...')") {
+    DefineEngineFunction(ImageDrawTriangleStrip, void, (S32 dstId, Vector<F32> pointValues, S32 pointCount, Color color), ,
+                         "Draw a triangle fan defined by points within an image (pointsValues format: 'x1 y1 x2 y2 ...')") {
         Image* dst = ImageMap.get(dstId);
         if (!dst || pointCount <= 0) return;
+
+        if (pointValues.size() != (size_t)(pointCount * 2)) {
+            Con::errorf("PointValues size (%d) does not match pointCount * 2 (%d)!", (int)pointValues.size(), pointCount * 2);
+            return;
+        }
 
         std::vector<Vector2> points;
         points.reserve(pointCount);
 
-        S32 currentElement = 0;
         for (S32 i = 0; i < pointCount; ++i) {
-            const char* xStr = StringUnit::getUnit(pointsStr.c_str(), currentElement++, " ");
-            const char* yStr = StringUnit::getUnit(pointsStr.c_str(), currentElement++, " ");
-
-            if (!xStr || !yStr || *xStr == '\0' || *yStr == '\0') {
-                Con::errorf("ImageDrawTriangleFan: Missing Points you gave me only: %d !", pointCount);
-                return;
-            }
-
-            points.push_back(Vector2{ dAtof(xStr), dAtof(yStr) });
+            points.push_back( { pointValues[i*2], pointValues[i*2+1] });
         }
-
         ImageDrawTriangleStrip(dst, points.data(), pointCount, color);
     }
+
 
     // RLAPI void ImageDraw(Image *dst, Image src, Rectangle srcRec, Rectangle dstRec, Color tint);
     DefineEngineFunction(ImageDraw, void, (S32 dstId, S32 srcId, Rectangle srcRec, Rectangle dstRec, Color tint), ,

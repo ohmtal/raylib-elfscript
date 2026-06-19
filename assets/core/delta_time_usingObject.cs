@@ -55,6 +55,14 @@ function MainInit() {
     InitWindow($Game.screenWidth, $Game.screenHeight,  "raylib [core] example - delta time");
     SetTargetFPS($Game.currentFps);
 
+    // Image/Icon Test
+    // LoadImage return a Image identifier (imageId)
+    $Game.iconImg = LoadImage("assets/texture/raylib_32x32.png");
+    SetWindowIcon($Game.iconImg);
+    // IconImg can be unloaded now, but i keep it for later testing texture.
+    // It's unloaded when programm ends automaticly
+    //  UnloadImage($Game.iconImg);
+
     return true;
 }
 

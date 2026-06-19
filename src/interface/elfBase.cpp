@@ -7,6 +7,7 @@
 #include "console/script.h"
 #include "console/engineAPI.h"
 #include "ConsoleTypes.h"
+#include "elfStorage.h"
 
 //the lazy (long build time) way or define KeyboardKey (348)
 // #define MAGIC_ENUM_RANGE_MIN 0
@@ -122,16 +123,21 @@ DefineEngineFunction(RestoreWindow, void, (), , "Restore window from being minim
 }
 
 // RLAPI void SetWindowIcon(Image image);                            // Set icon for window (single image, RGBA 32bit)
-// FIXME
-// DefineEngineFunction(SetWindowIcon, void, (Image image), , "Set icon for window (single image, RGBA 32bit)"){
-//     SetWindowIcon(image);
-// }
+DefineEngineFunction(SetWindowIcon, void, (S32 imageId), , "Set icon for window (single image, RGBA 32bit)"){
+
+    Image* img = ElfResource::ImageMap.get(imageId);
+    if (img) SetWindowIcon(*img);
+    else Con::errorf("Image with id %d not found.", imageId);
+}
 
 // RLAPI void SetWindowIcons(Image *images, int count);              // Set icon for window (multiple images, RGBA 32bit)
-// FIXME
-// DefineEngineFunction(SetWindowIcons, void, (Image *images, int count), , "Set icon for window (multiple images, RGBA 32bit)"){
-//     SetWindowIcons(images, count);
-// }
+DefineEngineFunction(SetWindowIcons, void, (Vector<S32> imageIds, int count), , "Set icon for window (multiple images, RGBA 32bit)"){
+    auto images = ElfResource::ImageMap.getList(imageIds);
+    if (images.size() > 0) SetWindowIcons(images.data(), (int) images.size());
+    if ((int) images.size() != count) {
+        Con::warnf("ImagesIds size missmatch. got:%d, count is: %d", (int) images.size(),count);
+    }
+}
 
 // RLAPI void SetWindowTitle(const char *title);                     // Set title for window
 DefineEngineFunction(SetWindowTitle, void, (const char *title), , "Set title for window"){
