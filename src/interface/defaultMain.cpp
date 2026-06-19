@@ -19,6 +19,7 @@
 bool gShutDownRequest = false;
 extern void initEnum();
 extern void CustomTraceLog(int msgType, const char *text, va_list args);
+namespace ElfResource { extern void shutDown(); }
 
 int defaultMain(void)
 {
@@ -63,6 +64,7 @@ int defaultMain(void)
 
     Con::executef("MainShutdown");
     // -------- finallize
+    ElfResource::shutDown();
     engineGlue::shutDown();
 
     return 0;

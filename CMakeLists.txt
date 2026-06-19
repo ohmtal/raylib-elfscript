@@ -10,6 +10,8 @@ set(PROJECT_SRC
     src/interface/ConsoleTypes.cpp
     src/interface/elfBase.cpp
     src/interface/elfEnum.cpp
+    src/interface/elfResource.cpp
+    src/interface/elfImageResource.cpp
 )
 
 
