@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include "core/util/tVector.h"
 #include <vector>
+#include <console/console.h>
 
 namespace ElfResource {
 
@@ -69,10 +70,28 @@ struct ElfStorage {
         mId = 0;
     }
 
-
-
 };
 // -----------------------------------------------------------------------------------
+// Helper func to get Vector2  from: Vector<F32> pointValues, S32 pointCount
+// return nullptr if failed
+inline std::vector<Vector2> getVector2List(Vector<F32> pointValues, S32 pointCount) {
+    std::vector<Vector2> points;
+    if ( pointCount <= 0) return points;
+
+    if (pointValues.size() != (pointCount * 2)) {
+        Con::errorf("PointValues size (%d) does not match pointCount * 2 (%d)!", (int)pointValues.size(), pointCount * 2);
+        return points;
+    }
+
+    points.reserve(pointCount);
+
+    for (S32 i = 0; i < pointCount; ++i) {
+        points.push_back( { pointValues[i*2], pointValues[i*2+1] });
+    }
+    return points;
+}
+// -----------------------------------------------------------------------------------
+
 
 inline ElfStorage<Image, UnloadImage> ImageMap;
 inline ElfStorage<Texture2D, UnloadTexture> TextureMap;

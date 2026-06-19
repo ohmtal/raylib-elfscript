@@ -548,17 +548,9 @@ namespace ElfResource {
         Image* dst = ImageMap.get(dstId);
         if (!dst || pointCount <= 0) return;
 
-        if (pointValues.size() != (size_t)(pointCount * 2)) {
-            Con::errorf("PointValues size (%d) does not match pointCount * 2 (%d)!", (int)pointValues.size(), pointCount * 2);
-            return;
-        }
+        auto points = getVector2List(pointValues, pointCount);
+        if (points.size() != (size_t) pointCount ) return;
 
-        std::vector<Vector2> points;
-        points.reserve(pointCount);
-
-        for (S32 i = 0; i < pointCount; ++i) {
-            points.push_back( { pointValues[i*2], pointValues[i*2+1] });
-        }
         ImageDrawTriangleFan(dst, points.data(), pointCount, color);
     }
 
@@ -567,17 +559,9 @@ namespace ElfResource {
         Image* dst = ImageMap.get(dstId);
         if (!dst || pointCount <= 0) return;
 
-        if (pointValues.size() != (size_t)(pointCount * 2)) {
-            Con::errorf("PointValues size (%d) does not match pointCount * 2 (%d)!", (int)pointValues.size(), pointCount * 2);
-            return;
-        }
+        auto points = getVector2List(pointValues, pointCount);
+        if (points.size() != (size_t) pointCount ) return;
 
-        std::vector<Vector2> points;
-        points.reserve(pointCount);
-
-        for (S32 i = 0; i < pointCount; ++i) {
-            points.push_back( { pointValues[i*2], pointValues[i*2+1] });
-        }
         ImageDrawTriangleStrip(dst, points.data(), pointCount, color);
     }
 
