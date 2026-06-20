@@ -31,9 +31,9 @@
 
 
 #define TORQUE_SCRIPT_EXTENSION   "cs"
-#define TORQUE_APP_NAME            "ElfTestBed"
+#define TORQUE_APP_NAME            "raylib-elfscript"
 #define TORQUE_APP_VERSION         1000
-#define TORQUE_APP_VERSION_STRING  "26.06.06.0"
+#define TORQUE_APP_VERSION_STRING  "26.06.20.0"
 #define TORQUE_DISABLE_MEMORY_MANAGER
 
 /* #undef TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM */
@@ -62,4 +62,5 @@
 /// FrameAllocator being used as temporary storage for bitmaps in the D3D9
 /// texture manager.
 #define TORQUE_FRAME_SIZE     32 << 20
+
 
