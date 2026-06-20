@@ -1,6 +1,6 @@
 // Main Script
 
-$MODULES="Eyes DeltaTime LOADFAILTEST";
+$MODULES="Eyes DeltaTime LOADFAILTEST shapes_starfield_effect shapes_starfield_effect_v1";
 
 function Main::init(%this) {
     SetConfigFlags(%this.flags );

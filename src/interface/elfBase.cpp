@@ -349,12 +349,23 @@ DefineEngineFunction(SetRandomSeed, void, (unsigned int seed), , "Set the seed f
 DefineEngineFunction(GetRandomValue, int, (int min, int max), , "Get a random value between min and max (both included)"){
     return GetRandomValue(min, max);
 }
+DefineEngineFunction(GetRandomValues, Vector<S32>, (U32 count, S32 min, S32 max), ,
+            "Generate a list of random values. Unline LoadRandomSequence they are NOT uniqe "
+            "#elfScript custom function."
+)
+{
+    Vector<S32> result;
+    for (S32 i = 0; i < count; i++) result.push_back(GetRandomValue(min,max));
+    return result;
+}
+
 
 // RLAPI int *LoadRandomSequence(unsigned int count, int min, int max); // Load random values sequence, no values repeated
 DefineEngineFunction(LoadRandomSequence, Vector<S32>, (U32 count, S32 min, S32 max), ,
                      "Load random values sequence, no values repeated, unload automaticly done. "){
    int* sequence = LoadRandomSequence(count, min, max);
    Vector<S32> result;
+   if (!sequence) return result;
    for (S32 i = 0; i < count; i++) result.push_back(sequence[i]);
    UnloadRandomSequence(sequence);
    return result;
