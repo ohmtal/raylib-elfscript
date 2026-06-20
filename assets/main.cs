@@ -1,6 +1,6 @@
 // Main Script
 
-$MODULES="Eyes DeltaTime";
+$MODULES="Eyes DeltaTime LOADFAILTEST";
 
 function Main::init(%this) {
     SetConfigFlags(%this.flags );
@@ -50,7 +50,7 @@ function Main::loop(%this) {
     if (isObject(%this.module)){
         %this.module.update();
     }
-    if ( IsKeyDown($KEY_LEFT_CONTROL) || IsKeyDown($KEY_LEFT_CONTROL) ) {
+    if ( IsKeyDown($KEY_LEFT_CONTROL) || IsKeyDown($KEY_RIGHT_CONTROL) ) {
         if (IsKeyPressed($KEY_UP)) {
           %this.moduleIndex--;
           %this.loadModule();
@@ -68,9 +68,9 @@ function Main::loop(%this) {
         DrawText("Loaded module:" SPC %this.moduleName , 5, GetScreenHeight() - 30, 20, $BLUE);
         %this.module.render();
     } else {
-        DrawText("Failed to load module:" SPC %this.moduleName, 5, GetScreenHeight() - 30, 16, $GREEN);
+        DrawText("Failed to load module:" SPC %this.moduleName, 5, GetScreenHeight() - 30, 20, $RED);
     }
-    DrawText("CTRL + UP or DOWN to load an other module."  , 5, GetScreenHeight() - 50, 14, $BLACK);
+    DrawText("CTRL + UP or DOWN to load an other module. FPS:" SPC GetFPS()  , 5, GetScreenHeight() - 50, 20, $BLACK);
     EndDrawing();
 }
 
