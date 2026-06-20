@@ -71,9 +71,43 @@ struct ElfStorage {
     }
 
 };
+// -------------------------------------------------------------------------
+// Special for default font when id <=0 !
+// -------------------------------------------------------------------------
+template<>
+inline Font* ElfStorage<Font, UnloadFont>::get(S32 id) {
+    if (id <= 0) {
+        static Font defaultFont = GetFontDefault();
+        return &defaultFont;
+    }
+
+    // Das ist der originale Code aus Ihrem Template für alle anderen IDs
+    auto it = mMap.find(id);
+    if (it != mMap.end()) {
+        return &it->second;
+    }
+    return nullptr;
+}
+// -------------------------------------------------------------------------
+// Special for Typ Material
+// -------------------------------------------------------------------------
+template<>
+inline Material* ElfStorage<Material, UnloadMaterial>::get(S32 id) {
+    if (id <= 0) {
+        static Material defaultMaterial = LoadMaterialDefault();
+        return &defaultMaterial;
+    }
+
+    auto it = mMap.find(id);
+    if (it != mMap.end()) {
+        return &it->second;
+    }
+    return nullptr;
+}
+
+// -----------------------------------------------------------------------------------
 // -----------------------------------------------------------------------------------
 // Helper func to get Vector2  from: Vector<F32> pointValues, S32 pointCount
-// return nullptr if failed
 inline std::vector<Vector2> getVector2List(Vector<F32> pointValues, S32 pointCount) {
     std::vector<Vector2> points;
     if ( pointCount <= 0) return points;
@@ -92,10 +126,72 @@ inline std::vector<Vector2> getVector2List(Vector<F32> pointValues, S32 pointCou
 }
 // -----------------------------------------------------------------------------------
 
+inline std::vector<Vector3> getVector3List(Vector<F32> pointValues, S32 pointCount) {
+    std::vector<Vector3> points;
+    if (pointCount <= 0) return points;
+
+    if (pointValues.size() != (size_t)(pointCount * 3)) {
+        Con::errorf("getVector3List: pointValues size (%d) does not match pointCount * 3 (%d)!", (int)pointValues.size(), pointCount * 3);
+        return points;
+    }
+
+    points.reserve(pointCount);
+
+    for (S32 i = 0; i < pointCount; ++i) {
+        S32 idx = i * 3;
+        points.push_back({ pointValues[idx], pointValues[idx + 1], pointValues[idx + 2] });
+    }
+    return points;
+}
+// -----------------------------------------------------------------------------------
+
+inline std::vector<Vector4> getVector4List(Vector<F32> pointValues, S32 pointCount) {
+    std::vector<Vector4> points;
+    if (pointCount <= 0) return points;
+
+    if (pointValues.size() != (size_t)(pointCount * 4)) {
+        Con::errorf("getVector4List: pointValues size (%d) does not match pointCount * 4 (%d)!", (int)pointValues.size(), pointCount * 4);
+        return points;
+    }
+
+    points.reserve(pointCount);
+
+    for (S32 i = 0; i < pointCount; ++i) {
+        S32 idx = i * 4;
+        points.push_back({ pointValues[idx], pointValues[idx + 1], pointValues[idx + 2], pointValues[idx + 3] });
+    }
+    return points;
+}
+
+// -----------------------------------------------------------------------------------
+// Special for animations
+struct ElfAnimationBlock {
+    ModelAnimation* anims = nullptr;
+    unsigned int count = 0;
+};
+
+
+inline void UnloadElfAnimationBlock(ElfAnimationBlock block) {
+    if (block.anims != nullptr && block.count > 0) {
+        UnloadModelAnimations(block.anims, block.count);
+    }
+}
+// -----------------------------------------------------------------------------------
 
 inline ElfStorage<Image, UnloadImage> ImageMap;
 inline ElfStorage<Texture2D, UnloadTexture> TextureMap;
+inline ElfStorage<RenderTexture, UnloadRenderTexture> RenderTextureMap;
 inline ElfStorage<Font, UnloadFont> FontMap;
+inline ElfStorage<Model, UnloadModel> ModelMap;
+inline ElfStorage<Mesh, UnloadMesh> MeshMap;
+inline ElfStorage<Material, UnloadMaterial> MaterialsMap;
+inline ElfStorage<ElfAnimationBlock, UnloadElfAnimationBlock> ModelAnimationMap; //special
+inline ElfStorage<Shader, UnloadShader> ShadersMap;
+inline ElfStorage<Wave, UnloadWave> WaveMap;
+inline ElfStorage<Sound, UnloadSound> SoundMap;
+inline ElfStorage<Music, UnloadMusicStream> MusicMap;
+
+
 
 
 // -----------------------------------------------------------------------------------

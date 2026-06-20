@@ -12,6 +12,12 @@ set(PROJECT_SRC
     src/interface/elfEnum.cpp
     src/interface/elfResource.cpp
     src/interface/elfImageResource.cpp
+    src/interface/elfObjects.cpp
+    src/interface/elfDrawing.cpp
+    src/interface/elfModels.cpp
+    src/interface/elfAudio.cpp
+    src/interface/elfShader.cpp
+    src/interface/elfFile.cpp
 )
 
 

@@ -63,6 +63,9 @@ function MainInit() {
     // It's unloaded when programm ends automaticly
     //  UnloadImage($Game.iconImg);
 
+    $Game.Eyes = createEyes();
+    $Game.Eyes.init();
+
     return true;
 }
 
@@ -71,68 +74,71 @@ function MainShutDown() {
     CloseWindow();        // Close window and OpenGL context
 }
 
-function MainUpdate() {
+function MainLoop() {
 
-        // Update
-        //----------------------------------------------------------------------------------
-        // Adjust the FPS target based on the mouse wheel
-        %mouseWheel = GetMouseWheelMove();
-        if (%mouseWheel != 0)
-        {
-            $Game.currentFps += %mouseWheel;
-            if ($Game.currentFps < 0) $Game.currentFps = 0;
-            SetTargetFPS($Game.currentFps);
-        }
+    // Update
+    //----------------------------------------------------------------------------------
+    $Game.Eyes.update($Game.frameCircle);
+    $Game.Eyes.render();
+    //----------------------------------------------------------------------------------
+    // Adjust the FPS target based on the mouse wheel
+    %mouseWheel = GetMouseWheelMove();
+    if (%mouseWheel != 0)
+    {
+        $Game.currentFps += %mouseWheel;
+        if ($Game.currentFps < 0) $Game.currentFps = 0;
+        SetTargetFPS($Game.currentFps);
+    }
 
-        // GetFrameTime() returns the time it took to draw the last frame, in seconds (usually called delta time)
-        // Uses the delta time to make the circle look like it's moving at a "consistent" speed regardless of FPS
+    // GetFrameTime() returns the time it took to draw the last frame, in seconds (usually called delta time)
+    // Uses the delta time to make the circle look like it's moving at a "consistent" speed regardless of FPS
 
-        // Multiply by 6.0 (an arbitrary value) in order to make the speed
-        // visually closer to the other circle (at 60 fps), for comparison
+    // Multiply by 6.0 (an arbitrary value) in order to make the speed
+    // visually closer to the other circle (at 60 fps), for comparison
 
 
 
-        $Game.deltaCircle.x += GetFrameTime() * 6.0 * $Game.speed;
-        $Game.frameCircle.x += 0.1 * $Game.speed;
+    $Game.deltaCircle.x += GetFrameTime() * 6.0 * $Game.speed;
+    $Game.frameCircle.x += 0.1 * $Game.speed;
 
-        if ($Game.deltaCircle.x > $Game.screenWidth) $Game.deltaCircle.x = 0;
-        if ($Game.frameCircle.x > $Game.screenWidth) $Game.frameCircle.x = 0;
+    if ($Game.deltaCircle.x > $Game.screenWidth) $Game.deltaCircle.x = 0;
+    if ($Game.frameCircle.x > $Game.screenWidth) $Game.frameCircle.x = 0;
 
-        if (IsKeyPressed($KEY_R))
-        {
-            $Game.deltaCircle.x = 0;
-            $Game.frameCircle.x = 0;
-            $Game.currentFps = 60;
-            SetTargetFPS($Game.currentFps);
-        }
-        if (IsKeyPressed($KEY_U))
-        {
-            $Game.currentFps = 0;
-            SetTargetFPS($Game.currentFps);
-        }
+    if (IsKeyPressed($KEY_R))
+    {
+        $Game.deltaCircle.x = 0;
+        $Game.frameCircle.x = 0;
+        $Game.currentFps = 60;
+        SetTargetFPS($Game.currentFps);
+    }
+    if (IsKeyPressed($KEY_U))
+    {
+        $Game.currentFps = 0;
+        SetTargetFPS($Game.currentFps);
+    }
 
-        // Draw
-        //----------------------------------------------------------------------------------
-        BeginDrawing();
-        ClearBackground($RAYWHITE);
+    // Draw
+    //----------------------------------------------------------------------------------
+    BeginDrawing();
+    ClearBackground("120 120 120");
 
-        // Draw both circles to the screen
-        DrawCircleV($Game.deltaCircle, $Game.circleRadius + 2, $RED);
-        DrawCircleV($Game.frameCircle, $Game.circleRadius, $BLUE);
+    // Draw both circles to the screen
+    DrawCircleV($Game.deltaCircle, $Game.circleRadius + 2, $RED);
+    DrawCircleV($Game.frameCircle, $Game.circleRadius, $BLUE);
 
-        // Draw the help text
-        // Determine what help text to show depending on the current FPS target
-        // NOTE strFormat only takes ONE parameter so I use SPC concat in second
-        if ($Game.currentFps <= 0) %fpsText = strFormat("FPS: unlimited (%i)", GetFPS());
-        else %fpsText = "FPS: " SPC GetFPS() SPC "target: " SPC $Game.currentFps;
-        DrawText(%fpsText, 10, 10, 20, $DARKGRAY);
-        DrawText(strFormat("Frame time: %02.02f ms", GetFrameTime()), 10, 30, 20, $DARKGRAY);
-        DrawText("Use the scroll wheel to change the fps limit, r to reset, u for unlimited", 10, 50, 20, $DARKGRAY);
+    // Draw the help text
+    // Determine what help text to show depending on the current FPS target
+    // NOTE strFormat only takes ONE parameter so I use SPC concat in second
+    if ($Game.currentFps <= 0) %fpsText = strFormat("FPS: unlimited (%i)", GetFPS());
+    else %fpsText = "FPS: " SPC GetFPS() SPC "target: " SPC $Game.currentFps;
+    DrawText(%fpsText, 10, 10, 20, $DARKGRAY);
+    DrawText(strFormat("Frame time: %02.02f ms", GetFrameTime()), 10, 30, 20, $DARKGRAY);
+    DrawText("Use the scroll wheel to change the fps limit, r to reset, u for unlimited", 10, 50, 20, $DARKGRAY);
 
-        // Draw the text above the circles
-        DrawText("FUNC: x += GetFrameTime()*speed", 10, 90, 20, $RED);
-        DrawText("FUNC: x += speed", 10, 240, 20, $BLUE);
+    // Draw the text above the circles
+    DrawText("FUNC: x += GetFrameTime()*speed", 10, 90, 20, $RED);
+    DrawText("FUNC: x += speed", 10, 240, 20, $BLUE);
 
-        EndDrawing();
+    EndDrawing();
 
 }

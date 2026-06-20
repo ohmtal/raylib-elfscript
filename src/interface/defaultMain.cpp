@@ -32,12 +32,12 @@ int defaultMain(void)
         return 1;
     }
 
-    if (!Con::isFunction("MainUpdate")) {
-        Con::errorf("MainUpdate function is missing!");
+    if (!Con::isFunction("MainLoop")) {
+        Con::errorf("MainLoop function is missing!");
         return 1;
     }
 
-    //FIXME arguments are scrambled.... SetTraceLogCallback(CustomTraceLog);
+    SetTraceLogCallback(CustomTraceLog);
     ConsoleValue initResult = Con::executef("MainInit");
     if (initResult.getBool() == false) {
         Con::errorf("init failed");
@@ -54,7 +54,7 @@ int defaultMain(void)
     // --------- advance time for scheduler this should be placed in the main loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
-        Con::executef("MainUpdate");
+        Con::executef("MainLoop");
         #if defined(__unix__)
         stdConsole->process();
         #endif

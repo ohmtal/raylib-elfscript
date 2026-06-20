@@ -53,7 +53,7 @@ function MainShutDown() {
     CloseWindow();        // Close window and OpenGL context
 }
 
-function MainUpdate() {
+function MainLoop() {
 
         // Update
         //----------------------------------------------------------------------------------

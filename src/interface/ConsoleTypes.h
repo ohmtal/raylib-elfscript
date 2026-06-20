@@ -27,20 +27,20 @@ DefineConsoleType( TypeVector2, Vector2 )
 DECLARE_STRUCT( Vector3 );
 DefineConsoleType( TypeVector3, Vector3 )
 
+DECLARE_STRUCT( Vector4 );
+DefineConsoleType( TypeVector4, Vector4 )
+
 
 DECLARE_STRUCT( Rectangle );
 DefineConsoleType( TypeRectangle, Rectangle )
 
-// DECLARE_STRUCT_R(Point2I);
-// DefineConsoleType( TypePoint2I, Point2I )
-//
-// DECLARE_STRUCT( RectI );
-// DECLARE_STRUCT( RectF );
-// DECLARE_STRUCT( Point2F );
-
-//
-// DefineConsoleType( TypeRectI, RectI )
-// DefineConsoleType( TypeRectF, RectF )
+DECLARE_STRUCT( Ray );
+DefineConsoleType( TypeRay, Ray )
 
 
+DECLARE_STRUCT( BoundingBox );
+DefineConsoleType( TypeBoundingBox, BoundingBox )
+
+DECLARE_STRUCT( Matrix );
+DefineConsoleType( TypeMatrix, Matrix );
 

@@ -20,18 +20,49 @@
 // -----------------------------------------------------------------------------
 //FIXME what it that ? =>
 //  TEXTURE: [ID 125595416] Texture loaded successfully (125595416x-2118071736 | UH��H�� �}�H�u�H�U��}�tn�}��� | -2118068406 mipmaps)
+// void CustomTraceLog(int msgType, const char *text, va_list args)
+// {
+//     switch (msgType)
+//     {
+//         case LOG_INFO: Con::infof(text,args); break;
+//         case LOG_ERROR: Con::errorf(text,args); break;
+//         case LOG_FATAL: Con::errorf(text,args); break;
+//         case LOG_WARNING: Con::warnf(text,args); break;
+//         case LOG_DEBUG: ; break;
+//         default: break;
+//     }
+// }
+
 void CustomTraceLog(int msgType, const char *text, va_list args)
 {
+
+    ConsoleLogEntry::Level level = ConsoleLogEntry::Normal;
+
     switch (msgType)
     {
-        case LOG_INFO: Con::infof(text,args); break;
-        case LOG_ERROR: Con::errorf(text,args); break;
-        case LOG_FATAL: Con::errorf(text,args); break;
-        case LOG_WARNING: Con::warnf(text,args); break;
-        case LOG_DEBUG: Con::debugf(text,args); break;
-        default: break;
+        case LOG_INFO:    level = ConsoleLogEntry::Normal; break;
+        case LOG_WARNING: level = ConsoleLogEntry::Warning; break;
+        case LOG_ERROR:   level = ConsoleLogEntry::Error; break;
+        case LOG_FATAL:   level = ConsoleLogEntry::Error; break;
+        case LOG_DEBUG:   level = ConsoleLogEntry::Normal; break; // Oder ein eigener Debug-Typ
+        default: return;
     }
+
+
+    Con::LogEntry(level, ConsoleLogEntry::General, text, args);
 }
+// -----------------------------------------------------------------------------
+// Logging system
+// -----------------------------------------------------------------------------
+// RLAPI void SetTraceLogLevel(int logLevel);                      // Set the current threshold (minimum) log level
+DefineEngineFunction( SetTraceLogLevel, void, (int logLevel), , "Set the current threshold (minimum) raylib log level (e.g. 2 = LOG_TRACE, 3 = LOG_DEBUG, 4 = LOG_INFO...)") {
+    SetTraceLogLevel(logLevel);
+}
+
+//RLAPI void SetTraceLogLevel(int logLevel);                      // Set the current threshold (minimum) log level
+// RLAPI void TraceLog(int logLevel, const char *text, ...);       // Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
+// RLAPI void SetTraceLogCallback(TraceLogCallback callback);      // Set custom trace log
+
 // -----------------------------------------------------------------------------
 // Window-related functions
 // -----------------------------------------------------------------------------
@@ -272,10 +303,11 @@ DefineEngineFunction(GetClipboardText, const char *, (), , "Get clipboard text c
 }
 
 // RLAPI Image GetClipboardImage(void);                              // Get clipboard image content
-// FIXME
-// DefineEngineFunction(GetClipboardImage, Image, (), , "Get clipboard image content"){
-//     return GetClipboardImage();
-// }
+DefineEngineFunction(GetClipboardImage, S32, (), , "Get clipboard image content"){
+    Image img = GetClipboardImage();
+    if (!IsImageValid(img)) return 0;
+    return ElfResource::ImageMap.add(img);
+}
 
 // RLAPI void EnableEventWaiting(void);                              // Enable waiting for events on EndDrawing(), no automatic event polling
 DefineEngineFunction(EnableEventWaiting, void, (), , "Enable waiting for events on EndDrawing(), no automatic event polling"){
@@ -319,13 +351,16 @@ DefineEngineFunction(GetRandomValue, int, (int min, int max), , "Get a random va
 }
 
 // RLAPI int *LoadRandomSequence(unsigned int count, int min, int max); // Load random values sequence, no values repeated
-// FIXME
-// DefineEngineFunction(LoadRandomSequence, int *, (unsigned int count, int min, int max), , "Load random values sequence, no values repeated"){
-//     return LoadRandomSequence(count, min, max);
-// }
+DefineEngineFunction(LoadRandomSequence, Vector<S32>, (U32 count, S32 min, S32 max), ,
+                     "Load random values sequence, no values repeated, unload automaticly done. "){
+   int* sequence = LoadRandomSequence(count, min, max);
+   Vector<S32> result;
+   for (S32 i = 0; i < count; i++) result.push_back(sequence[i]);
+   UnloadRandomSequence(sequence);
+   return result;
+}
 
 // RLAPI void UnloadRandomSequence(int *sequence);         // Unload random values sequence
-// FIXME
 // DefineEngineFunction(UnloadRandomSequence, void, (int *sequence), , "Unload random values sequence"){
 //     UnloadRandomSequence(sequence);
 // }
@@ -377,49 +412,52 @@ DefineEngineFunction(BeginDrawing, void, (),,"Begin canvas (framebuffer) drawing
 DefineEngineFunction(EndDrawing, void, (),," End canvas (framebuffer) drawing and swap buffers (double buffering)"){
     EndDrawing();
 }
-// RLAPI void BeginMode2D(Camera2D camera);                          // Begin 2D mode with custom camera (2D)
-// RLAPI void EndMode2D(void);                                       // End 2D mode with custom camera
-// RLAPI void BeginMode3D(Camera3D camera);                          // Begin 3D mode with custom camera (3D)
-// RLAPI void EndMode3D(void);                                       // End 3D mode and returns to default 2D orthographic mode
-// RLAPI void BeginTextureMode(RenderTexture2D target);              // Begin drawing to render texture
-// RLAPI void EndTextureMode(void);                                  // End drawing to render texture
+
+// RLAPI void BeginTextureMode(RenderTexture2D target);                                                     // Begins drawing to render texture
+DefineEngineFunction( BeginTextureMode, void, (S32 renderTextureId), , "Begins drawing to render texture") {
+    RenderTexture2D* target = ElfResource::RenderTextureMap.get(renderTextureId);
+    if (!target) return;
+    BeginTextureMode(*target);
+}
+DefineEngineFunction(EndTextureMode, void, (),, " End drawing to render texture") {
+    EndTextureMode();
+}
+
+// NOTE: in elfShader.cpp
 // RLAPI void BeginShaderMode(Shader shader);                        // Begin custom shader drawing
 // RLAPI void EndShaderMode(void);                                   // End custom shader drawing (use default shader)
+
+
 // RLAPI void BeginBlendMode(int mode);                              // Begin blending mode (alpha, additive, multiplied, subtract, custom)
+DefineEngineFunction( BeginBlendMode, void, (int mode), , "Begin blending mode (e.g. BLEND_ALPHA, BLEND_ADDITIVE, BLEND_MULTIPLIED)") {
+    BeginBlendMode(mode);
+}
+
 // RLAPI void EndBlendMode(void);                                    // End blending mode (reset to default: alpha blending)
+DefineEngineFunction( EndBlendMode, void, (), , "End blending mode (reset to default: alpha blending)") {
+    EndBlendMode();
+}
+
 // RLAPI void BeginScissorMode(int x, int y, int width, int height); // Begin scissor mode (define screen area for following drawing)
+DefineEngineFunction( BeginScissorMode, void, (int x, int y, int width, int height), , "Begin scissor mode (define screen area for following drawing)") {
+    BeginScissorMode(x, y, width, height);
+}
+
 // RLAPI void EndScissorMode(void);                                  // End scissor mode
+DefineEngineFunction( EndScissorMode, void, (), , "End scissor mode") {
+    EndScissorMode();
+}
+
+
+
+//NOTE not implemented:
 // RLAPI void BeginVrStereoMode(VrStereoConfig config);              // Begin stereo rendering (requires VR simulator)
 // RLAPI void EndVrStereoMode(void);                                 // End stereo rendering (requires VR simulator)
 
-// -----------------------------------------------------------------------------
-// Text drawing functions
-// -----------------------------------------------------------------------------
-// RLAPI void DrawFPS(int posX, int posY);                                                     // Draw current FPS
-DefineEngineFunction( DrawText, void, (const char *text, int posX, int posY
-    , int fontSize, Color color), (12 , RAYWHITE), "Draw text (using default font") {
-        DrawText(text,posX, posY, fontSize, color);
-    }
-
-    //FIXME FONT !!
-    // // RLAPI void DrawTextEx(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint); // Draw text using font and additional parameters
-    // DefineEngineFunction( DrawTextEx, void, (Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint), (RAYWHITE), "Draw text using font and additional parameters") {
-    //     DrawTextEx(font, text, position, fontSize, spacing, tint);
-    // }
-    //
-    // // RLAPI void DrawTextPro(Font font, const char *text, Vector2 position, Vector2 origin, float rotation, float fontSize, float spacing, Color tint); // Draw text using Font and pro parameters (rotation)
-    // DefineEngineFunction( DrawTextPro, void, (Font font, const char *text, Vector2 position,
-    //                 Vector2 origin, float rotation, float fontSize, float spacing, Color tint), (RAYWHITE),
-    //                 "Draw text using Font and pro parameters (rotation)") {
-    //     DrawTextPro(font, text, position, origin, rotation, fontSize, spacing, tint);
-    // }
-// RLAPI void DrawTextCodepoint(Font font, int codepoint, Vector2 position, float fontSize, Color tint); // Draw one character (codepoint)
-// RLAPI void DrawTextCodepoints(Font font, const int *codepoints, int codepointCount, Vector2 position, float fontSize, float spacing, Color tint); // Draw multiple characters (codepoint)
 
 // -----------------------------------------------------------------------------
 // Input-related functions: keyboard
 // -----------------------------------------------------------------------------
-                         //
 DefineEngineFunction(IsKeyPressed, bool, (S32 key), , "Check if a key has been pressed once"){
     return IsKeyPressed(key);
 }
@@ -446,7 +484,7 @@ DefineEngineFunction( GetCharPressed, int, (void), , "Get char pressed (unicode)
 }
 
 // RLAPI const char *GetKeyName(int key);                        // Get name of a QWERTY key on the current keyboard layout (eg returns string 'q' for KEY_A on an AZERTY keyboard)
-// FIXME: not working ???? GetKeyName return nullptr
+// TODO: not working ???? GetKeyName return nullptr
 // DefineEngineFunction( GetKeyName, String, (int key), , " Get name of a QWERTY key on the current keyboard layout (eg returns string 'q' for KEY_A on an AZERTY keyboard)") {
 //
 //     String result = GetKeyName(key);
@@ -491,298 +529,110 @@ DefineEngineFunction( GetMouseDelta, Vector2, (), , " Get mouse delta XY") {
 }
 
 // RLAPI void SetMousePosition(int x, int y);                    // Set mouse position XY
+DefineEngineFunction( SetMousePosition, void, (int x, int y), , "Set mouse position XY on the screen") {
+    SetMousePosition(x, y);
+}
+
 // RLAPI void SetMouseOffset(int offsetX, int offsetY);          // Set mouse offset
+DefineEngineFunction( SetMouseOffset, void, (int offsetX, int offsetY), , "Set mouse offset (useful for custom rendering resolution scaling)") {
+    SetMouseOffset(offsetX, offsetY);
+}
+
 // RLAPI void SetMouseScale(float scaleX, float scaleY);         // Set mouse scaling
+DefineEngineFunction( SetMouseScale, void, (float scaleX, float scaleY), , "Set mouse scaling for its coordinates (useful for custom rendering resolution scaling)") {
+    SetMouseScale(scaleX, scaleY);
+}
+
 DefineEngineFunction( GetMouseWheelMove, F32, (), , " Get mouse wheel movement for X or Y, whichever is larger") {
     return GetMouseWheelMove();
 }
 // RLAPI Vector2 GetMouseWheelMoveV(void);                       // Get mouse wheel movement for both X and Y
+DefineEngineFunction( GetMouseWheelMoveV, Vector2, (), , "Get mouse wheel movement for both X and Y as a Vector2") {
+    return GetMouseWheelMoveV();
+}
+
 // RLAPI void SetMouseCursor(int cursor);                        // Set mouse cursor
-// -----------------------------------------------------------------------------
-// Basic shapes drawing functions
-// -----------------------------------------------------------------------------
-// RLAPI void DrawPixel(int posX, int posY, Color color);                                                   // Draw a pixel using geometry [Can be slow, use with care]
-DefineEngineFunction( DrawPixel, void, (int posX, int posY, Color color), (RAYWHITE), "Draw a pixel using geometry [Can be slow, use with care]") {
-    DrawPixel(posX, posY, color);
-}
-
-// RLAPI void DrawPixelV(Vector2 position, Color color);                                                    // Draw a pixel using geometry (Vector version) [Can be slow, use with care]
-DefineEngineFunction( DrawPixelV, void, (Vector2 position, Color color), (RAYWHITE), "Draw a pixel using geometry (Vector version) [Can be slow, use with care]") {
-    DrawPixelV(position, color);
-}
-
-// RLAPI void DrawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color);                // Draw a line
-DefineEngineFunction( DrawLine, void, (int startPosX, int startPosY, int endPosX, int endPosY, Color color), (RAYWHITE), "Draw a line") {
-    DrawLine(startPosX, startPosY, endPosX, endPosY, color);
-}
-
-// RLAPI void DrawLineV(Vector2 startPos, Vector2 endPos, Color color);                                     // Draw a line (using gl lines)
-DefineEngineFunction( DrawLineV, void, (Vector2 startPos, Vector2 endPos, Color color), (RAYWHITE), "Draw a line (using gl lines)") {
-    DrawLineV(startPos, endPos, color);
-}
-
-// RLAPI void DrawLineEx(Vector2 startPos, Vector2 endPos, float thick, Color color);                       // Draw a line (using triangles/quads)
-DefineEngineFunction( DrawLineEx, void, (Vector2 startPos, Vector2 endPos, float thick, Color color), (RAYWHITE), "Draw a line (using triangles/quads)") {
-    DrawLineEx(startPos, endPos, thick, color);
-}
-
-//FIXME pointer ^^
-// RLAPI void DrawLineStrip(const Vector2 *points, int pointCount, Color color);                            // Draw lines sequence (using gl lines)
-// DefineEngineFunction( DrawLineStrip, void, (const Vector2 points, int pointCount, Color color), (RAYWHITE), "Draw lines sequence (using gl lines)") {
-//     DrawLineStrip(points, pointCount, color);
-// }
-
-// RLAPI void DrawLineBezier(Vector2 startPos, Vector2 endPos, float thick, Color color);                   // Draw line segment cubic-bezier in-out interpolation
-DefineEngineFunction( DrawLineBezier, void, (Vector2 startPos, Vector2 endPos, float thick, Color color), (RAYWHITE), "Draw line segment cubic-bezier in-out interpolation") {
-    DrawLineBezier(startPos, endPos, thick, color);
-}
-
-// RLAPI void DrawLineDashed(Vector2 startPos, Vector2 endPos, int dashSize, int spaceSize, Color color);   // Draw a dashed line
-DefineEngineFunction( DrawLineDashed, void, (Vector2 startPos, Vector2 endPos, int dashSize, int spaceSize, Color color), (RAYWHITE), "Draw a dashed line") {
-    DrawLineDashed(startPos, endPos, dashSize, spaceSize, color);
-}
-
-// RLAPI void DrawCircle(int centerX, int centerY, float radius, Color color);                              // Draw a color-filled circle
-DefineEngineFunction( DrawCircle, void, (int centerX, int centerY, float radius, Color color), (RAYWHITE), "Draw a color-filled circle") {
-    DrawCircle(centerX, centerY, radius, color);
-}
-
-// RLAPI void DrawCircleV(Vector2 center, float radius, Color color); // Draw a filled circle within an image (Vector version)
-DefineEngineFunction( DrawCircleV, void, (Vector2 center, float radius, Color color), (RAYWHITE), "Draw a filled circle within an image (Vector version)") {
-    DrawCircleV(center, radius, color);
-}
-
-// RLAPI void DrawCircleGradient(Vector2 center, float radius, Color inner, Color outer);                   // Draw a gradient-filled circle
-DefineEngineFunction( DrawCircleGradient, void, (Vector2 center, float radius, Color inner,
-            Color outer), , "Draw a gradient-filled circle") {
-    DrawCircleGradient(center, radius, inner, outer);
-}
-
-// RLAPI void DrawCircleSector(Vector2 center, float radius, float startAngle, float endAngle, int segments, Color color); // Draw a piece of a circle
-DefineEngineFunction( DrawCircleSector, void, (Vector2 center, float radius, float startAngle, float endAngle, int segments, Color color), (RAYWHITE), "Draw a piece of a circle") {
-    DrawCircleSector(center, radius, startAngle, endAngle, segments, color);
-}
-
-// RLAPI void DrawCircleSectorLines(Vector2 center, float radius, float startAngle, float endAngle, int segments, Color color); // Draw circle sector outline
-DefineEngineFunction( DrawCircleSectorLines, void, (Vector2 center, float radius, float startAngle, float endAngle, int segments, Color color), (RAYWHITE), "Draw circle sector outline") {
-    DrawCircleSectorLines(center, radius, startAngle, endAngle, segments, color);
-}
-
-// RLAPI void DrawCircleLines(int centerX, int centerY, float radius, Color color);                         // Draw circle outline
-DefineEngineFunction( DrawCircleLines, void, (int centerX, int centerY, float radius, Color color), (RAYWHITE), "Draw circle outline") {
-    DrawCircleLines(centerX, centerY, radius, color);
-}
-
-// RLAPI void DrawCircleLinesV(Vector2 center, float radius, Color color);                                  // Draw circle outline (Vector version)
-DefineEngineFunction( DrawCircleLinesV, void, (Vector2 center, float radius, Color color), (RAYWHITE), "Draw circle outline (Vector version)") {
-    DrawCircleLinesV(center, radius, color);
-}
-
-// RLAPI void DrawEllipse(int centerX, int centerY, float radiusH, float radiusV, Color color);             // Draw ellipse
-DefineEngineFunction( DrawEllipse, void, (int centerX, int centerY, float radiusH, float radiusV, Color color), (RAYWHITE), "Draw ellipse") {
-    DrawEllipse(centerX, centerY, radiusH, radiusV, color);
-}
-
-// RLAPI void DrawEllipseV(Vector2 center, float radiusH, float radiusV, Color color);                      // Draw ellipse (Vector version)
-DefineEngineFunction( DrawEllipseV, void, (Vector2 center, float radiusH, float radiusV, Color color), (RAYWHITE), "Draw ellipse (Vector version)") {
-    DrawEllipseV(center, radiusH, radiusV, color);
-}
-
-// RLAPI void DrawEllipseLines(int centerX, int centerY, float radiusH, float radiusV, Color color);        // Draw ellipse outline
-DefineEngineFunction( DrawEllipseLines, void, (int centerX, int centerY, float radiusH, float radiusV, Color color), (RAYWHITE), "Draw ellipse outline") {
-    DrawEllipseLines(centerX, centerY, radiusH, radiusV, color);
-}
-
-// RLAPI void DrawEllipseLinesV(Vector2 center, float radiusH, float radiusV, Color color);                 // Draw ellipse outline (Vector version)
-DefineEngineFunction( DrawEllipseLinesV, void, (Vector2 center, float radiusH, float radiusV, Color color), (RAYWHITE), "Draw ellipse outline (Vector version)") {
-    DrawEllipseLinesV(center, radiusH, radiusV, color);
-}
-
-// RLAPI void DrawRing(Vector2 center, float innerRadius, float outerRadius, float startAngle, float endAngle, int segments, Color color); // Draw ring
-DefineEngineFunction( DrawRing, void, (Vector2 center, float innerRadius, float outerRadius, float startAngle, float endAngle, int segments, Color color), (RAYWHITE), "Draw ring") {
-    DrawRing(center, innerRadius, outerRadius, startAngle, endAngle, segments, color);
-}
-
-// RLAPI void DrawRingLines(Vector2 center, float innerRadius, float outerRadius, float startAngle, float endAngle, int segments, Color color); // Draw ring outline
-DefineEngineFunction( DrawRingLines, void, (Vector2 center, float innerRadius, float outerRadius, float startAngle, float endAngle, int segments, Color color), (RAYWHITE), "Draw ring outline") {
-    DrawRingLines(center, innerRadius, outerRadius, startAngle, endAngle, segments, color);
-}
-
-// RLAPI void DrawRectangle(int posX, int posY, int width, int height, Color color);                        // Draw a color-filled rectangle
-DefineEngineFunction( DrawRectangle, void, (int posX, int posY, int width, int height, Color color), (RAYWHITE), "Draw a color-filled rectangle") {
-    DrawRectangle(posX, posY, width, height, color);
-}
-
-// RLAPI void DrawRectangleV(Vector2 position, Vector2 size, Color color);                                  // Draw a color-filled rectangle (Vector version)
-DefineEngineFunction( DrawRectangleV, void, (Vector2 position, Vector2 size, Color color), (RAYWHITE), "Draw a color-filled rectangle (Vector version)") {
-    DrawRectangleV(position, size, color);
-}
-
-// RLAPI void DrawRectangleRec(Rectangle rec, Color color);                                                 // Draw a color-filled rectangle
-DefineEngineFunction( DrawRectangleRec, void, (Rectangle rec, Color color), (RAYWHITE), "Draw a color-filled rectangle") {
-    DrawRectangleRec(rec, color);
-}
-
-// RLAPI void DrawRectanglePro(Rectangle rec, Vector2 origin, float rotation, Color color);                 // Draw a color-filled rectangle with pro parameters
-DefineEngineFunction( DrawRectanglePro, void, (Rectangle rec, Vector2 origin, float rotation, Color color), (RAYWHITE), "Draw a color-filled rectangle with pro parameters") {
-    DrawRectanglePro(rec, origin, rotation, color);
-}
-
-// RLAPI void DrawRectangleGradientV(int posX, int posY, int width, int height, Color top, Color bottom);   // Draw a vertical-gradient-filled rectangle
-DefineEngineFunction( DrawRectangleGradientV, void, (int posX, int posY, int width, int height,
-        Color top, Color bottom), , "Draw a vertical-gradient-filled rectangle") {
-    DrawRectangleGradientV(posX, posY, width, height, top, bottom);
-}
-
-// RLAPI void DrawRectangleGradientH(int posX, int posY, int width, int height, Color left, Color right);   // Draw a horizontal-gradient-filled rectangle
-DefineEngineFunction( DrawRectangleGradientH, void, (int posX, int posY, int width, int height,
-        Color left, Color right), , "Draw a horizontal-gradient-filled rectangle") {
-    DrawRectangleGradientH(posX, posY, width, height, left, right);
-}
-
-// RLAPI void DrawRectangleGradientEx(Rectangle rec, Color topLeft, Color bottomLeft, Color bottomRight, Color topRight); // Draw a gradient-filled rectangle with custom vertex colors
-DefineEngineFunction( DrawRectangleGradientEx, void,
-                (Rectangle rec, Color topLeft, Color bottomLeft, Color bottomRight, Color topRight)
-                , , "Draw a gradient-filled rectangle with custom vertex colors") {
-    DrawRectangleGradientEx(rec, topLeft, bottomLeft, bottomRight, topRight);
-}
-
-// RLAPI void DrawRectangleLines(int posX, int posY, int width, int height, Color color);                   // Draw rectangle outline
-DefineEngineFunction( DrawRectangleLines, void, (int posX, int posY, int width, int height, Color color), (RAYWHITE), "Draw rectangle outline") {
-    DrawRectangleLines(posX, posY, width, height, color);
-}
-
-// RLAPI void DrawRectangleLinesEx(Rectangle rec, float lineThick, Color color);                            // Draw rectangle outline with extended parameters
-DefineEngineFunction( DrawRectangleLinesEx, void, (Rectangle rec, float lineThick, Color color), (RAYWHITE), "Draw rectangle outline with extended parameters") {
-    DrawRectangleLinesEx(rec, lineThick, color);
-}
-
-// RLAPI void DrawRectangleRounded(Rectangle rec, float roundness, int segments, Color color);              // Draw rectangle with rounded edges
-DefineEngineFunction( DrawRectangleRounded, void, (Rectangle rec, float roundness, int segments, Color color), (RAYWHITE), "Draw rectangle with rounded edges") {
-    DrawRectangleRounded(rec, roundness, segments, color);
-}
-
-// RLAPI void DrawRectangleRoundedLines(Rectangle rec, float roundness, int segments, Color color);         // Draw rectangle lines with rounded edges
-DefineEngineFunction( DrawRectangleRoundedLines, void, (Rectangle rec, float roundness, int segments, Color color), (RAYWHITE), "Draw rectangle lines with rounded edges") {
-    DrawRectangleRoundedLines(rec, roundness, segments, color);
-}
-
-// RLAPI void DrawRectangleRoundedLinesEx(Rectangle rec, float roundness, int segments, float lineThick, Color color); // Draw rectangle lines with rounded edges outline
-DefineEngineFunction( DrawRectangleRoundedLinesEx, void, (Rectangle rec, float roundness, int segments, float lineThick, Color color), (RAYWHITE), "Draw rectangle lines with rounded edges outline") {
-    DrawRectangleRoundedLinesEx(rec, roundness, segments, lineThick, color);
-}
-
-// RLAPI void DrawTriangle(Vector2 v1, Vector2 v2, Vector2 v3, Color color);                                // Draw a color-filled triangle (vertex in counter-clockwise order!)
-DefineEngineFunction( DrawTriangle, void, (Vector2 v1, Vector2 v2, Vector2 v3, Color color), (RAYWHITE), "Draw a color-filled triangle (vertex in counter-clockwise order!)") {
-    DrawTriangle(v1, v2, v3, color);
-}
-
-// RLAPI void DrawTriangleGradient(Vector2 v1, Vector2 v2, Vector2 v3, Color c1, Color c2, Color c3);       // Draw triangle with interpolated colors (vertex in counter-clockwise order!)
-DefineEngineFunction( DrawTriangleGradient, void, (
-        Vector2 v1, Vector2 v2, Vector2 v3,
-        Color c1, Color c2, Color c3), ,
-        "Draw triangle with interpolated colors (vertex in counter-clockwise order!)") {
-    DrawTriangleGradient(v1, v2, v3, c1, c2, c3);
-}
-
-// RLAPI void DrawTriangleLines(Vector2 v1, Vector2 v2, Vector2 v3, Color color);                           // Draw triangle outline (vertex in counter-clockwise order!)
-DefineEngineFunction( DrawTriangleLines, void, (Vector2 v1, Vector2 v2, Vector2 v3, Color color), (RAYWHITE), "Draw triangle outline (vertex in counter-clockwise order!)") {
-    DrawTriangleLines(v1, v2, v3, color);
-}
-
-//FIXME POINTER
-// RLAPI void DrawTriangleFan(const Vector2 *points, int pointCount, Color color);                          // Draw a triangle fan defined by points (first vertex is the center)
-// DefineEngineFunction( DrawTriangleFan, void, (const Vector2 *points, int pointCount, Color color), (RAYWHITE), "Draw a triangle fan defined by points (first vertex is the center)") {
-//     DrawTriangleFan(points, pointCount, color);
-// }
-
-//FIXME POINTER
-// RLAPI void DrawTriangleStrip(const Vector2 *points, int pointCount, Color color);                        // Draw a triangle strip defined by points
-// DefineEngineFunction( DrawTriangleStrip, void, (const Vector2 *points, int pointCount, Color color), (RAYWHITE), "Draw a triangle strip defined by points") {
-//     DrawTriangleStrip(points, pointCount, color);
-// }
-
-// RLAPI void DrawPoly(Vector2 center, int sides, float radius, float rotation, Color color);               // Draw a polygon of n sides
-DefineEngineFunction( DrawPoly, void, (Vector2 center, int sides, float radius, float rotation, Color color), (RAYWHITE), "Draw a polygon of n sides") {
-    DrawPoly(center, sides, radius, rotation, color);
-}
-
-// RLAPI void DrawPolyLines(Vector2 center, int sides, float radius, float rotation, Color color);          // Draw a polygon outline of n sides
-DefineEngineFunction( DrawPolyLines, void, (Vector2 center, int sides, float radius, float rotation, Color color), (RAYWHITE), "Draw a polygon outline of n sides") {
-    DrawPolyLines(center, sides, radius, rotation, color);
-}
-
-// RLAPI void DrawPolyLinesEx(Vector2 center, int sides, float radius, float rotation, float lineThick, Color color); // Draw a polygon outline of n sides with extended parameters
-DefineEngineFunction( DrawPolyLinesEx, void, (Vector2 center, int sides, float radius, float rotation, float lineThick, Color color), (RAYWHITE), "Draw a polygon outline of n sides with extended parameters") {
-    DrawPolyLinesEx(center, sides, radius, rotation, lineThick, color);
+DefineEngineFunction( SetMouseCursor, void, (int cursor), , "Set mouse cursor icon type (e.g. MOUSE_CURSOR_IBEAM, MOUSE_CURSOR_POINT)") {
+    SetMouseCursor(cursor);
 }
 // -----------------------------------------------------------------------------
-// Splines drawing functions
+// Input-related functions: touch
 // -----------------------------------------------------------------------------
-// RLAPI void DrawSplineLinear(const Vector2 *points, int pointCount, float thick, Color color);            // Draw spline: Linear, minimum 2 points
-//FIXME POINTER
-
-// RLAPI void DrawSplineBasis(const Vector2 *points, int pointCount, float thick, Color color);             // Draw spline: B-Spline, minimum 4 points
-//FIXME POINTER
-
-// RLAPI void DrawSplineCatmullRom(const Vector2 *points, int pointCount, float thick, Color color);        // Draw spline: Catmull-Rom, minimum 4 points
-//FIXME POINTER
-
-// RLAPI void DrawSplineBezierQuadratic(const Vector2 *points, int pointCount, float thick, Color color);   // Draw spline: Quadratic Bezier, minimum 3 points (1 control point): [p1, c2, p3, c4...]
-//FIXME POINTER
-
-// RLAPI void DrawSplineBezierCubic(const Vector2 *points, int pointCount, float thick, Color color);       // Draw spline: Cubic Bezier, minimum 4 points (2 control points): [p1, c2, c3, p4, c5, c6...]
-//FIXME POINTER
-
-// RLAPI void DrawSplineSegmentLinear(Vector2 p1, Vector2 p2, float thick, Color color);                    // Draw spline segment: Linear, 2 points
-DefineEngineFunction( DrawSplineSegmentLinear, void, (Vector2 p1, Vector2 p2, float thick, Color color), (RAYWHITE), "Draw spline segment: Linear, 2 points") {
-    DrawSplineSegmentLinear(p1, p2, thick, color);
+// RLAPI int GetTouchX(void);                                    // Get touch position X for touch point 0
+DefineEngineFunction( GetTouchX, int, (), , "Get touch position X for touch point 0 (relative to screen size)") {
+    return GetTouchX();
 }
 
-// RLAPI void DrawSplineSegmentBasis(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, float thick, Color color); // Draw spline segment: B-Spline, 4 points
-DefineEngineFunction( DrawSplineSegmentBasis, void, (Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, float thick, Color color), (RAYWHITE), "Draw spline segment: B-Spline, 4 points") {
-    DrawSplineSegmentBasis(p1, p2, p3, p4, thick, color);
+// RLAPI int GetTouchY(void);                                    // Get touch position Y for touch point 0
+DefineEngineFunction( GetTouchY, int, (), , "Get touch position Y for touch point 0 (relative to screen size)") {
+    return GetTouchY();
 }
 
-// RLAPI void DrawSplineSegmentCatmullRom(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, float thick, Color color); // Draw spline segment: Catmull-Rom, 4 points
-DefineEngineFunction( DrawSplineSegmentCatmullRom, void, (Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, float thick, Color color), (RAYWHITE), "Draw spline segment: Catmull-Rom, 4 points") {
-    DrawSplineSegmentCatmullRom(p1, p2, p3, p4, thick, color);
+// RLAPI Vector2 GetTouchPosition(int index);                    // Get touch position XY for a touch point index
+DefineEngineFunction( GetTouchPosition, Vector2, (int index), , "Get touch position XY for a touch point index (relative to screen size)") {
+    return GetTouchPosition(index);
 }
 
-// RLAPI void DrawSplineSegmentBezierQuadratic(Vector2 p1, Vector2 c2, Vector2 p3, float thick, Color color); // Draw spline segment: Quadratic Bezier, 2 points, 1 control point
-DefineEngineFunction( DrawSplineSegmentBezierQuadratic, void, (Vector2 p1, Vector2 c2, Vector2 p3, float thick, Color color), (RAYWHITE), "Draw spline segment: Quadratic Bezier, 2 points, 1 control point") {
-    DrawSplineSegmentBezierQuadratic(p1, c2, p3, thick, color);
+// RLAPI int GetTouchPointId(int index);                         // Get touch point identifier for given index
+DefineEngineFunction( GetTouchPointId, int, (int index), , "Get touch point identifier for given index") {
+    return GetTouchPointId(index);
 }
 
-// RLAPI void DrawSplineSegmentBezierCubic(Vector2 p1, Vector2 c2, Vector2 c3, Vector2 p4, float thick, Color color); // Draw spline segment: Cubic Bezier, 2 points, 2 control points
-DefineEngineFunction( DrawSplineSegmentBezierCubic, void, (Vector2 p1, Vector2 c2, Vector2 c3, Vector2 p4, float thick, Color color), (RAYWHITE), "Draw spline segment: Cubic Bezier, 2 points, 2 control points") {
-    DrawSplineSegmentBezierCubic(p1, c2, c3, p4, thick, color);
+// RLAPI int GetTouchPointCount(void);                           // Get number of touch points
+DefineEngineFunction( GetTouchPointCount, int, (), , "Get number of active touch points") {
+    return GetTouchPointCount();
 }
 
-// RLAPI Vector2 GetSplinePointLinear(Vector2 startPos, Vector2 endPos, float t);                           // Get (evaluate) spline point: Linear
-DefineEngineFunction( GetSplinePointLinear, Vector2, (Vector2 startPos, Vector2 endPos, float t), , "Get (evaluate) spline point: Linear") {
-    return GetSplinePointLinear(startPos, endPos, t);
+//------------------------------------------------------------------------------------
+// Gestures and Touch Handling Functions (Module: rgestures)
+//------------------------------------------------------------------------------------
+// RLAPI void SetGesturesEnabled(unsigned int flags);            // Enable a set of gestures using flags
+DefineEngineFunction( SetGesturesEnabled, void, (int flags), , "Enable a set of gestures using flags (bitmask)") {
+    SetGesturesEnabled((unsigned int)flags);
 }
 
-// RLAPI Vector2 GetSplinePointBasis(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, float t);              // Get (evaluate) spline point: B-Spline
-DefineEngineFunction( GetSplinePointBasis, Vector2, (Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, float t), , "Get (evaluate) spline point: B-Spline") {
-    return GetSplinePointBasis(p1, p2, p3, p4, t);
+// RLAPI bool IsGestureDetected(unsigned int gesture);           // Check if a gesture has been detected
+DefineEngineFunction( IsGestureDetected, bool, (int gesture), , "Check if a specific gesture has been detected") {
+    return IsGestureDetected((unsigned int)gesture);
 }
 
-// RLAPI Vector2 GetSplinePointCatmullRom(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, float t);         // Get (evaluate) spline point: Catmull-Rom
-DefineEngineFunction( GetSplinePointCatmullRom, Vector2, (Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, float t), , "Get (evaluate) spline point: Catmull-Rom") {
-    return GetSplinePointCatmullRom(p1, p2, p3, p4, t);
+// RLAPI int GetGestureDetected(void);                           // Get latest detected gesture
+DefineEngineFunction( GetGestureDetected, int, (), , "Get latest detected gesture type") {
+    return GetGestureDetected();
 }
 
-// RLAPI Vector2 GetSplinePointBezierQuadratic(Vector2 p1, Vector2 c2, Vector2 p3, float t);                // Get (evaluate) spline point: Quadratic Bezier
-DefineEngineFunction( GetSplinePointBezierQuadratic, Vector2, (Vector2 p1, Vector2 c2, Vector2 p3, float t), , "Get (evaluate) spline point: Quadratic Bezier") {
-    return GetSplinePointBezierQuadratic(p1, c2, p3, t);
+// RLAPI float GetGestureHoldDuration(void);                     // Get gesture hold time in seconds
+DefineEngineFunction( GetGestureHoldDuration, float, (), , "Get gesture hold time in seconds") {
+    return GetGestureHoldDuration();
 }
 
-// RLAPI Vector2 GetSplinePointBezierCubic(Vector2 p1, Vector2 c2, Vector2 c3, Vector2 p4, float t);        // Get (evaluate) spline point: Cubic Bezier
-DefineEngineFunction( GetSplinePointBezierCubic, Vector2, (Vector2 p1, Vector2 c2, Vector2 c3, Vector2 p4, float t), , "Get (evaluate) spline point: Cubic Bezier") {
-    return GetSplinePointBezierCubic(p1, c2, c3, p4, t);
+// RLAPI Vector2 GetGestureDragVector(void);                     // Get gesture drag vector
+DefineEngineFunction( GetGestureDragVector, Vector2, (), , "Get gesture drag vector as Vector2") {
+    return GetGestureDragVector();
 }
+
+// RLAPI float GetGestureDragAngle(void);                        // Get gesture drag angle
+DefineEngineFunction( GetGestureDragAngle, float, (), , "Get gesture drag angle in degrees") {
+    return GetGestureDragAngle();
+}
+
+// RLAPI Vector2 GetGesturePinchVector(void);                    // Get gesture pinch delta
+DefineEngineFunction( GetGesturePinchVector, Vector2, (), , "Get gesture pinch delta vector as Vector2") {
+    return GetGesturePinchVector();
+}
+
+// RLAPI float GetGesturePinchAngle(void);                       // Get gesture pinch angle
+DefineEngineFunction( GetGesturePinchAngle, float, (), , "Get gesture pinch angle in degrees") {
+    return GetGesturePinchAngle();
+}
+//------------------------------------------------------------------------------------
+// Camera System Functions (Module: rcamera)
+//------------------------------------------------------------------------------------
+// NOTE: implemented in Camera3DObject!
+// RLAPI void UpdateCamera(Camera *camera, int mode);            // Update camera position for selected mode
+// RLAPI void UpdateCameraPro(Camera *camera, Vector3 movement, Vector3 rotation, float zoom); // Update camera movement/rotation
+
+
 // -----------------------------------------------------------------------------
 // Basic shapes collision detection functions
 // -----------------------------------------------------------------------------
@@ -827,12 +677,73 @@ DefineEngineFunction( CheckCollisionPointLine, bool, (Vector2 point, Vector2 p1,
 }
 
 // RLAPI bool CheckCollisionPointPoly(Vector2 point, const Vector2 *points, int pointCount);                // Check if point is within a polygon described by array of vertices
-//FIXME POINTER
+DefineEngineFunction( CheckCollisionPointPoly, bool, (Vector2 point, Vector<F32> pointValues, int pointCount), , "Check if point is within a polygon described by array of vertices") {
+    auto points = ElfResource::getVector2List(pointValues, pointCount);
+    if (points.size() != (size_t) pointCount ) return false;
+
+    return CheckCollisionPointPoly(point, points.data(), pointCount);
+}
 
 // RLAPI bool CheckCollisionLines(Vector2 startPos1, Vector2 endPos1, Vector2 startPos2, Vector2 endPos2, Vector2 *collisionPoint); // Check the collision between two lines defined by two points each, returns collision point by reference
-//FIXME POINTER
+DefineEngineFunction( CheckCollisionLines, Vector2, (Vector2 startPos1, Vector2 endPos1, Vector2 startPos2, Vector2 endPos2), , "Check the collision between two lines. Returns 'x y' string if colliding, or empty string if not.") {
+    Vector2 collisionPoint = { 0.0f, 0.0f };
+
+    CheckCollisionLines(startPos1, endPos1, startPos2, endPos2, &collisionPoint);
+     return collisionPoint;
+
+}
+
 
 // RLAPI Rectangle GetCollisionRec(Rectangle rec1, Rectangle rec2);                                         // Get collision rectangle for two rectangles collision
 DefineEngineFunction( GetCollisionRec, Rectangle, (Rectangle rec1, Rectangle rec2), , "Get collision rectangle for two rectangles collision") {
     return GetCollisionRec(rec1, rec2);
 }
+
+
+
+//------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------
+// FIXME ?
+//------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------
+
+// // Text codepoints management functions (unicode characters)
+// RLAPI char *LoadUTF8(const int *codepoints, int length);                                    // Load UTF-8 text encoded from codepoints array
+// RLAPI void UnloadUTF8(char *text);                                                          // Unload UTF-8 text encoded from codepoints array
+// RLAPI int *LoadCodepoints(const char *text, int *count);                                    // Load all codepoints from a UTF-8 text string, codepoints count returned by parameter
+// RLAPI void UnloadCodepoints(int *codepoints);                                               // Unload codepoints data from memory
+// RLAPI int GetCodepointCount(const char *text);                                              // Get total number of codepoints in a UTF-8 encoded string
+// RLAPI int GetCodepoint(const char *text, int *codepointSize);                               // Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+// RLAPI int GetCodepointNext(const char *text, int *codepointSize);                           // Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+// RLAPI int GetCodepointPrevious(const char *text, int *codepointSize);                       // Get previous codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+// RLAPI const char *CodepointToUTF8(int codepoint, int *utf8Size);                            // Encode one codepoint into UTF-8 byte array (array length returned as parameter)
+
+// Text strings management functions (no UTF-8 strings, only byte chars)
+// WARNING 1: Most of these functions use internal static buffers[], it's recommended to store returned data on user-side for re-use
+// WARNING 2: Some functions allocate memory internally for the returned strings, those strings must be freed by user using MemFree()
+// RLAPI char **LoadTextLines(const char *text, int *count);                                   // Load text as separate lines ('\n')
+// RLAPI void UnloadTextLines(char **text, int lineCount);                                     // Unload text lines
+// RLAPI int TextCopy(char *dst, const char *src);                                             // Copy one string to another, returns bytes copied
+// RLAPI bool TextIsEqual(const char *text1, const char *text2);                               // Check if two text strings are equal
+// RLAPI unsigned int TextLength(const char *text);                                            // Get text length, checks for '\0' ending
+// RLAPI const char *TextFormat(const char *text, ...);                                        // Text formatting with variables (sprintf() style)
+// RLAPI const char *TextSubtext(const char *text, int position, int length);                  // Get a piece of a text string
+// RLAPI const char *TextRemoveSpaces(const char *text);                                       // Remove text spaces, concat words
+// RLAPI char *GetTextBetween(const char *text, const char *begin, const char *end);           // Get text between two strings
+// RLAPI char *TextReplace(const char *text, const char *search, const char *replacement);     // Replace text string with new string
+// RLAPI char *TextReplaceAlloc(const char *text, const char *search, const char *replacement); // Replace text string with new string, memory must be MemFree()
+// RLAPI char *TextReplaceBetween(const char *text, const char *begin, const char *end, const char *replacement); // Replace text between two specific strings
+// RLAPI char *TextReplaceBetweenAlloc(const char *text, const char *begin, const char *end, const char *replacement); // Replace text between two specific strings, memory must be MemFree()
+// RLAPI char *TextInsert(const char *text, const char *insert, int position);                 // Insert text in a defined byte position
+// RLAPI char *TextInsertAlloc(const char *text, const char *insert, int position);            // Insert text in a defined byte position, memory must be MemFree()
+// RLAPI char *TextJoin(char **textList, int count, const char *delimiter);                    // Join text strings with delimiter
+// RLAPI char **TextSplit(const char *text, char delimiter, int *count);                       // Split text into multiple strings, using MAX_TEXTSPLIT_COUNT static strings
+// RLAPI void TextAppend(char *text, const char *append, int *position);                       // Append text at specific position and move cursor
+// RLAPI int TextFindIndex(const char *text, const char *search);                              // Find first text occurrence within a string, -1 if not found
+// RLAPI char *TextToUpper(const char *text);                                                  // Get upper case version of provided string
+// RLAPI char *TextToLower(const char *text);                                                  // Get lower case version of provided string
+// RLAPI char *TextToPascal(const char *text);                                                 // Get Pascal case notation version of provided string
+// RLAPI char *TextToSnake(const char *text);                                                  // Get Snake case notation version of provided string
+// RLAPI char *TextToCamel(const char *text);                                                  // Get Camel case notation version of provided string
+// RLAPI int TextToInteger(const char *text);                                                  // Get integer value from text
+// RLAPI float TextToFloat(const char *text);                                                  // Get float value from text

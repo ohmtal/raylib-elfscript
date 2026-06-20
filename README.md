@@ -2,9 +2,7 @@
  
 Raylib binding of Elf(Torque)Script.
 
-2026-06-16: I just started and it's far away from complete.
-            NOTE: Before I continue i need a console for testing ;) (ImGui)
-            
+2026-06-20: A lot (80-90% excluding VR stuff) of bindings are implemented but not tested.  
 
 ## Setup: 
 
@@ -29,7 +27,7 @@ If you wonder why the the script file ends with .cs. This is not CSharp it's CSc
 There are three functions called from the C Code to get it working:
 
     - function MainInit() { return true;}
-    - function MainUpdate() {}
+    - function MainLoop() {}
     - function MainShutDown() {}
     
 The Script is:

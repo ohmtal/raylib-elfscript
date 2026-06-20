@@ -19,8 +19,6 @@
 void registerRaylibColors() {
     const String prefix = "";
 
-
-
     const std::vector<std::pair<String, Color>> colors = {
         {"LIGHTGRAY", LIGHTGRAY},
         {"GRAY", GRAY},

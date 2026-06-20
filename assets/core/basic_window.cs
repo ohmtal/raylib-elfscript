@@ -19,7 +19,7 @@ function MainShutDown() {
 }
 
 
-function MainUpdate()
+function MainLoop()
 {
         // Update
         //----------------------------------------------------------------------------------
