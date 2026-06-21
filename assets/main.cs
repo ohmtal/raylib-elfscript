@@ -1,6 +1,7 @@
 // Main Script
 
-$MODULES="Eyes DeltaTime LOADFAILTEST shapes_starfield_effect shapes_starfield_effect_v1";
+$MODULES="blank Eyes DeltaTime shapes_starfield_effect shapes_starfield_batch";
+// LOADFAILTEST shapes_starfield_effect_v1
 
 function Main::init(%this) {
     SetConfigFlags(%this.flags );
@@ -37,19 +38,18 @@ function Main::loadModule(%this, %setNewModuleIndex) {
     if (isObject(%this.module)) {
         %this.module.delete();
     }
+    SetTargetFPS(%this.currentFps); //reset fps
     %cmd = %this.getId() @ ".module = Create" @ %this.moduleName @ "();";
     echo("loadModule command is:" SPC %cmd);
     eval(%cmd);
     echo("loadModule success:" SPC isObject(%this.module));
-    if (isObject(%this.module)) {
-        %this.module.init();
-    }
+    // if (isObject(%this.module)) {
+    //     %this.module.init();
+    // }
 }
 
 function Main::loop(%this) {
-    if (isObject(%this.module)){
-        %this.module.update();
-    }
+
     if ( IsKeyDown($KEY_LEFT_CONTROL) || IsKeyDown($KEY_RIGHT_CONTROL) ) {
         if (IsKeyPressed($KEY_UP)) {
           %this.moduleIndex--;
@@ -64,13 +64,15 @@ function Main::loop(%this) {
 
     BeginDrawing();
     ClearBackground("20 100 100");
+    // DrawFPS(10, 10); //2500 fps without the module stuff below. Also > 2.4k  with
+
     if (isObject(%this.module)){
         DrawText("Loaded module:" SPC %this.moduleName , 5, GetScreenHeight() - 30, 20, $BLUE);
         %this.module.render();
     } else {
         DrawText("Failed to load module:" SPC %this.moduleName, 5, GetScreenHeight() - 30, 20, $RED);
     }
-    DrawText("CTRL + UP or DOWN to load an other module. FPS:" SPC GetFPS()  , 5, GetScreenHeight() - 50, 20, $BLACK);
+    DrawText("CTRL + UP or DOWN to load an other module. FPS:" SPC GetFPS()  , 5, GetScreenHeight() - 50, 20, $BLACK, true, $DARKGRAY);
     EndDrawing();
 }
 

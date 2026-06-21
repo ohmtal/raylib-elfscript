@@ -41,20 +41,21 @@ ConsoleSetType( TypeColor )
    Color *tmpColor = (Color *) dptr;
    if(argc == 1)
    {
-      U8 r,g,b,a;
+      S32 r,g,b,a;
       S32 args = dSscanf(argv[0], "%d %d %d %d", &r, &g, &b, &a);
       tmpColor->r = r;
       tmpColor->g = g;
       tmpColor->b = b;
-      if (args == 4)
-         tmpColor->a = a;
+      if (args == 4) tmpColor->a = a;
+      else tmpColor->a = 255;
+
    }
    else if(argc == 3)
    {
       tmpColor->r    = dAtoi(argv[0]);
       tmpColor->g  = dAtoi(argv[1]);
       tmpColor->b   = dAtoi(argv[2]);
-      tmpColor->a  = 1.f;
+      tmpColor->a  = 255;
    }
    else if(argc == 4)
    {
@@ -64,7 +65,7 @@ ConsoleSetType( TypeColor )
       tmpColor->a  = dAtoi(argv[3]);
    }
    else
-      Con::printf("Color must be set as { r, g, b [,a] }, { r g b [b] } ");
+      Con::printf("Color must be set as { r, g, b [,a] }, { r g b [a] } ");
 
 }
 

@@ -13,7 +13,7 @@ function DeltaTime::onRemove(%this) {
     SetTargetFPS(60); //guess it was 60 :P
 }
 
-function DeltaTime::init(%this) {
+function DeltaTime::OnAdd(%this) {
 
     %this.screenHeight = GetScreenHeight();
     %this.screenWidth = GetScreenWidth();
@@ -26,7 +26,8 @@ function DeltaTime::init(%this) {
     return true;
 }
 
-function DeltaTime::update(%this) {
+function DeltaTime::render(%this) {
+    // update>>>>
     // Adjust the FPS target based on the mouse wheel
     %mouseWheel = GetMouseWheelMove();
     if (%mouseWheel != 0)
@@ -54,8 +55,10 @@ function DeltaTime::update(%this) {
         %this.currentFps = 0;
         SetTargetFPS(%this.currentFps);
     }
-}
-function DeltaTime::render(%this) {
+
+    //<<<update
+
+
     ClearBackground("120 120 120");
 
     // Draw both circles to the screen

@@ -7,7 +7,7 @@ function createshapes_starfield_effect_v1() {
         TypeColor bgColor = 0;
 
         TypeBool drawLines = true;
-        TypeS32 startCount = 175; // 420;
+        TypeS32 startCount = 420; // 420;
     };
     return %obj;
 }
@@ -20,7 +20,7 @@ function shapes_starfield_effect_v1::onRemove(%this) {
    SetTargetFPS(60);
 }
 
-function shapes_starfield_effect_v1::Init(%this) {
+function shapes_starfield_effect_v1::OnAdd(%this) {
     %this.bgColor = ColorLerp($DARKBLUE, $BLACK, 0.89);
 
     %this.screenHeight = GetScreenHeight();
@@ -41,23 +41,9 @@ function shapes_starfield_effect_v1::Init(%this) {
         echo("STAR #" @ %i SPC $starPoints[%i] SPC "rand" SPC GetRandomValue(-%this.screenWidth / 2 ,  %this.screenWidth / 2));
     }
 
+    SetTargetFPS(0);
+
     return true;
-}
-
-function shapes_starfield_effect_v1::Update(%this) {
-    if (IsKeyPressed($KEY_U)) {
-        SetTargetFPS(0);
-    }
-    if (IsKeyPressed($KEY_R)) {
-        SetTargetFPS(60);
-    }
-
-    // Toggle lines / points with space bar
-    if (IsKeyPressed($KEY_SPACE)) {
-        %this.drawLines = !%this.drawLines;
-        echo("SPACE pressed new drawlines is: " SPC %this.drawLines );
-    }
-
 }
 
 function shapes_starfield_effect_v1::UpdatePoint(%this, %i , %dt) {
@@ -85,6 +71,21 @@ function shapes_starfield_effect_v1::UpdatePoint(%this, %i , %dt) {
 
 function shapes_starfield_effect_v1::Render(%this) {
 
+    if (IsKeyPressed($KEY_U)) {
+        SetTargetFPS(0);
+    }
+    if (IsKeyPressed($KEY_R)) {
+        SetTargetFPS(60);
+    }
+
+    // Toggle lines / points with space bar
+    if (IsKeyPressed($KEY_SPACE)) {
+        %this.drawLines = !%this.drawLines;
+        echo("SPACE pressed new drawlines is: " SPC %this.drawLines );
+    }
+
+
+
     %mouseMove = GetMouseWheelMove();
 
     if (%mouseMove != 0) %this.speed += 2.0 * %mouseMove / 9.0;
@@ -103,7 +104,7 @@ function shapes_starfield_effect_v1::Render(%this) {
         if (%this.drawLines)
         {
             // Get the time a little while ago for this star, but clamp it
-            %t = mClamp($starPoints[%i].z + 1.0 / 32.0 , 0.0 , 1.0 );
+            %t = mClampF($starPoints[%i].z + 1.0 / 32.0 , 0.0 , 1.0 );
             // If it's different enough from the current time, we proceed
             if ((%t - $starPoints[%i].z) > 1e-3)
             {

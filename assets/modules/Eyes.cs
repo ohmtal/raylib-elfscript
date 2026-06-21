@@ -20,7 +20,7 @@ function createEyes() {
 }
 
 
-function Eyes::Init(%this) {
+function Eyes::OnAdd(%this) {
     %this.mScleraLeftPosition  =  GetScreenWidth() - 200.0 SPC GetScreenHeight() - 100.0;
     %this.mScleraRightPosition =  GetScreenWidth() - 60.0  SPC GetScreenHeight() - 100.0;
 
@@ -30,14 +30,15 @@ function Eyes::Init(%this) {
     return true;
 }
 //----------------------------------------------------------------------
-function Eyes::Update(%this, %customPos)  {
+function Eyes::Render(%this) {
 
     if (IsWindowResized()) {
         %this.mScleraLeftPosition  =  GetScreenWidth() - 200.0 SPC GetScreenHeight() - 100.0;
         %this.mScleraRightPosition =  GetScreenWidth() - 60.0  SPC GetScreenHeight() - 100.0;
     }
-    if (%customPos !$= "") %this.mIrisLeftPosition = %this.mIrisRightPosition = %customPos;
-    else %this.mIrisLeftPosition = %this.mIrisRightPosition = GetMousePosition();
+    // if (%customPos !$= "") %this.mIrisLeftPosition = %this.mIrisRightPosition = %customPos;
+    // else
+    %this.mIrisLeftPosition = %this.mIrisRightPosition = GetMousePosition();
 
     // Check not inside the left eye sclera
     if (!CheckCollisionPointCircle(%this.mIrisLeftPosition,%this.mScleraLeftPosition,
@@ -46,7 +47,7 @@ function Eyes::Update(%this, %customPos)  {
         %this.dx = %this.mIrisLeftPosition.x - %this.mScleraLeftPosition.x;
         %this.dy = %this.mIrisLeftPosition.y - %this.mScleraLeftPosition.y;
 
-        //FIXME ?
+
         %this.mIrisAngle = mAtan(%this.dy, %this.dx);
 
         %this.dxx = (%this.mScleraRadius - %this.mIrisRadius) * mCos(%this.mIrisAngle);
@@ -72,10 +73,8 @@ function Eyes::Update(%this, %customPos)  {
         %this.mIrisRightPosition.x = %this.mScleraRightPosition.x + %this.dxx;
         %this.mIrisRightPosition.y = %this.mScleraRightPosition.y + %this.dyy;
     }
+    // <<<<<<<<<<<< update
 
-}
-//----------------------------------------------------------------------
-function Eyes::Render(%this) {
     // eyes
     DrawCircleV( %this.mScleraLeftPosition, %this.mScleraRadius, $LIGHTGRAY);
     DrawCircleV( %this.mIrisLeftPosition,  %this.mIrisRadius, $BROWN);

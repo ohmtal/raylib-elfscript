@@ -352,7 +352,9 @@ namespace ElfResource {
     }
 
     DefineEngineFunction( DrawText, void, (const char *text, int posX, int posY
-    , int fontSize, Color color), (12 , RAYWHITE), "Draw text (using default font") {
+    , int fontSize, Color color, bool doShadow, Color shadowColor),
+        (20 , RAYWHITE, false, DARKGRAY), "Draw text (using default font") {
+        if (doShadow) DrawText(text,posX+1.f, posY+1.f, fontSize, shadowColor);
         DrawText(text,posX, posY, fontSize, color);
     }
 

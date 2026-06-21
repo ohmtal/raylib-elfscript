@@ -738,6 +738,15 @@ DefineEngineFunction( GetCollisionRec, Rectangle, (Rectangle rec1, Rectangle rec
 // RLAPI bool TextIsEqual(const char *text1, const char *text2);                               // Check if two text strings are equal
 // RLAPI unsigned int TextLength(const char *text);                                            // Get text length, checks for '\0' ending
 // RLAPI const char *TextFormat(const char *text, ...);                                        // Text formatting with variables (sprintf() style)
+// not really usable ... use strFormat also if it's only one parameter
+// ConsoleFunction( TextFormat, const char *, 3, 0, "Text formatting with variables (sprintf() style)")
+// {
+//     // argc is the argument count
+//     // argv[1] is text
+//     // argv[2..n] are the parameters
+//     // *TextFormat(const char *text, ...);
+// }
+
 // RLAPI const char *TextSubtext(const char *text, int position, int length);                  // Get a piece of a text string
 // RLAPI const char *TextRemoveSpaces(const char *text);                                       // Remove text spaces, concat words
 // RLAPI char *GetTextBetween(const char *text, const char *begin, const char *end);           // Get text between two strings
