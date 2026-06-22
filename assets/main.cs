@@ -1,6 +1,6 @@
 // Main Script
 $MODULES = "Eyes";
-$MODULES = $MODULES SPC "looptest";
+$MODULES = $MODULES SPC "BatchTest looptest";
 $MODULES = $MODULES SPC "blank DeltaTime shapes_starfield_effect shapes_starfield_batch";
 
 // LOADFAILTEST shapes_starfield_effect_v1
@@ -69,7 +69,7 @@ function Main::loop(%this) {
     // DrawFPS(10, 10); //2500 fps without the module stuff below. Also > 2.4k  with
 
     if (isObject(%this.module)){
-        DrawText("Loaded module:" SPC %this.moduleName , 5, GetScreenHeight() - 30, 20, BLUE);
+        DrawText("Loaded module:" SPC %this.moduleName , 5, GetScreenHeight() - 30, 20, BLUE, true, BLACK);
         %this.module.render();
     } else {
         ClearBackground("20 100 100");

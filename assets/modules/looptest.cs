@@ -96,7 +96,9 @@ function looptest::onAdd(%this) {
 function looptest::Render(%this) {
      // ---------- display and change current method ------------
     ClearBackGround("60 60 60");
-    DrawText("Method" SPC %this.method, 10 , 10);
+    DrawText("Method" SPC %this.method SPC GetFPS(), 10 , 10, 20, YELLOW);
+    DrawText("TAB/shift TAB to toggle", 10 , 40, 20,  GREEN);
+    DrawText("Description in source files modules/looptest.cs", 10 , 70,20, "100 100 255");
     if (IsKeyPressed(KEY_TAB)) {
         if (isKeyDown(KEY_LEFT_SHIFT)) %this.method --;
         else %this.method ++;
@@ -125,6 +127,9 @@ function looptest::Render(%this) {
     if(%m == 2) {
         for ( %i = 0 ; %i < _LOOP_COUNT_ ; %i++) {
             %this.setVector2(%i,11,12);
+            //crash !! BatchRender::setVector2(%this,%i,11,12);
+            // maybe this did work with old ConsoleMethod ?!
+            // but i guess it's not faster anyway
         }
     }
     else

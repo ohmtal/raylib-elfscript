@@ -63,7 +63,7 @@ void registerRaylibColors() {
             const char* colorStrP = type->getData(&value, nullptr, 0);
             std::string colorString = std::format("\"{}\"", colorStrP);
             Con::setScriptConstant(fullName.c_str(), colorString );
-            Con::printf("DEBUG key value: %s => %s", fullName.c_str(), colorString.c_str());
+            // Con::printf("DEBUG key value: %s => %s", fullName.c_str(), colorString.c_str());
         }
     }
 
