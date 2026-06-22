@@ -47,7 +47,7 @@ function shapes_starfield_effect::UpdateSize(%this) {
 }
 // -----------------------------------------------------------------------------
 function shapes_starfield_effect::OnAdd(%this) {
-    %this.bgColor = ColorLerp($DARKBLUE, $BLACK, 0.69);
+    %this.bgColor = ColorLerp( DARKBLUE, BLACK, 0.69);
     %this.updateSize();
     for ( %i = 0; %i < %this.starCount; %i++)
     {
@@ -55,8 +55,8 @@ function shapes_starfield_effect::OnAdd(%this) {
         $starPoints_Y[%i] = GetRandomValue($minW , $maxW);
         $starPoints_Z[%i] = 1.0;
 
-        echo("STAR #" @ %i SPC $starPoints_X[%i] SPC $starPoints_Y[%i] SPC $starPoints_Z[%i]
-        SPC "rand" SPC GetRandomValue($minH ,  $maxH));
+        // echo("STAR #" @ %i SPC $starPoints_X[%i] SPC $starPoints_Y[%i] SPC $starPoints_Z[%i]
+        // SPC "rand" SPC GetRandomValue($minH ,  $maxH));
     }
 
     $speed = 10.0/9.0;
@@ -96,14 +96,14 @@ function shapes_starfield_effect::Render(%this) {
 
 
     // Toggle lines / points with space bar
-    if (IsKeyPressed($KEY_SPACE)) {
+    if (IsKeyPressed(KEY_SPACE)) {
         %this.drawLines = !%this.drawLines;
         echo("SPACE pressed new drawlines is: " SPC %this.drawLines );
     }
-    if (IsKeyPressed($KEY_U)) {
+    if (IsKeyPressed(KEY_U)) {
         SetTargetFPS(0);
     }
-    if (IsKeyPressed($KEY_R)) {
+    if (IsKeyPressed(KEY_R)) {
         SetTargetFPS(60);
     }
 
@@ -160,13 +160,13 @@ function shapes_starfield_effect::Render(%this) {
                 %startX = $hW + (%x * %invT);
                 %startY = $hH + (%y * %invT);
 
-                DrawLine(%startX, %startY, %screenPos_X, %screenPos_Y, $RAYWHITE);
+                DrawLine(%startX, %startY, %screenPos_X, %screenPos_Y, RAYWHITE);
             }
         }
         else
         {
             %radius = mLerp(3.0, 1.0, %z);
-            DrawCircle(%screenPos_X, %screenPos_Y, %radius, $RAYWHITE);
+            DrawCircle(%screenPos_X, %screenPos_Y, %radius, RAYWHITE);
         }
 
         // store back z it change every time
@@ -174,8 +174,8 @@ function shapes_starfield_effect::Render(%this) {
     }
 
 
-    DrawText("[MOUSE WHEEL] Current Speed:" SPC  strFormat("%.2f",$speed) , 10, 40, 20, $RAYWHITE);
-    DrawText("[SPACE] Current draw mode:" SPC  ( %this.drawLines ? "Lines" : "Circles" ) , 10, 70, 20, $RAYWHITE);
+    DrawText("[MOUSE WHEEL] Current Speed:" SPC  strFormat("%.2f",$speed) , 10, 40, 20, RAYWHITE);
+    DrawText("[SPACE] Current draw mode:" SPC  ( %this.drawLines ? "Lines" : "Circles" ) , 10, 70, 20, RAYWHITE);
 
     DrawFPS(10, 10);
 }

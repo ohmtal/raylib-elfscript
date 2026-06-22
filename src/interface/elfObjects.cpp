@@ -96,7 +96,26 @@ public:
         dMemset(mElement.address(), 0, mElement.size() * sizeof(Matrix));
     }
 
+    static bool _setBufferSize(void* obj,const char* , const char* data) {
+        BatchRender* object = static_cast<BatchRender*>(obj);
+        if (!object || !data) return false;
+        S32 size = dAtoi(data);
+        if ( size >= 0 ) {
+          object->setBufferSize(size);
+          //NOT! return true;
+        }
+        return false;
+    }
+    static const char *_getBufferSize(void* obj, const char* data) {
+        BatchRender* object = static_cast<BatchRender*>(obj);
+        if (!object) return "";
+        return Con::getIntArg(object->mElement.size());
+    }
 
+    static void initPersistFields() {
+        addProtectedField("count", TypeS32, 0, &_setBufferSize,&_getBufferSize, "Set the buffersize (element count).");
+        Parent::initPersistFields();
+    }
 
     // BATCH DRAW 1: Render circles using rectangle coordinates
     void drawCircles(S32 count, Color color) {
@@ -140,6 +159,13 @@ DefineEngineMethod(BatchRender, setVector2, void, (S32 index, F32 x, F32 y),
     if (index >= 0 && index < object->mElement.size()) {
         object->mElement[index].m0 = x;
         object->mElement[index].m1 = y;
+    }
+}
+DefineEngineMethod(BatchRender, setVector2v, void, (S32 index, Vector2 vec),
+                   , "Sets data at a specific index") {
+    if (index >= 0 && index < object->mElement.size()) {
+        object->mElement[index].m0 = vec.x;
+        object->mElement[index].m1 = vec.y;
     }
 }
 
@@ -280,6 +306,20 @@ DefineEngineMethod(BatchRender, getVector2GlobalV, void,
         if (varY) Con::setFloatVariable(varY, object->mElement[index].m1);
     }
 }
+
+// this ? not DefineEngineMethod(BatchRender, feedVector2GlobalV, void,
+
+
+// FIXME also the others ? --- guess not it's not that fast
+DefineEngineMethod(BatchRender, setVector2GlobalV, void,
+                   (S32 index, String varX, String varY),
+                   , "Fetches X, Y FROM global variables named by parameters") {
+    if (index >= 0 && index < object->mElement.size()) {
+        if (varX) object->mElement[index].m0 = Con::getFloatVariable(varX);
+        if (varY) object->mElement[index].m1 = Con::getFloatVariable(varY);
+    }
+}
+
 DefineEngineMethod(BatchRender, getVector3GlobalV, void,
                    (S32 index, String varX, String varY, String varW),
                    , "Fetches X, Y, Z to global variables named by parameters") {
@@ -289,7 +329,7 @@ DefineEngineMethod(BatchRender, getVector3GlobalV, void,
         if (varW) Con::setFloatVariable(varW, object->mElement[index].m2);
     }
 }
-DefineEngineMethod(BatchRender, setVector4GlobalV, void,
+DefineEngineMethod(BatchRender, getVector4GlobalV, void,
         (S32 index, String varX, String varY, String varW, String varH),
             , "Fetches X, Y, W, H to global variables named by parameters") {
     if (index >= 0 && index < object->mElement.size()) {
@@ -299,6 +339,19 @@ DefineEngineMethod(BatchRender, setVector4GlobalV, void,
         if (varH) Con::setFloatVariable(varH, object->mElement[index].m3);
     }
 }
+
+DefineEngineMethod(BatchRender, setVector4GlobalV, void,
+                   (S32 index, String varX, String varY, String varW, String varH),
+                   , "Fetches X, Y, W, H to global variables named by parameters") {
+    if (index >= 0 && index < object->mElement.size()) {
+        if (varX) object->mElement[index].m0 = Con::getFloatVariable(varX);
+        if (varY) object->mElement[index].m1 = Con::getFloatVariable(varY);
+        if (varW) object->mElement[index].m2 = Con::getFloatVariable(varW);
+        if (varH) object->mElement[index].m3 = Con::getFloatVariable(varH);
+
+    }
+}
+
 DefineEngineMethod(BatchRender, getVector4_1GlobalV, void,
                    (S32 index, String varX, String varY, String varW, String varH),
                    , "Fetches X, Y, W, H to global variables named by parameters") {
@@ -309,6 +362,19 @@ DefineEngineMethod(BatchRender, getVector4_1GlobalV, void,
         if (varH) Con::setFloatVariable(varH, object->mElement[index].m7);
     }
 }
+
+DefineEngineMethod(BatchRender, setVector4_1GlobalV, void,
+                   (S32 index, String varX, String varY, String varW, String varH),
+                   , "Fetches X, Y, W, H to global variables named by parameters") {
+    if (index >= 0 && index < object->mElement.size()) {
+        if (varX) object->mElement[index].m4 = Con::getFloatVariable(varX);
+        if (varY) object->mElement[index].m5 = Con::getFloatVariable(varY);
+        if (varW) object->mElement[index].m6 = Con::getFloatVariable(varW);
+        if (varH) object->mElement[index].m7 = Con::getFloatVariable(varH);
+
+    }
+}
+
 DefineEngineMethod(BatchRender, getVector4_2GlobalV, void,
                    (S32 index, String varX, String varY, String varW, String varH),
                    , "Fetches X, Y, W, H to global variables named by parameters") {
@@ -319,6 +385,18 @@ DefineEngineMethod(BatchRender, getVector4_2GlobalV, void,
         if (varH) Con::setFloatVariable(varH, object->mElement[index].m11);
     }
 }
+DefineEngineMethod(BatchRender, setVector4_2GlobalV, void,
+                   (S32 index, String varX, String varY, String varW, String varH),
+                   , "Fetches X, Y, W, H to global variables named by parameters") {
+    if (index >= 0 && index < object->mElement.size()) {
+        if (varX) object->mElement[index].m8 = Con::getFloatVariable(varX);
+        if (varY) object->mElement[index].m9 = Con::getFloatVariable(varY);
+        if (varW) object->mElement[index].m10= Con::getFloatVariable(varW);
+        if (varH) object->mElement[index].m11= Con::getFloatVariable(varH);
+
+    }
+}
+
 DefineEngineMethod(BatchRender, getVector4_3GlobalV, void,
                    (S32 index, String varX, String varY, String varW, String varH),
                    , "Fetches X, Y, W, H to global variables named by parameters") {
@@ -329,6 +407,21 @@ DefineEngineMethod(BatchRender, getVector4_3GlobalV, void,
         if (varH) Con::setFloatVariable(varH, object->mElement[index].m15);
     }
 }
+
+DefineEngineMethod(BatchRender, setVector4_3GlobalV, void,
+                   (S32 index, String varX, String varY, String varW, String varH),
+                   , "Fetches X, Y, W, H to global variables named by parameters") {
+    if (index >= 0 && index < object->mElement.size()) {
+        if (varX) object->mElement[index].m12= Con::getFloatVariable(varX);
+        if (varY) object->mElement[index].m13= Con::getFloatVariable(varY);
+        if (varW) object->mElement[index].m14= Con::getFloatVariable(varW);
+        if (varH) object->mElement[index].m15= Con::getFloatVariable(varH);
+
+    }
+}
+// ================================================================================================
+// prior version using rect
+
 // class BatchRender : public SimObject {
 //     typedef SimObject Parent;
 //

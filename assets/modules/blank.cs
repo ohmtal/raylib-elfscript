@@ -16,6 +16,6 @@ function Blank::OnRemove(%this) {
 }
 //----------------------------------------------------------------------
 function Blank::Render(%this) {
-
+    ClearBackground(WHITE);
 }
 

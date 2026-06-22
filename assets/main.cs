@@ -1,6 +1,8 @@
 // Main Script
+$MODULES = "Eyes";
+$MODULES = $MODULES SPC "looptest";
+$MODULES = $MODULES SPC "blank DeltaTime shapes_starfield_effect shapes_starfield_batch";
 
-$MODULES="blank Eyes DeltaTime shapes_starfield_effect shapes_starfield_batch";
 // LOADFAILTEST shapes_starfield_effect_v1
 
 function Main::init(%this) {
@@ -50,29 +52,30 @@ function Main::loadModule(%this, %setNewModuleIndex) {
 
 function Main::loop(%this) {
 
-    if ( IsKeyDown($KEY_LEFT_CONTROL) || IsKeyDown($KEY_RIGHT_CONTROL) ) {
-        if (IsKeyPressed($KEY_UP)) {
+    if ( IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL) ) {
+        if (IsKeyPressed(KEY_UP)) {
           %this.moduleIndex--;
           %this.loadModule();
-        } else  if (IsKeyPressed($KEY_DOWN)) {
+        } else  if (IsKeyPressed(KEY_DOWN)) {
             %this.moduleIndex++;
             %this.loadModule();
-        } else if (IsKeyPressed($KEY_R)) {
+        } else if (IsKeyPressed(KEY_R)) {
             rl();
         }
     }
 
     BeginDrawing();
-    ClearBackground("20 100 100");
+
     // DrawFPS(10, 10); //2500 fps without the module stuff below. Also > 2.4k  with
 
     if (isObject(%this.module)){
-        DrawText("Loaded module:" SPC %this.moduleName , 5, GetScreenHeight() - 30, 20, $BLUE);
+        DrawText("Loaded module:" SPC %this.moduleName , 5, GetScreenHeight() - 30, 20, BLUE);
         %this.module.render();
     } else {
-        DrawText("Failed to load module:" SPC %this.moduleName, 5, GetScreenHeight() - 30, 20, $RED);
+        ClearBackground("20 100 100");
+        DrawText("Failed to load module:" SPC %this.moduleName, 5, GetScreenHeight() - 30, 20, RED);
     }
-    DrawText("CTRL + UP or DOWN to load an other module. FPS:" SPC GetFPS()  , 5, GetScreenHeight() - 50, 20, $BLACK, true, $DARKGRAY);
+    DrawText("CTRL + UP or DOWN to load an other module. FPS:" SPC GetFPS()  , 5, GetScreenHeight() - 50, 20, BLACK, true, DARKGRAY);
     EndDrawing();
 }
 
@@ -85,7 +88,7 @@ function MainInit() {
         TypeS32 screenWidth = 800;
         TypeS32 screenHeight = 450;
         TypeS32 currentFps = 60;
-        TypeS32 flags = $FLAG_WINDOW_RESIZABLE;
+        TypeS32 flags = FLAG_WINDOW_RESIZABLE;
         TypeS32 moduleIndex = 0;
         TypeS32 module = 0;
     };

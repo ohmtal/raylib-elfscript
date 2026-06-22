@@ -75,14 +75,15 @@ function Eyes::Render(%this) {
     }
     // <<<<<<<<<<<< update
 
+    ClearBackground(DARKGREEN);
     // eyes
-    DrawCircleV( %this.mScleraLeftPosition, %this.mScleraRadius, $LIGHTGRAY);
-    DrawCircleV( %this.mIrisLeftPosition,  %this.mIrisRadius, $BROWN);
-    DrawCircleV( %this.mIrisLeftPosition, 10, $BLACK);
+    DrawCircleV( %this.mScleraLeftPosition, %this.mScleraRadius, LIGHTGRAY);
+    DrawCircleV( %this.mIrisLeftPosition,  %this.mIrisRadius, BROWN);
+    DrawCircleV( %this.mIrisLeftPosition, 10, BLACK);
 
-    DrawCircleV( %this.mScleraRightPosition,  %this.mScleraRadius, $LIGHTGRAY);
-    DrawCircleV( %this.mIrisRightPosition,  %this.mIrisRadius, $DARKGREEN);
-    DrawCircleV( %this.mIrisRightPosition, 10, $BLACK);
+    DrawCircleV( %this.mScleraRightPosition,  %this.mScleraRadius, LIGHTGRAY);
+    DrawCircleV( %this.mIrisRightPosition,  %this.mIrisRadius, DARKGREEN);
+    DrawCircleV( %this.mIrisRightPosition, 10, BLACK);
 
 }
 

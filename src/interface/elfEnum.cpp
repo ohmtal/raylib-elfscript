@@ -5,6 +5,9 @@
 #include "raylib.h"
 #include "console/engineAPI.h"
 #include "ConsoleTypes.h"
+#include "console/scriptPreprocessor.h"
+#include "ConsoleTypes.h"
+
 
 
 //the lazy (long build time) way or define KeyboardKey (348)
@@ -12,6 +15,7 @@
 // #define MAGIC_ENUM_RANGE_MAX 348
 // compile takes ages! #define MAGIC_ENUM_RANGE_MAX 65536
 #include "console/consoleExtras.h" // registerEnum
+#include <format>
 
 // -----------------------------------------------------------------------------
 // CONST
@@ -48,21 +52,38 @@ void registerRaylibColors() {
         {"RAYWHITE", RAYWHITE}
     };
 
-    // Statischer Speicher, damit die Adressen im Speicher für Torque/Con stabil bleiben
-    static std::vector<Color> storedColors;
-    storedColors.resize(colors.size());
 
     for (std::size_t i = 0; i < colors.size(); ++i) {
-        storedColors[i] = colors[i].second;
+        // 1. Namen zusammenbauen
         String fullName = prefix + colors[i].first;
+        Color value = static_cast<Color>(colors[i].second);
+        ConsoleBaseType* type = ConsoleBaseType::getType(TypeColor);
 
-        Con::addConstant(
-            fullName.c_str(),
-                         TypeColor,
-                         &storedColors[i],
-                         ""
-        );
+        if (type) {
+            const char* colorStrP = type->getData(&value, nullptr, 0);
+            std::string colorString = std::format("\"{}\"", colorStrP);
+            Con::setScriptConstant(fullName.c_str(), colorString );
+            Con::printf("DEBUG key value: %s => %s", fullName.c_str(), colorString.c_str());
+        }
     }
+
+
+    // static std::vector<Color> storedColors;
+    // storedColors.resize(colors.size());
+
+    // for (std::size_t i = 0; i < colors.size(); ++i) {
+    //     // storedColors[i] = colors[i].second;
+    //     String fullName = prefix + colors[i].first;
+    //
+    //     Color value = static_cast<Color>(colors[i].second);
+    //     Con::setScriptConstant(fullName.c_str(), ConsoleTypeTypeColor::getData(....)); ///opt/raylib-elfscript/src/interface/elfEnum.cpp:63:50: error: ‘ConsoleTypeTypeColor’ has not been declared
+    //     // Con::addConstant(
+    //     //     fullName.c_str(),
+    //     //                  TypeColor,
+    //     //                  &storedColors[i],
+    //     //                  ""
+    //     // );
+    // }
 }
 
 
@@ -93,19 +114,21 @@ void registerRaylibConfigFlags() {
     };
 
 
-    static std::vector<S32> storedValues;
-    storedValues.resize(flags.size());
+    // static std::vector<S32> storedValues;
+    // storedValues.resize(flags.size());
 
     for (std::size_t i = 0; i < flags.size(); ++i) {
-        storedValues[i] = flags[i].second;
+        // storedValues[i] = flags[i].second;
         String fullName = prefix + flags[i].first;
+        S32 value = static_cast<S32>(flags[i].second);
+        Con::setScriptConstant(fullName.c_str(), value);
 
-        Con::addConstant(
-            fullName.c_str(),
-                         TypeS32,
-                         &storedValues[i],
-                         ""
-        );
+        // Con::addConstant(
+        //     fullName.c_str(),
+        //                  TypeS32,
+        //                  &storedValues[i],
+        //                  ""
+        // );
     }
 }
 
@@ -228,19 +251,22 @@ void registerRaylibKeyboardKeys() {
         {"KEY_VOLUME_DOWN", KEY_VOLUME_DOWN}
     };
 
-    static std::vector<S32> storedValues;
-    storedValues.resize(keys.size());
+    // static std::vector<S32> storedValues;
+    // storedValues.resize(keys.size());
 
     for (std::size_t i = 0; i < keys.size(); ++i) {
-        storedValues[i] = keys[i].second;
+        // storedValues[i] = keys[i].second;
         String fullName = prefix + keys[i].first;
 
-        Con::addConstant(
-            fullName.c_str(),
-                         TypeS32,
-                         &storedValues[i],
-                         ""
-        );
+        S32 value = static_cast<S32>(keys[i].second);
+        Con::setScriptConstant(fullName.c_str(), value);
+
+        // Con::addConstant(
+        //     fullName.c_str(),
+        //                  TypeS32,
+        //                  &storedValues[i],
+        //                  ""
+        // );
     }
 }
 
@@ -261,19 +287,22 @@ void registerRaylibGestures() {
         {"GESTURE_PINCH_OUT", GESTURE_PINCH_OUT}
     };
 
-    static std::vector<S32> storedValues;
-    storedValues.resize(gestures.size());
+    // static std::vector<S32> storedValues;
+    // storedValues.resize(gestures.size());
 
     for (std::size_t i = 0; i < gestures.size(); ++i) {
-        storedValues[i] = gestures[i].second;
+        // storedValues[i] = gestures[i].second;
         String fullName = prefix + gestures[i].first;
 
-        Con::addConstant(
-            fullName.c_str(),
-                         TypeS32,
-                         &storedValues[i],
-                         ""
-        );
+        S32 value = static_cast<S32>(gestures[i].second);
+        Con::setScriptConstant(fullName.c_str(), value);
+
+        // Con::addConstant(
+        //     fullName.c_str(),
+        //                  TypeS32,
+        //                  &storedValues[i],
+        //                  ""
+        // );
     }
 }
 
