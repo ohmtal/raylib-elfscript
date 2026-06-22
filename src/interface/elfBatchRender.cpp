@@ -279,38 +279,40 @@ DefineEngineMethod(BatchRender, drawLines, void, (S32 count, Color color),, "Bat
 }
 
 // -------------------------------------------------------------------------------------
+
+// FIXME look at global batch !!! with stack .. but wait until i did the pointer redesign!
 // set named global variables for x, y, z
-// DefineEngineMethod(BatchRender, getVector2GlobalV, void,
-//                    (S32 index, String varX, String varY),
-//                    , "Fetches X, Yto global variables named by parameters") {
-//     if (index >= 0 && index < object->mElement.size()) {
-//         if (varX) Con::setFloatVariable(varX, object->mElement[index].m0);
-//         if (varY) Con::setFloatVariable(varY, object->mElement[index].m1);
-//     }
-// }
-//
-// // this ? not DefineEngineMethod(BatchRender, feedVector2GlobalV, void,
-//
-//
-// // FIXME also the others ? --- guess not it's not that fast
-// DefineEngineMethod(BatchRender, setVector2GlobalV, void,
-//                    (S32 index, String varX, String varY),
-//                    , "Fetches X, Y FROM global variables named by parameters") {
-//     if (index >= 0 && index < object->mElement.size()) {
-//         if (varX) object->mElement[index].m0 = Con::getFloatVariable(varX);
-//         if (varY) object->mElement[index].m1 = Con::getFloatVariable(varY);
-//     }
-// }
-//
-// DefineEngineMethod(BatchRender, getVector3GlobalV, void,
-//                    (S32 index, String varX, String varY, String varW),
-//                    , "Fetches X, Y, Z to global variables named by parameters") {
-//     if (index >= 0 && index < object->mElement.size()) {
-//         if (varX) Con::setFloatVariable(varX, object->mElement[index].m0);
-//         if (varY) Con::setFloatVariable(varY, object->mElement[index].m1);
-//         if (varW) Con::setFloatVariable(varW, object->mElement[index].m2);
-//     }
-// }
+DefineEngineMethod(BatchRender, getVector2GlobalV, void,
+                   (S32 index, String varX, String varY),
+                   , "Fetches X, Yto global variables named by parameters") {
+    if (index >= 0 && index < object->mElement.size()) {
+        if (varX) Con::setFloatVariable(varX, object->mElement[index].m0);
+        if (varY) Con::setFloatVariable(varY, object->mElement[index].m1);
+    }
+}
+
+// this ? not DefineEngineMethod(BatchRender, feedVector2GlobalV, void,
+
+
+// FIXME look at global batch !!! with stack .. but wait until i did the pointer redesign!
+DefineEngineMethod(BatchRender, setVector2GlobalV, void,
+                   (S32 index, String varX, String varY),
+                   , "Fetches X, Y FROM global variables named by parameters") {
+    if (index >= 0 && index < object->mElement.size()) {
+        if (varX) object->mElement[index].m0 = Con::getFloatVariable(varX);
+        if (varY) object->mElement[index].m1 = Con::getFloatVariable(varY);
+    }
+}
+
+DefineEngineMethod(BatchRender, getVector3GlobalV, void,
+                   (S32 index, String varX, String varY, String varW),
+                   , "Fetches X, Y, Z to global variables named by parameters") {
+    if (index >= 0 && index < object->mElement.size()) {
+        if (varX) Con::setFloatVariable(varX, object->mElement[index].m0);
+        if (varY) Con::setFloatVariable(varY, object->mElement[index].m1);
+        if (varW) Con::setFloatVariable(varW, object->mElement[index].m2);
+    }
+}
 // -------------------------- Vecor2 Stacks ----------------------------------------
 // 8 Stacks from 0..7 x/y
 static bool _assignVector2ToGlobal(BatchRender* object, S32 stack, S32 index

@@ -5,7 +5,7 @@
 // -----------------------------------------------------------------------------
 
 // orig 420
-#define STAR_COUNT 120
+#define STAR_COUNT 420
 
 function createshapes_starfield_batch() {
     %obj = new BatchRender() { //NOTE BatchRender!!

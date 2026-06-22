@@ -13,14 +13,16 @@
 // batched is a bit better and release build make a big difference
 // -----------------------------------------------------------------------------
 
+// orig 420
+#define STAR_COUNT 420
+
 function createshapes_starfield_effect() {
     %obj = new ScriptObject() {
         class = "shapes_starfield_effect";
         // TypeF32 speed = 10.0/9.0;
         TypeColor bgColor = 0;
 
-        TypeBool drawLines = false;
-        TypeS32 starCount = 120; // orig 420
+        TypeBool drawLines = true;
     };
     return %obj;
 }
@@ -49,7 +51,7 @@ function shapes_starfield_effect::UpdateSize(%this) {
 function shapes_starfield_effect::OnAdd(%this) {
     %this.bgColor = ColorLerp( DARKBLUE, BLACK, 0.69);
     %this.updateSize();
-    for ( %i = 0; %i < %this.starCount; %i++)
+    for ( %i = 0; %i < STAR_COUNT; %i++)
     {
         $starPoints_X[%i] = GetRandomValue($minH , $maxH);
         $starPoints_Y[%i] = GetRandomValue($minW , $maxW);
@@ -113,15 +115,13 @@ function shapes_starfield_effect::Render(%this) {
 
      %dt = GetFrameTime();
 
-     // does also not speed up ..
-     // $randomValues = GetRandomValues(%this.starCount * 2,$minH, $maxH );
 
     ClearBackground( %this.bgColor);
 
     %startDiv = 1.0 / 32.0;
     %drawLines = %this.drawLines;
 
-    for ( %i = 0; %i < %this.starCount; %i++)
+    for ( %i = 0; %i < STAR_COUNT; %i++)
     {
         // put into local variables ... did not change so much as the %screenPos_Y variables
         %x = $starPoints_X[%i];

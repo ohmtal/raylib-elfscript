@@ -90,7 +90,7 @@ public:
     bool onAdd() override ;
     void onRemove() override;
 
-    bool resize(S32 width, S32 height, bool copyContent = true, Color copyColor TE); //resize ==> recreate!
+    bool resize(S32 width, S32 height, bool copyContent = true, Color copyColor = WHITE); //resize ==> recreate!
 
     static void initPersistFields()
     {

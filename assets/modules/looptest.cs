@@ -158,7 +158,7 @@ function looptest::Render(%this) {
     // to global
     if(%m == 6) {
         for ( %i = 0 ; %i < _LOOP_COUNT_ ; %i++) {
-            %this.getVector2GlobalV(%i,"gX","gY");
+            %this.getVector2GlobalV(%i,"$gX","$gY");
             // %tmpX = $gX; // eat a lot
             // %tmpY = $gY;
         }
@@ -167,19 +167,19 @@ function looptest::Render(%this) {
     // from global
     if(%m == 7) {
         for ( %i = 0 ; %i < _LOOP_COUNT_ ; %i++) {
-             %this.setVector2GlobalV(%i,"gX","gY");
+             %this.setVector2GlobalV(%i,"$gX","$gY");
         }
     }
     else
     if(%m == 8) {
         for ( %i = 0 ; %i < _LOOP_COUNT_ ; %i++) {
-            %this.getVector2GlobalV(%i,"gX" @ %i ,"gY" @ %i );
+            %this.getVector2GlobalV(%i,"$gX" @ %i ,"$gY" @ %i );
         }
     }
     else
     if(%m == 9) {
         for ( %i = 0 ; %i < _LOOP_COUNT_ ; %i++) {
-            %this.setVector2GlobalV(%i,"gX" @ %i ,"gY" @ %i);
+            %this.setVector2GlobalV(%i,"$gX" @ %i ,"$gY" @ %i);
         }
     }
     else
