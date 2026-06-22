@@ -2,7 +2,7 @@
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
-// Storage Template for Resources
+// Storage Template for Resources and Resource Tools
 // usage: ElfStorage<Image, UnloadImage> ImageMap;
 //-----------------------------------------------------------------------------
 #pragma once
@@ -12,6 +12,7 @@
 #include "core/util/tVector.h"
 #include <vector>
 #include <console/console.h>
+#include "elfObjects.h"
 
 namespace ElfResource {
 
@@ -58,6 +59,13 @@ struct ElfStorage {
 
         UnloadFunc(it->second);
 
+        mMap.erase(it);
+        return true;
+    }
+    // -------------------------------------------------------------------------
+    bool removeId(S32 id) {
+        auto it = mMap.find(id);
+        if (it == mMap.end()) return false;
         mMap.erase(it);
         return true;
     }
@@ -180,7 +188,9 @@ inline void UnloadElfAnimationBlock(ElfAnimationBlock block) {
 
 inline ElfStorage<Image, UnloadImage> ImageMap;
 inline ElfStorage<Texture2D, UnloadTexture> TextureMap;
-inline ElfStorage<RenderTexture, UnloadRenderTexture> RenderTextureMap;
+
+// inline ElfStorage<RenderTexture, UnloadRenderTexture> RenderTextureMap;
+
 inline ElfStorage<Font, UnloadFont> FontMap;
 inline ElfStorage<Model, UnloadModel> ModelMap;
 inline ElfStorage<Mesh, UnloadMesh> MeshMap;

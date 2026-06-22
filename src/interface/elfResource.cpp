@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
 
-#include "elfStorage.h"
+#include "elfResource.h"
 #include <console/console.h>
 #include "console/engineAPI.h"
 #include "ConsoleTypes.h"
@@ -53,12 +53,13 @@ namespace ElfResource {
         return TextureMap.add(cube);
     }
 
+    // NOTE:: use RenderTextureObject
     // RLAPI RenderTexture2D LoadRenderTexture(int width, int height);                                          // Load texture for rendering (framebuffer)
-    DefineEngineFunction( LoadRenderTexture, S32, (int width, int height), , "Load texture for rendering (framebuffer) and return RenderTextureID") {
-        RenderTexture2D target = LoadRenderTexture(width, height);
-        if (!IsRenderTextureValid(target)) return 0;
-        return RenderTextureMap.add(target);
-    }
+    // DefineEngineFunction( LoadRenderTexture, S32, (int width, int height), , "Load texture for rendering (framebuffer) and return RenderTextureID") {
+    //     RenderTexture2D target = LoadRenderTexture(width, height);
+    //     if (!IsRenderTextureValid(target)) return 0;
+    //     return RenderTextureMap.add(target);
+    // }
 
     // RLAPI bool IsTextureValid(Texture2D texture);                                                            // Check if a texture is valid (loaded in GPU)
     DefineEngineFunction( IsTextureValid, bool, (S32 textureId), , "Check if a texture is valid (loaded in GPU)") {
@@ -67,17 +68,18 @@ namespace ElfResource {
         return IsTextureValid(*tex);
     }
 
+    // NOTE:: use RenderTextureObject
     // RLAPI bool IsRenderTextureValid(RenderTexture2D target);                                                 // Check if a render texture is valid (loaded in GPU)
-    DefineEngineFunction( IsRenderTextureValid, bool, (S32 renderTextureId), , "Check if a render texture is valid (loaded in GPU)") {
-        RenderTexture2D* target = RenderTextureMap.get(renderTextureId);
-        if (!target) return false;
-        return IsRenderTextureValid(*target);
-    }
-
-    // RLAPI void UnloadRenderTexture(RenderTexture2D target);                                                  // Unload render texture from GPU memory (VRAM)
-    DefineEngineFunction( UnloadRenderTexture, void, (S32 renderTextureId), , "Unload render texture from GPU memory (VRAM)") {
-        RenderTextureMap.remove(renderTextureId);
-    }
+    // DefineEngineFunction( IsRenderTextureValid, bool, (S32 renderTextureId), , "Check if a render texture is valid (loaded in GPU)") {
+    //     RenderTexture2D* target = RenderTextureMap.get(renderTextureId);
+    //     if (!target) return false;
+    //     return IsRenderTextureValid(*target);
+    // }
+    //
+    // // RLAPI void UnloadRenderTexture(RenderTexture2D target);                                                  // Unload render texture from GPU memory (VRAM)
+    // DefineEngineFunction( UnloadRenderTexture, void, (S32 renderTextureId), , "Unload render texture from GPU memory (VRAM)") {
+    //     RenderTextureMap.remove(renderTextureId);
+    // }
 
     // RLAPI void UpdateTexture(Texture2D texture, const void *pixels);                                         // Update GPU texture with new data
     DefineEngineFunction( UpdateTexture, void, (S32 textureId, S32 imageId), , "Update GPU texture with data from an Image ID") {

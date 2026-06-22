@@ -7,7 +7,7 @@
 #include "console/script.h"
 #include "console/engineAPI.h"
 #include "ConsoleTypes.h"
-#include "elfStorage.h"
+#include "elfResource.h"
 #include <core/strings/stringUnit.h>
 #include <vector>
 

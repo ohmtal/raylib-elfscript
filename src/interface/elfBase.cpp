@@ -7,7 +7,7 @@
 #include "console/script.h"
 #include "console/engineAPI.h"
 #include "ConsoleTypes.h"
-#include "elfStorage.h"
+#include "elfResource.h"
 
 //the lazy (long build time) way or define KeyboardKey (348)
 // #define MAGIC_ENUM_RANGE_MIN 0
@@ -424,15 +424,17 @@ DefineEngineFunction(EndDrawing, void, (),," End canvas (framebuffer) drawing an
     EndDrawing();
 }
 
-// RLAPI void BeginTextureMode(RenderTexture2D target);                                                     // Begins drawing to render texture
-DefineEngineFunction( BeginTextureMode, void, (S32 renderTextureId), , "Begins drawing to render texture") {
-    RenderTexture2D* target = ElfResource::RenderTextureMap.get(renderTextureId);
-    if (!target) return;
-    BeginTextureMode(*target);
-}
-DefineEngineFunction(EndTextureMode, void, (),, " End drawing to render texture") {
-    EndTextureMode();
-}
+// RLAPI void BeginTextureMode(RenderTexture2D target);
+// Begins drawing to render texture
+// NOTE moved to RenderTextureObject!
+// DefineEngineFunction( BeginTextureMode, void, (S32 renderTextureId), , "Begins drawing to render texture") {
+//     RenderTexture2D* target = ElfResource::RenderTextureMap.get(renderTextureId);
+//     if (!target) return;
+//     BeginTextureMode(*target);
+// }
+// DefineEngineFunction(EndTextureMode, void, (),, " End drawing to render texture") {
+//     EndTextureMode();
+// }
 
 // NOTE: in elfShader.cpp
 // RLAPI void BeginShaderMode(Shader shader);                        // Begin custom shader drawing

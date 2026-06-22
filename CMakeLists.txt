@@ -18,6 +18,7 @@ set(PROJECT_SRC
     src/interface/elfAudio.cpp
     src/interface/elfShader.cpp
     src/interface/elfFile.cpp
+    src/interface/elfBatchRender.cpp
 )
 
 

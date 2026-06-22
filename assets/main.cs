@@ -1,6 +1,6 @@
 // Main Script
 $MODULES = "Eyes";
-$MODULES = $MODULES SPC "BatchTest looptest";
+$MODULES = $MODULES SPC "RenderMap BatchTest looptest";
 $MODULES = $MODULES SPC "blank DeltaTime shapes_starfield_effect shapes_starfield_batch";
 
 // LOADFAILTEST shapes_starfield_effect_v1
@@ -35,6 +35,7 @@ function Main::loadModule(%this, %setNewModuleIndex) {
 
     if (!exec("assets/modules/" @ %this.moduleName @ ".cs")) {
         error("Failed to load module" SPC %this.moduleName);
+        return false;
     }
 
     if (isObject(%this.module)) {
@@ -45,9 +46,11 @@ function Main::loadModule(%this, %setNewModuleIndex) {
     echo("loadModule command is:" SPC %cmd);
     eval(%cmd);
     echo("loadModule success:" SPC isObject(%this.module));
-    // if (isObject(%this.module)) {
-    //     %this.module.init();
-    // }
+    if (!isObject(%this.module) || !%this.module.isMethod("render")) {
+        %this.module = 0;
+        return false;
+    }
+    return true;
 }
 
 function Main::loop(%this) {

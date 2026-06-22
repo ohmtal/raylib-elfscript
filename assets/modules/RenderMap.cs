@@ -1,19 +1,23 @@
-
+/*
+ * RenderTexture2D target = LoadRenderTexture(screenWidth, screenHeight);
+ *  BeginTextureMode(target);
+ *  EndTextureMode();
+ *   DrawTextureRec(target.texture, (Rectangle){ 0, 0, (float)target.texture.width, (float)-target.texture.height }, (Vector2){ 0, 0 }, WHITE);
+*/
 #define _BATCH_COUNT_ 50000
 #define _RECT_SIZE_ 20
 #define _UPDATE_INTERVAL_ 3
 
-function createBatchTest() {
+function createRenderMap() {
     %obj = new ScriptObject() {
-        class = "BatchTest";
+        class = "RenderMap";
     };
-
 
     return %obj;
 }
 //----------------------------------------------------------------------
-function BatchTest::onAdd(%this) {
-    SetTargetFPS(0); //FPS TEST only calling module
+function RenderMap::onAdd(%this) {
+    // SetTargetFPS(0); //FPS TEST only calling module
 
     BatchCreate(_BATCH_COUNT_);
 
@@ -38,16 +42,19 @@ function BatchTest::onAdd(%this) {
 
     $updateTimer = _UPDATE_INTERVAL_;
 
+    $target = new RenderTextureObject() { width = GetScreenWidth(); height = GetScreenHeight(); };
+
     echo(" ---------- init done");
     return true;
 }
 //----------------------------------------------------------------------
-function BatchTest::OnRemove(%this) {
-
+function RenderMap::OnRemove(%this) {
+    $target.delete();
+    $target = 0;
 }
 //----------------------------------------------------------------------
-function BatchTest::Render(%this) {
-    ClearBackground(WHITE);
+function RenderMap::Render(%this) {
+
     $updateTimer += GetFrameTime();
 
     if ( $updateTimer > _UPDATE_INTERVAL_ ) {
@@ -59,9 +66,22 @@ function BatchTest::Render(%this) {
             $b0Y = GetRandomValue(0, $h);
             BatchPushVec2(%i, 0, "$b0X", "$b0Y");
         }
+        $target.BeginTextureMode();
+         ClearBackground(WHITE);
+         BatchDrawColoredRects();
+        $target.EndTextureMode();
     }
-    BatchDrawColoredRects();
+    ClearBackground(WHITE);
+    DrawTextureRec($target.texture
+    , "0 0" SPC $target.width SPC -$target.height
+    , "0 0"
+    , WHITE );
+
     DrawText("Rects: _BATCH_COUNT_ Timer is:" SPC strFormat("%d",$updateTimer) SPC "/" SPC _UPDATE_INTERVAL_, 5, 5, 20, YELLOW, true, BLACK);
+
+    if (IsWindowResized()) {
+       $target.resize( GetScreenWidth(),GetScreenHeight());
+    }
 
 }
 

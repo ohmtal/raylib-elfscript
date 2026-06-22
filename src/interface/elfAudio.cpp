@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
 
-#include "elfStorage.h"
+#include "elfResource.h"
 #include <console/console.h>
 #include "console/engineAPI.h"
 #include "ConsoleTypes.h"
