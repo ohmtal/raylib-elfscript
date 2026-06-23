@@ -226,7 +226,7 @@ function looptest::Render(%this) {
     if(%m == 16) { // curelement stuff => pull
         %foo = 0.0;
         for ( %i = 0 ; %i < _LOOP_COUNT_ ; %i++) {
-            %this.pull(%i);
+            // %this.pull(%i);
             %x = %this.x;
             %y = %this.y;
         }
@@ -237,7 +237,7 @@ function looptest::Render(%this) {
         for ( %i = 0 ; %i < _LOOP_COUNT_ ; %i++) {
             %this.x = 20.1;
             %this.y = 10.2;
-            %this.push(%i);
+            // %this.push(%i);
         }
     }
 
