@@ -81,7 +81,7 @@ public:
 
     static void initPersistFields() {
         addProtectedField("count", TypeS32, 0, &_setBufferSize,&_getBufferSize, "Set the buffersize (element count).");
-        addField("x", TypeF32, Offset(mCurElement.m0, BatchRender), "curent x on the matrix"),
+        addField("m0", TypeF32, Offset(mCurElement.m0, BatchRender), "curent x on the matrix"),
         addField("y", TypeF32, Offset(mCurElement.m1, BatchRender), "curent y on the matrix"),
         addField("z", TypeF32, Offset(mCurElement.m2, BatchRender), "curent z on the matrix"),
         addField("w", TypeF32, Offset(mCurElement.m3, BatchRender), "curent w on the matrix"),
