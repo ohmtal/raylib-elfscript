@@ -99,6 +99,7 @@ function MainInit() {
 
     $Main.init();
 
+
     return true;
 }
 function MainShutDown() {

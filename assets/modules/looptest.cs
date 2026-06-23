@@ -96,7 +96,7 @@ function looptest::onAdd(%this) {
 function looptest::Render(%this) {
      // ---------- display and change current method ------------
     ClearBackGround("60 60 60");
-    DrawText("Method" SPC %this.method SPC GetFPS(), 10 , 10, 20, YELLOW);
+    DrawText("Method" SPC %this.method SPC _LOOP_COUNT_ SPC GetFPS(), 10 , 10, 20, YELLOW);
     DrawText("TAB/shift TAB to toggle", 10 , 40, 20,  GREEN);
     DrawText("Description in source files modules/looptest.cs", 10 , 70,20, "100 100 255");
     if (IsKeyPressed(KEY_TAB)) {
@@ -217,8 +217,9 @@ function looptest::Render(%this) {
     }
     else
     if(%m == 15) {
+        %foo = 0.0;
         for ( %i = 0 ; %i < _LOOP_COUNT_ ; %i++) {
-
+            %foo += 0.1;
         }
     }
 

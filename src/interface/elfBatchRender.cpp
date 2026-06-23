@@ -9,6 +9,21 @@
 // -------------------------------------------------------------------------------------------
 namespace ElfRender {
 
+
+// TODO use a map of StringTableEntry pointer instead building the strings!:
+// Dictionary::Entry *getVariableEntry(const char *name)
+// {
+//     name = prependDollar(name);
+//     return gGlobalVars.lookup(StringTable->insert(name));
+// }
+// ------
+// Dictionary::Entry *entry = getVariableEntry(varName);
+// return entry ? entry->getFloatValue() : def;
+//
+// unfortually with the modular BatchPushVec2 it's ait tricky
+// or maybe not BatchPushVec2(%i,1, "$b0Z", "$b0W");
+// sequence is $b0X, $b0Y, $b0Z, $b0W where 0  is the Vector4 stack (0..3)
+
 //TODO just start porting to Pointers
 const String globalVarNames[16] = {
     "$b0X", "$b0Y", "$b0Z", "$b0W"
@@ -543,19 +558,6 @@ DefineEngineFunction(BatchPush,bool, (S32 index,S32 stack),(0),"push variables $
 {
     if (!gBatchRender || stack < 0 || stack > 3) return false;
 
-    // FIXME use a map of StringTableEntry pointer instead building the strings!:
-    // Dictionary::Entry *getVariableEntry(const char *name)
-    // {
-    //     name = prependDollar(name);
-    //     return gGlobalVars.lookup(StringTable->insert(name));
-    // }
-    // ------
-    // Dictionary::Entry *entry = getVariableEntry(varName);
-    // return entry ? entry->getFloatValue() : def;
-    //
-    // unfortually with the modular BatchPushVec2 it's ait tricky
-    // or maybe not BatchPushVec2(%i,1, "$b0Z", "$b0W");
-    // sequence is $b0X, $b0Y, $b0Z, $b0W where 0  is the Vector4 stack (0..3)
 
 
 
