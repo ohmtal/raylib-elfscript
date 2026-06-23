@@ -222,7 +222,24 @@ function looptest::Render(%this) {
             %foo += 0.1;
         }
     }
-
+    else
+    if(%m == 16) { // curelement stuff => pull
+        %foo = 0.0;
+        for ( %i = 0 ; %i < _LOOP_COUNT_ ; %i++) {
+            %this.pull(%i);
+            %x = %this.x;
+            %y = %this.y;
+        }
+    }
+    else
+    if(%m == 17) { // curelement stuff => push
+        %foo = 0.0;
+        for ( %i = 0 ; %i < _LOOP_COUNT_ ; %i++) {
+            %this.x = 20.1;
+            %this.y = 10.2;
+            %this.push(%i);
+        }
+    }
 
     // BAD! use "if for" capsulate if possible
     // for ( %i = 0 ; %i < _LOOP_COUNT_; %i++) {

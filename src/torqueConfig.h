@@ -37,6 +37,7 @@
 #define TORQUE_DISABLE_MEMORY_MANAGER
 
 #define ELFSCRIPT_STRICT_SLOT_TYPE
+// lot of changes .. instable and no enhancements! #define ELFSCRIPT_CALLFUNC_CACHED
 
 /* #undef TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM */
 /* #undef TORQUE_DISABLE_FIND_ROOT_WITHIN_ZIP */

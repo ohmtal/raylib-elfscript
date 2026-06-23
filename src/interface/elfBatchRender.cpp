@@ -5,7 +5,7 @@
 
 // -------------------------------------------------------------------------------------------
 // BatchRender
-//
+// this is more a speed test playground than a usable object
 // -------------------------------------------------------------------------------------------
 namespace ElfRender {
 
@@ -43,9 +43,10 @@ class BatchRender : public SimObject {
 
 public:
     // Flat memory layout holding Raylib Matrix structures
-    Vector<Matrix> mElement;
+    Vector<Matrix> mElements;
 
-
+    //WARNING for testing fields only! should be set a functions
+    Matrix mCurElement;
 
 
     DECLARE_CONOBJECT(BatchRender);
@@ -53,8 +54,9 @@ public:
     // Safely resize the internal Torque vector allocation
     void setBufferSize(S32 size) {
         // NOTE: Torque uses setSize() instead of resize() for its Vector
-        mElement.setSize(size);
-        dMemset(mElement.address(), 0, mElement.size() * sizeof(Matrix));
+
+        mElements.setSize(size);
+        dMemset(mElements.address(), 0, mElements.size() * sizeof(Matrix));
     }
 
     static bool _setBufferSize(void* obj,const char* , const char* data) {
@@ -68,32 +70,37 @@ public:
         return false;
     }
 
-    S32 getCount() { return mElement.size();}
+    S32 getCount() { return mElements.size();}
 
     static const char *_getBufferSize(void* obj, const char* data) {
         BatchRender* object = static_cast<BatchRender*>(obj);
         if (!object) return "";
-        return Con::getIntArg(object->mElement.size());
+        return Con::getIntArg(object->mElements.size());
     }
+
 
     static void initPersistFields() {
         addProtectedField("count", TypeS32, 0, &_setBufferSize,&_getBufferSize, "Set the buffersize (element count).");
+        addField("x", TypeF32, Offset(mCurElement.m0, BatchRender), "curent x on the matrix"),
+        addField("y", TypeF32, Offset(mCurElement.m1, BatchRender), "curent y on the matrix"),
+        addField("z", TypeF32, Offset(mCurElement.m2, BatchRender), "curent z on the matrix"),
+        addField("w", TypeF32, Offset(mCurElement.m3, BatchRender), "curent w on the matrix"),
         Parent::initPersistFields();
     }
 
     // BATCH DRAW 1: Render circles using rectangle coordinates
     void drawCircles(S32 count, Color color) {
-        S32 safeCount = getMin(count, mElement.size());
+        S32 safeCount = getMin(count, mElements.size());
         for (S32 i = 0; i < safeCount; ++i) {
-            DrawCircle(mElement[i].m0, mElement[i].m1, mElement[i].m2, color);
+            DrawCircle(mElements[i].m0, mElements[i].m1, mElements[i].m2, color);
         }
     }
 
     // BATCH DRAW 2: Render solid rectangles directly
     void drawRects(S32 count, Color color) {
-        S32 safeCount = getMin(count, mElement.size());
+        S32 safeCount = getMin(count, mElements.size());
         for (S32 i = 0; i < safeCount; ++i) {
-            DrawRectangle( mElement[i].m0, mElement[i].m1, mElement[i].m2, mElement[i].m3, color);
+            DrawRectangle( mElements[i].m0, mElements[i].m1, mElements[i].m2, mElements[i].m3, color);
         }
     }
 
@@ -102,26 +109,26 @@ public:
      * fetch color from stack id:3
      */
     void drawColoredRects() {
-        S32 count = mElement.size();
+        S32 count = mElements.size();
         Color color = RAYWHITE;
         for (S32 i = 0; i < count; ++i) {
-            color = { (U8) mElement[i].m12 ,(U8) mElement[i].m13,
-                      (U8) mElement[i].m14, (U8) mElement[i].m15 };
-            DrawRectangle( mElement[i].m0, mElement[i].m1, mElement[i].m2, mElement[i].m3,color);
+            color = { (U8) mElements[i].m12 ,(U8) mElements[i].m13,
+                      (U8) mElements[i].m14, (U8) mElements[i].m15 };
+            DrawRectangle( mElements[i].m0, mElements[i].m1, mElements[i].m2, mElements[i].m3,color);
         }
     }
 
     void dumpRects() {
-        S32 safeCount  = mElement.size();
+        S32 safeCount  = mElements.size();
         for (S32 i = 0; i < safeCount; ++i) {
-            Con::printf("#%d %f %f %f %f", i, mElement[i].m0, mElement[i].m1, mElement[i].m2, mElement[i].m3);
+            Con::printf("#%d %f %f %f %f", i, mElements[i].m0, mElements[i].m1, mElements[i].m2, mElements[i].m3);
         }
     }
     // BATCH DRAW 3: Render lines interpreting components as start/end vectors
     void drawLines(S32 count, Color color) {
-        S32 safeCount = getMin(count, mElement.size());
+        S32 safeCount = getMin(count, mElements.size());
         for (S32 i = 0; i < safeCount; ++i) {
-            DrawLine(mElement[i].m0, mElement[i].m1, mElement[i].m2, mElement[i].m3, color);
+            DrawLine(mElements[i].m0, mElements[i].m1, mElements[i].m2, mElements[i].m3, color);
 
         }
     }
@@ -131,17 +138,26 @@ public:
      * fetch color from stack id:3
      */
     void drawColoredLines() {
-        S32 count = mElement.size();
+        S32 count = mElements.size();
         Color color = RAYWHITE;
         for (S32 i = 0; i < count; ++i) {
-            color = { (U8) mElement[i].m12 ,(U8) mElement[i].m13,
-                (U8) mElement[i].m14, (U8) mElement[i].m15 };
-                DrawLine(mElement[i].m0, mElement[i].m1, mElement[i].m2, mElement[i].m3,color);
+            color = { (U8) mElements[i].m12 ,(U8) mElements[i].m13,
+                (U8) mElements[i].m14, (U8) mElements[i].m15 };
+                DrawLine(mElements[i].m0, mElements[i].m1, mElements[i].m2, mElements[i].m3,color);
         }
     }
 };
 
 IMPLEMENT_CONOBJECT(BatchRender);
+
+DefineEngineMethod(BatchRender, push,void, (S32 index), , "push the index to current") {
+    if (index < 0 || index > object->mElements.size()) return;
+    object->mElements[index] = object->mCurElement;
+}
+DefineEngineMethod(BatchRender, pull,void, (S32 index), , "push the index to current") {
+    if (index < 0 || index > object->mElements.size()) return;
+    object->mCurElement = object->mElements[index];
+}
 
 // --- Console Method Bindings ---
 
@@ -153,67 +169,67 @@ DefineEngineMethod(BatchRender, setBufferSize, void, (S32 size),, "Resizes the i
 // FIXME USE STACK HERE too!!
 DefineEngineMethod(BatchRender, setVector2, void, (S32 index, F32 x, F32 y),
                    , "Sets data at a specific index") {
-    if (index >= 0 && index < object->mElement.size()) {
-        object->mElement[index].m0 = x;
-        object->mElement[index].m1 = y;
+    if (index >= 0 && index < object->mElements.size()) {
+        object->mElements[index].m0 = x;
+        object->mElements[index].m1 = y;
     }
 }
 DefineEngineMethod(BatchRender, setVector2v, void, (S32 index, Vector2 vec),
                    , "Sets data at a specific index") {
-    if (index >= 0 && index < object->mElement.size()) {
-        object->mElement[index].m0 = vec.x;
-        object->mElement[index].m1 = vec.y;
+    if (index >= 0 && index < object->mElements.size()) {
+        object->mElements[index].m0 = vec.x;
+        object->mElements[index].m1 = vec.y;
     }
 }
 
 
 DefineEngineMethod(BatchRender, setVector3, void, (S32 index, F32 x, F32 y, F32 z),
                    , "Sets data at a specific index") {
-    if (index >= 0 && index < object->mElement.size()) {
-        object->mElement[index].m0 = x;
-        object->mElement[index].m1 = y;
-        object->mElement[index].m2 = z;
+    if (index >= 0 && index < object->mElements.size()) {
+        object->mElements[index].m0 = x;
+        object->mElements[index].m1 = y;
+        object->mElements[index].m2 = z;
     }
 }
 
 DefineEngineMethod(BatchRender, setVector4, void, (S32 index, F32 x, F32 y, F32 w, F32 h),
                    , "Sets data at a specific index") {
-    if (index >= 0 && index < object->mElement.size()) {
-        object->mElement[index].m0 = x;
-        object->mElement[index].m1 = y;
-        object->mElement[index].m2 = w;
-        object->mElement[index].m3 = h;
+    if (index >= 0 && index < object->mElements.size()) {
+        object->mElements[index].m0 = x;
+        object->mElements[index].m1 = y;
+        object->mElements[index].m2 = w;
+        object->mElements[index].m3 = h;
     }
 }
 
 DefineEngineMethod(BatchRender, setVector4_1, void, (S32 index
 ,  F32 m4, F32 m5, F32 m6, F32 m7),
 , "Sets data at a specific index") {
-    if (index >= 0 && index < object->mElement.size()) {
-        object->mElement[index].m4 = m4;
-        object->mElement[index].m5 = m5;
-        object->mElement[index].m6 = m6;
-        object->mElement[index].m7 = m7;
+    if (index >= 0 && index < object->mElements.size()) {
+        object->mElements[index].m4 = m4;
+        object->mElements[index].m5 = m5;
+        object->mElements[index].m6 = m6;
+        object->mElements[index].m7 = m7;
     }
 }
 DefineEngineMethod(BatchRender, setVector4_2, void, (S32 index
     , F32 m8, F32 m9, F32 m10, F32 m11),
     , "Sets data at a specific index") {
-    if (index >= 0 && index < object->mElement.size()) {
-        object->mElement[index].m8 = m8;
-        object->mElement[index].m9 = m9;
-        object->mElement[index].m10 = m10;
-        object->mElement[index].m11 = m11;
+    if (index >= 0 && index < object->mElements.size()) {
+        object->mElements[index].m8 = m8;
+        object->mElements[index].m9 = m9;
+        object->mElements[index].m10 = m10;
+        object->mElements[index].m11 = m11;
     }
 }
 DefineEngineMethod(BatchRender, setVector4_3, void, (S32 index
 , F32 m12, F32 m13, F32 m14, F32 m15),
 , "Sets data at a specific index") {
-    if (index >= 0 && index < object->mElement.size()) {
-        object->mElement[index].m12 = m12;
-        object->mElement[index].m13 = m13;
-        object->mElement[index].m14 = m14;
-        object->mElement[index].m15 = m15;
+    if (index >= 0 && index < object->mElements.size()) {
+        object->mElements[index].m12 = m12;
+        object->mElements[index].m13 = m13;
+        object->mElements[index].m14 = m14;
+        object->mElements[index].m15 = m15;
     }
 }
 
@@ -221,63 +237,63 @@ DefineEngineMethod(BatchRender, setVector4_3, void, (S32 index
 DefineEngineMethod(BatchRender, setVector8, void, (S32 index
 , F32 m0, F32 m1, F32 m2, F32 m3, F32 m4, F32 m5, F32 m6, F32 m7),
 , "Sets data at a specific index") {
-    if (index >= 0 && index < object->mElement.size()) {
-        object->mElement[index].m0 = m0;
-        object->mElement[index].m1 = m1;
-        object->mElement[index].m2 = m2;
-        object->mElement[index].m3 = m3;
-        object->mElement[index].m4 = m4;
-        object->mElement[index].m5 = m5;
-        object->mElement[index].m6 = m6;
-        object->mElement[index].m7 = m7;
+    if (index >= 0 && index < object->mElements.size()) {
+        object->mElements[index].m0 = m0;
+        object->mElements[index].m1 = m1;
+        object->mElements[index].m2 = m2;
+        object->mElements[index].m3 = m3;
+        object->mElements[index].m4 = m4;
+        object->mElements[index].m5 = m5;
+        object->mElements[index].m6 = m6;
+        object->mElements[index].m7 = m7;
     }
 }
 
 DefineEngineMethod(BatchRender, getX, F32, (S32 index),, "Get x position by index") {
-    return object->mElement[index].m0;
+    return object->mElements[index].m0;
 }
 
 DefineEngineMethod(BatchRender, getY, F32, (S32 index),, "Get y position by index") {
-    return object->mElement[index].m1;
+    return object->mElements[index].m1;
 }
 
 // Purposefully mapping width to Z-depth for script-side math optimization
 DefineEngineMethod(BatchRender, getZ, F32, (S32 index),, "Get z (width) by index") {
-    return object->mElement[index].m2;
+    return object->mElements[index].m2;
 }
 
 DefineEngineMethod(BatchRender, getW, F32, (S32 index),, "Get width by index") {
-    return object->mElement[index].m2;
+    return object->mElements[index].m2;
 }
 
 DefineEngineMethod(BatchRender, getH, F32, (S32 index),, "Get height by index") {
-    return object->mElement[index].m3;
+    return object->mElements[index].m3;
 }
 
 DefineEngineMethod(BatchRender, getVector2, Vector3, (S32 index),, "Get full Vector2 structure by index") {
-    return { object->mElement[index].m0, object->mElement[index].m1 };
+    return { object->mElements[index].m0, object->mElements[index].m1 };
 }
 
 DefineEngineMethod(BatchRender, getVector3, Vector3, (S32 index),, "Get full Vector3 structure by index") {
-    return { object->mElement[index].m0, object->mElement[index].m1, object->mElement[index].m2 };
+    return { object->mElements[index].m0, object->mElements[index].m1, object->mElements[index].m2 };
 }
 
 DefineEngineMethod(BatchRender, getVector4, Vector4, (S32 index),, "Get Vector4 structure by index") {
-   return { object->mElement[index].m0, object->mElement[index].m1, object->mElement[index].m2 , object->mElement[index].m3};
+   return { object->mElements[index].m0, object->mElements[index].m1, object->mElements[index].m2 , object->mElements[index].m3};
 }
 
 DefineEngineMethod(BatchRender, getVector4_1, Vector4, (S32 index),, "Get second Vector4 structure by index") {
-    return { object->mElement[index].m4, object->mElement[index].m5, object->mElement[index].m6 , object->mElement[index].m7};
+    return { object->mElements[index].m4, object->mElements[index].m5, object->mElements[index].m6 , object->mElements[index].m7};
 }
 DefineEngineMethod(BatchRender, getVector4_2, Vector4, (S32 index),, "Get third Vector4 structure by index") {
-    return { object->mElement[index].m8, object->mElement[index].m9, object->mElement[index].m10 , object->mElement[index].m11};
+    return { object->mElements[index].m8, object->mElements[index].m9, object->mElements[index].m10 , object->mElements[index].m11};
 }
 DefineEngineMethod(BatchRender, getVector4_3, Vector4, (S32 index),, "Get fourth Vector4 structure by index") {
-    return { object->mElement[index].m12, object->mElement[index].m13, object->mElement[index].m14 , object->mElement[index].m15};
+    return { object->mElements[index].m12, object->mElements[index].m13, object->mElements[index].m14 , object->mElements[index].m15};
 }
 
 DefineEngineMethod(BatchRender, getMatrix, Matrix, (S32 index),, "Get the Matrix structure by index") {
-    return object->mElement[index];
+    return object->mElements[index];
 }
 
 
@@ -300,9 +316,9 @@ DefineEngineMethod(BatchRender, drawLines, void, (S32 count, Color color),, "Bat
 DefineEngineMethod(BatchRender, getVector2GlobalV, void,
                    (S32 index, String varX, String varY),
                    , "Fetches X, Yto global variables named by parameters") {
-    if (index >= 0 && index < object->mElement.size()) {
-        if (varX) Con::setFloatVariable(varX, object->mElement[index].m0);
-        if (varY) Con::setFloatVariable(varY, object->mElement[index].m1);
+    if (index >= 0 && index < object->mElements.size()) {
+        if (varX) Con::setFloatVariable(varX, object->mElements[index].m0);
+        if (varY) Con::setFloatVariable(varY, object->mElements[index].m1);
     }
 }
 
@@ -313,19 +329,19 @@ DefineEngineMethod(BatchRender, getVector2GlobalV, void,
 DefineEngineMethod(BatchRender, setVector2GlobalV, void,
                    (S32 index, String varX, String varY),
                    , "Fetches X, Y FROM global variables named by parameters") {
-    if (index >= 0 && index < object->mElement.size()) {
-        if (varX) object->mElement[index].m0 = Con::getFloatVariable(varX);
-        if (varY) object->mElement[index].m1 = Con::getFloatVariable(varY);
+    if (index >= 0 && index < object->mElements.size()) {
+        if (varX) object->mElements[index].m0 = Con::getFloatVariable(varX);
+        if (varY) object->mElements[index].m1 = Con::getFloatVariable(varY);
     }
 }
 
 DefineEngineMethod(BatchRender, getVector3GlobalV, void,
                    (S32 index, String varX, String varY, String varW),
                    , "Fetches X, Y, Z to global variables named by parameters") {
-    if (index >= 0 && index < object->mElement.size()) {
-        if (varX) Con::setFloatVariable(varX, object->mElement[index].m0);
-        if (varY) Con::setFloatVariable(varY, object->mElement[index].m1);
-        if (varW) Con::setFloatVariable(varW, object->mElement[index].m2);
+    if (index >= 0 && index < object->mElements.size()) {
+        if (varX) Con::setFloatVariable(varX, object->mElements[index].m0);
+        if (varY) Con::setFloatVariable(varY, object->mElements[index].m1);
+        if (varW) Con::setFloatVariable(varW, object->mElements[index].m2);
     }
 }
 // -------------------------- Vecor2 Stacks ----------------------------------------
@@ -334,38 +350,38 @@ static bool _assignVector2ToGlobal(BatchRender* object, S32 stack, S32 index
         , String varX, String varY)
 {
     if (!object) return false;
-    if (index >= 0 && index < object->mElement.size()) {
+    if (index >= 0 && index < object->mElements.size()) {
 
         if (stack == 0) {
-            if (varX) Con::setFloatVariable(varX, object->mElement[index].m0);
-            if (varY) Con::setFloatVariable(varY, object->mElement[index].m1);
+            if (varX) Con::setFloatVariable(varX, object->mElements[index].m0);
+            if (varY) Con::setFloatVariable(varY, object->mElements[index].m1);
         } else if (stack == 2) {
-            if (varX) Con::setFloatVariable(varX, object->mElement[index].m2);
-            if (varY) Con::setFloatVariable(varY, object->mElement[index].m3);
+            if (varX) Con::setFloatVariable(varX, object->mElements[index].m2);
+            if (varY) Con::setFloatVariable(varY, object->mElements[index].m3);
         } else if (stack == 3) {
-            if (varX) Con::setFloatVariable(varX, object->mElement[index].m4);
-            if (varY) Con::setFloatVariable(varY, object->mElement[index].m5);
+            if (varX) Con::setFloatVariable(varX, object->mElements[index].m4);
+            if (varY) Con::setFloatVariable(varY, object->mElements[index].m5);
         } else if (stack == 4) {
-            if (varX) Con::setFloatVariable(varX, object->mElement[index].m6);
-            if (varY) Con::setFloatVariable(varY, object->mElement[index].m7);
+            if (varX) Con::setFloatVariable(varX, object->mElements[index].m6);
+            if (varY) Con::setFloatVariable(varY, object->mElements[index].m7);
         } else  if (stack == 5) {
-            if (varX) Con::setFloatVariable(varX, object->mElement[index].m8);
-            if (varY) Con::setFloatVariable(varY, object->mElement[index].m9);
+            if (varX) Con::setFloatVariable(varX, object->mElements[index].m8);
+            if (varY) Con::setFloatVariable(varY, object->mElements[index].m9);
         } else if (stack == 6) {
-            if (varX) Con::setFloatVariable(varX, object->mElement[index].m10);
-            if (varY) Con::setFloatVariable(varY, object->mElement[index].m11);
+            if (varX) Con::setFloatVariable(varX, object->mElements[index].m10);
+            if (varY) Con::setFloatVariable(varY, object->mElements[index].m11);
         } else  if (stack == 7) {
-            if (varX) Con::setFloatVariable(varX, object->mElement[index].m12);
-            if (varY) Con::setFloatVariable(varY, object->mElement[index].m13);
+            if (varX) Con::setFloatVariable(varX, object->mElements[index].m12);
+            if (varY) Con::setFloatVariable(varY, object->mElements[index].m13);
         } else if (stack == 8) {
-            if (varX) Con::setFloatVariable(varX, object->mElement[index].m14);
-            if (varY) Con::setFloatVariable(varY, object->mElement[index].m15);
+            if (varX) Con::setFloatVariable(varX, object->mElements[index].m14);
+            if (varY) Con::setFloatVariable(varY, object->mElements[index].m15);
         } else {
             Con::errorf("getVector2ToGlobal Invalid stack id! (%d)", stack);
             return false;
         }
     } else {
-        Con::errorf("getVector2ToGlobal invalid index!! %d max:%d", index,object->mElement.size() );
+        Con::errorf("getVector2ToGlobal invalid index!! %d max:%d", index,object->mElements.size() );
         return false;
     }
     return true;
@@ -375,37 +391,37 @@ static bool _assignVector2FromGlobal(BatchRender* object, S32 stack, S32 index
         , String varX, String varY)
 {
     if (!object) return false;
-    if (index >= 0 && index < object->mElement.size()) {
+    if (index >= 0 && index < object->mElements.size()) {
         if (stack == 0) {
-            if (varX) object->mElement[index].m0 = Con::getFloatVariable(varX);
-            if (varY) object->mElement[index].m1 = Con::getFloatVariable(varY);
+            if (varX) object->mElements[index].m0 = Con::getFloatVariable(varX);
+            if (varY) object->mElements[index].m1 = Con::getFloatVariable(varY);
         } else if (stack == 1) {
-            if (varX) object->mElement[index].m2 = Con::getFloatVariable(varX);
-            if (varY) object->mElement[index].m3 = Con::getFloatVariable(varY);
+            if (varX) object->mElements[index].m2 = Con::getFloatVariable(varX);
+            if (varY) object->mElements[index].m3 = Con::getFloatVariable(varY);
         } else if (stack == 2) {
-            if (varX) object->mElement[index].m4 = Con::getFloatVariable(varX);
-            if (varY) object->mElement[index].m5 = Con::getFloatVariable(varY);
+            if (varX) object->mElements[index].m4 = Con::getFloatVariable(varX);
+            if (varY) object->mElements[index].m5 = Con::getFloatVariable(varY);
         } else if (stack == 3) {
-            if (varX) object->mElement[index].m6 = Con::getFloatVariable(varX);
-            if (varY) object->mElement[index].m7 = Con::getFloatVariable(varY);
+            if (varX) object->mElements[index].m6 = Con::getFloatVariable(varX);
+            if (varY) object->mElements[index].m7 = Con::getFloatVariable(varY);
         } else if (stack == 4) {
-            if (varX) object->mElement[index].m8 = Con::getFloatVariable(varX);
-            if (varY) object->mElement[index].m9 = Con::getFloatVariable(varY);
+            if (varX) object->mElements[index].m8 = Con::getFloatVariable(varX);
+            if (varY) object->mElements[index].m9 = Con::getFloatVariable(varY);
         } else if (stack == 5) {
-            if (varX) object->mElement[index].m10= Con::getFloatVariable(varX);
-            if (varY) object->mElement[index].m11= Con::getFloatVariable(varY);
+            if (varX) object->mElements[index].m10= Con::getFloatVariable(varX);
+            if (varY) object->mElements[index].m11= Con::getFloatVariable(varY);
         } else if (stack == 6) {
-            if (varX) object->mElement[index].m12= Con::getFloatVariable(varX);
-            if (varY) object->mElement[index].m13= Con::getFloatVariable(varY);
+            if (varX) object->mElements[index].m12= Con::getFloatVariable(varX);
+            if (varY) object->mElements[index].m13= Con::getFloatVariable(varY);
         } else if (stack == 7) {
-            if (varX) object->mElement[index].m14= Con::getFloatVariable(varX);
-            if (varY) object->mElement[index].m15= Con::getFloatVariable(varY);
+            if (varX) object->mElements[index].m14= Con::getFloatVariable(varX);
+            if (varY) object->mElements[index].m15= Con::getFloatVariable(varY);
         } else {
             Con::errorf("getVector2ToGlobal Invalid stack id! (%d)", stack);
             return false;
         }
     } else {
-        Con::errorf("getVector2ToGlobal invalid index!! %d max:%d", index,object->mElement.size() );
+        Con::errorf("getVector2ToGlobal invalid index!! %d max:%d", index,object->mElements.size() );
         return false;
     }
     return true;
@@ -415,34 +431,34 @@ static bool _assignVector4ToGlobal(BatchRender* object, S32 stack, S32 index
     , String varX, String varY, String varW, String varH)
 {
     if (!object) return false;
-    if (index >= 0 && index < object->mElement.size()) {
+    if (index >= 0 && index < object->mElements.size()) {
 
         if (stack == 0) {
-            if (varX) Con::setFloatVariable(varX, object->mElement[index].m0);
-            if (varY) Con::setFloatVariable(varY, object->mElement[index].m1);
-            if (varW) Con::setFloatVariable(varW, object->mElement[index].m2);
-            if (varH) Con::setFloatVariable(varH, object->mElement[index].m3);
+            if (varX) Con::setFloatVariable(varX, object->mElements[index].m0);
+            if (varY) Con::setFloatVariable(varY, object->mElements[index].m1);
+            if (varW) Con::setFloatVariable(varW, object->mElements[index].m2);
+            if (varH) Con::setFloatVariable(varH, object->mElements[index].m3);
         } else if (stack == 1) {
-            if (varX) Con::setFloatVariable(varX, object->mElement[index].m4);
-            if (varY) Con::setFloatVariable(varY, object->mElement[index].m5);
-            if (varW) Con::setFloatVariable(varW, object->mElement[index].m6);
-            if (varH) Con::setFloatVariable(varH, object->mElement[index].m7);
+            if (varX) Con::setFloatVariable(varX, object->mElements[index].m4);
+            if (varY) Con::setFloatVariable(varY, object->mElements[index].m5);
+            if (varW) Con::setFloatVariable(varW, object->mElements[index].m6);
+            if (varH) Con::setFloatVariable(varH, object->mElements[index].m7);
         } else  if (stack == 2) {
-            if (varX) Con::setFloatVariable(varX, object->mElement[index].m8);
-            if (varY) Con::setFloatVariable(varY, object->mElement[index].m9);
-            if (varW) Con::setFloatVariable(varW, object->mElement[index].m10);
-            if (varH) Con::setFloatVariable(varH, object->mElement[index].m11);
+            if (varX) Con::setFloatVariable(varX, object->mElements[index].m8);
+            if (varY) Con::setFloatVariable(varY, object->mElements[index].m9);
+            if (varW) Con::setFloatVariable(varW, object->mElements[index].m10);
+            if (varH) Con::setFloatVariable(varH, object->mElements[index].m11);
         } else  if (stack == 3) {
-            if (varX) Con::setFloatVariable(varX, object->mElement[index].m12);
-            if (varY) Con::setFloatVariable(varY, object->mElement[index].m13);
-            if (varW) Con::setFloatVariable(varW, object->mElement[index].m14);
-            if (varH) Con::setFloatVariable(varH, object->mElement[index].m15);
+            if (varX) Con::setFloatVariable(varX, object->mElements[index].m12);
+            if (varY) Con::setFloatVariable(varY, object->mElements[index].m13);
+            if (varW) Con::setFloatVariable(varW, object->mElements[index].m14);
+            if (varH) Con::setFloatVariable(varH, object->mElements[index].m15);
         } else {
             Con::errorf("getVector4ToGlobal Invalid stack id! (%d)", stack);
             return false;
         }
     } else {
-        Con::errorf("getVector4ToGlobal invalid index!! %d max:%d", index,object->mElement.size() );
+        Con::errorf("getVector4ToGlobal invalid index!! %d max:%d", index,object->mElements.size() );
         return false;
     }
     return true;
@@ -452,35 +468,35 @@ static bool _assignVector4FromGlobal(BatchRender* object, S32 stack, S32 index
 , String varX, String varY, String varW, String varH)
 {
      if (!object) return false;
-    if (index >= 0 && index < object->mElement.size()) {
+    if (index >= 0 && index < object->mElements.size()) {
         if (stack == 0) {
-            if (varX) object->mElement[index].m0 = Con::getFloatVariable(varX);
-            if (varY) object->mElement[index].m1 = Con::getFloatVariable(varY);
-            if (varW) object->mElement[index].m2 = Con::getFloatVariable(varW);
-            if (varH) object->mElement[index].m3 = Con::getFloatVariable(varH);
+            if (varX) object->mElements[index].m0 = Con::getFloatVariable(varX);
+            if (varY) object->mElements[index].m1 = Con::getFloatVariable(varY);
+            if (varW) object->mElements[index].m2 = Con::getFloatVariable(varW);
+            if (varH) object->mElements[index].m3 = Con::getFloatVariable(varH);
 
         } else if (stack == 1) {
-            if (varX) object->mElement[index].m4 = Con::getFloatVariable(varX);
-            if (varY) object->mElement[index].m5 = Con::getFloatVariable(varY);
-            if (varW) object->mElement[index].m6 = Con::getFloatVariable(varW);
-            if (varH) object->mElement[index].m7 = Con::getFloatVariable(varH);
+            if (varX) object->mElements[index].m4 = Con::getFloatVariable(varX);
+            if (varY) object->mElements[index].m5 = Con::getFloatVariable(varY);
+            if (varW) object->mElements[index].m6 = Con::getFloatVariable(varW);
+            if (varH) object->mElements[index].m7 = Con::getFloatVariable(varH);
         } else  if (stack == 2) {
-            if (varX) object->mElement[index].m8 = Con::getFloatVariable(varX);
-            if (varY) object->mElement[index].m9 = Con::getFloatVariable(varY);
-            if (varW) object->mElement[index].m10= Con::getFloatVariable(varW);
-            if (varH) object->mElement[index].m11= Con::getFloatVariable(varH);
+            if (varX) object->mElements[index].m8 = Con::getFloatVariable(varX);
+            if (varY) object->mElements[index].m9 = Con::getFloatVariable(varY);
+            if (varW) object->mElements[index].m10= Con::getFloatVariable(varW);
+            if (varH) object->mElements[index].m11= Con::getFloatVariable(varH);
 
         } else  if (stack == 3) {
-            if (varX) object->mElement[index].m12= Con::getFloatVariable(varX);
-            if (varY) object->mElement[index].m13= Con::getFloatVariable(varY);
-            if (varW) object->mElement[index].m14= Con::getFloatVariable(varW);
-            if (varH) object->mElement[index].m15= Con::getFloatVariable(varH);
+            if (varX) object->mElements[index].m12= Con::getFloatVariable(varX);
+            if (varY) object->mElements[index].m13= Con::getFloatVariable(varY);
+            if (varW) object->mElements[index].m14= Con::getFloatVariable(varW);
+            if (varH) object->mElements[index].m15= Con::getFloatVariable(varH);
         } else {
             Con::errorf("getVector4ToGlobal Invalid stack id! (%d)", stack);
             return false;
         }
     } else {
-        Con::errorf("getVector4ToGlobal invalid index!! %d max:%d", index,object->mElement.size() );
+        Con::errorf("getVector4ToGlobal invalid index!! %d max:%d", index,object->mElements.size() );
         return false;
     }
     return true;
