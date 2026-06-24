@@ -33,6 +33,8 @@ function createlooptest() {
         method = 0;
         methodCount = 20;
 
+        TypeF32 lX = 0.0;
+        TypeF32 lY = 0.0;
     };
 
      $gCount = %obj.count;
@@ -92,6 +94,8 @@ function looptest::onAdd(%this) {
  * 14: incrementing/decrementing 2 global fake array variables => 170
  *
  */
+
+// $TEST_TEXT = ""
 //----------------------------------------------------------------------
 function looptest::Render(%this) {
      // ---------- display and change current method ------------
@@ -104,6 +108,13 @@ function looptest::Render(%this) {
         else %this.method ++;
         if ( %this.method < 0 )  %this.method = %this.methodCount;
         else if (%this.method >= %this.methodCount) %this.method = 0;
+    }
+
+    if ( $peep ) {
+
+        %this.lx = "HUHU";
+        $peep = false;
+        echo("PEEP lx" SPC %this.lx SPC "STRICT=>" SPC (%this.lx $= "0"));
     }
     // ---------- loop method stuff ------------
 
@@ -220,6 +231,7 @@ function looptest::Render(%this) {
         %foo = 0.0;
         for ( %i = 0 ; %i < _LOOP_COUNT_ ; %i++) {
             %foo += 0.1;
+            %bar -= 0.3;
         }
     }
     else
@@ -240,7 +252,14 @@ function looptest::Render(%this) {
             // %this.push(%i);
         }
     }
+    else
+        if(%m == 18) { //  typed def
 
+            for ( %i = 0 ; %i < _LOOP_COUNT_ ; %i++) {
+                %this.lX = 20.1;
+                %this.lY = 10.2;
+            }
+        }
     // BAD! use "if for" capsulate if possible
     // for ( %i = 0 ; %i < _LOOP_COUNT_; %i++) {
     //     if (%m == 2) {
@@ -257,6 +276,7 @@ function looptest::Render(%this) {
     //     if (%m == 5) {
     //     }
     // }
+
 
 }
 

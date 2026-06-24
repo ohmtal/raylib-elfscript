@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
 extern int defaultMain(void);
+#include "torqueConfig.h"
 
 int main(void)
 {
