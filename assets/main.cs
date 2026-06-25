@@ -8,7 +8,7 @@ $MODULES = $MODULES SPC "blank DeltaTime shapes_starfield_effect shapes_starfiel
 function Main::init(%this) {
     SetConfigFlags(%this.flags );
 
-    InitWindow(%this.screenWidth, %this.screenHeight,  "raylib-elfScript Demo Loader");
+    InitWindow(%this.screenWidth, %this.screenHeight, %this.caption);
     SetTargetFPS(%this.currentFps);
 
     // Image/Icon Test
@@ -45,9 +45,11 @@ function Main::loadModule(%this, %setNewModuleIndex) {
     %cmd = %this.getId() @ ".module = Create" @ %this.moduleName @ "();";
     echo("loadModule command is:" SPC %cmd);
     eval(%cmd);
-    echo("loadModule success:" SPC isObject(%this.module));
-    if (!isObject(%this.module) || !%this.module.isMethod("render")) {
+    %created = isObject(%this.module);
+    echo("loadModule success:" SPC %created);
+    if (!%created || !%this.module.isMethod("render")) {
         error("Module failed!! obj:" SPC %this.module SPC "method render exists:" SPC %this.module.isMethod("render"));
+        if (%created) %this.module.delete();
         %this.module = 0;
         return false;
     }
@@ -89,6 +91,8 @@ function MainInit() {
 
     $Main = new ScriptObject() {
         class = "Main";
+        // dynamic fields:
+        TypeString caption = "raylib-elfScript Demo Loader";
         TypeS32 screenWidth = 800;
         TypeS32 screenHeight = 450;
         TypeS32 currentFps = 60;

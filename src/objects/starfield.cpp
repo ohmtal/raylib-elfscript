@@ -70,7 +70,7 @@ namespace ElfObjects {
         // ---------------------------------------------------------------------
         static void initPersistFields()
         {
-            addProtectedField("count", TypeS32, 0, &_setStarsCount,&defaultProtectedGetFn, "Set the mStars count.");
+            addProtectedField("count", TypeS32, Offset(mStarCount, StarField), &_setStarsCount,&defaultProtectedGetFn, 1,"Set the mStars count.");
             addField("mode", TypeS32,     Offset(mMode, StarField), "mode 0=lines, 1=rectangles, 2=circles");
             addField("speed", TypeF32 , Offset(mSpeed, StarField), "set the mSpeed of the mStars");
             addField("color", TypeColor,     Offset(mColor, StarField), "color of the mStars");
