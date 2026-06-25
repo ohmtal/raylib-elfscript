@@ -70,25 +70,6 @@ function shapes_starfield_effect::OnAdd(%this) {
 }
 
 // -----------------------------------------------------------------------------
-// function shapes_starfield_effect::UpdatePoint(%this, %i , %dt) {
-//
-//     // Update star's timer
-//     $starPoints_Z[%i] -= %dt * $speed;
-//
-//     // Calculate the screen position
-//     $starPointsScreenPos_X[%i] = $hW + $starPoints_X[%i] / $starPoints_Z[%i];
-//     $starPointsScreenPos_Y[%i] = $hH + $starPoints_Y[%i] / $starPoints_Z[%i];
-//
-//     if (($starPoints_Z[%i] < 0) || ($starPointsScreenPos_X[%i] < 0) || ($starPointsScreenPos_Y[%i] < 0) ||
-//         ($starPointsScreenPos_X[%i] > $screenWidth) || ($starPointsScreenPos_Y[%i] > $screenHeight))
-//     {
-//         $starPoints_X[%i] = GetRandomValue($minH, $maxH);
-//         $starPoints_Y[%i] = GetRandomValue($minW, $maxW);
-//         $starPoints_Z[%i] = 1.0;
-//     }
-//
-// }
-// -----------------------------------------------------------------------------
 function shapes_starfield_effect::Render(%this) {
 
     %mouseMove = GetMouseWheelMove();

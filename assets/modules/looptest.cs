@@ -23,6 +23,8 @@
 //ElfScript extension via preprocessor:
 #define _LOOP_COUNT_ 5000
 
+// $testObj = new TestObj();
+
 function createlooptest() {
 
     // using batch render to set positions
@@ -245,11 +247,16 @@ function looptest::Render(%this) {
     }
     else
     if(%m == 17) { // curelement stuff => push
-        %obj = %this;
+        // i dont get why it works in my test script in
+        // ElfScript demo code and not here ?!
+        // %testObj = $testObj;
         for ( %i = 0 ; %i < _LOOP_COUNT_ ; %i++) {
-            %obj.m0 = 20.1;
-            // %this.y = 10.2;
+            // 20.1 is a string for the parser :(
+            %this.x += 0.1;
+            %this.y *= 0.1;
             // %this.push(%i);
+
+             // %testObj.testFloat += 0.1;
         }
     }
     else

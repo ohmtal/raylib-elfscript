@@ -660,3 +660,6 @@ DefineEngineFunction(BatchDrawColoredLines,bool, (Color color),(DARKPURPLE),"Dra
     return true;
 }
 } //namespace ElfRender
+
+// ==============================================================================
+

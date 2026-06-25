@@ -19,6 +19,8 @@ set(PROJECT_SRC
     src/interface/elfShader.cpp
     src/interface/elfFile.cpp
     src/interface/elfBatchRender.cpp
+
+    src/objects/starfield.cpp
 )
 
 

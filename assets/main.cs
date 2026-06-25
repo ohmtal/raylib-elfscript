@@ -1,7 +1,7 @@
 // Main Script
 $MODULES = "Eyes";
 $MODULES = $MODULES SPC "RenderMap BatchTest looptest";
-$MODULES = $MODULES SPC "blank DeltaTime shapes_starfield_effect shapes_starfield_batch";
+$MODULES = $MODULES SPC "blank DeltaTime shapes_starfield_effect shapes_starfield_batch shapes_starfield_nativ";
 
 // LOADFAILTEST shapes_starfield_effect_v1
 
@@ -47,6 +47,7 @@ function Main::loadModule(%this, %setNewModuleIndex) {
     eval(%cmd);
     echo("loadModule success:" SPC isObject(%this.module));
     if (!isObject(%this.module) || !%this.module.isMethod("render")) {
+        error("Module failed!! obj:" SPC %this.module SPC "method render exists:" SPC %this.module.isMethod("render"));
         %this.module = 0;
         return false;
     }
