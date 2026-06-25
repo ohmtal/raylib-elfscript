@@ -245,10 +245,10 @@ function looptest::Render(%this) {
     }
     else
     if(%m == 17) { // curelement stuff => push
-        %foo = 0.0;
+        %obj = %this;
         for ( %i = 0 ; %i < _LOOP_COUNT_ ; %i++) {
-            %this.x = 20.1;
-            %this.y = 10.2;
+            %obj.m0 = 20.1;
+            // %this.y = 10.2;
             // %this.push(%i);
         }
     }

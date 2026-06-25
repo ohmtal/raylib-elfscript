@@ -7,12 +7,17 @@
 #pragma once
 
 // ----------------------------------------------------------------------------
+// enable #define in torque script
+#define ELFSCRIPT_PREPROCESSOR
+
 // make slots type save but same slotname always have the same type
-// #define ELFSCRIPT_STRICT_SLOT_TYPE
+#define ELFSCRIPT_STRICT_SLOT_TYPE
 
 // cache function calls WARNING: inconsitent
 // #define ELFSCRIPT_CALLFUNC_CACHED
 
+// Fast Path static fields float/interger
+#define ELFSCRIPT_FASTPATH_FLD
 // ----------------------------------------------------------------------------
 
 #define TORQUE_SCRIPT_EXTENSION   "cs"
@@ -21,10 +26,6 @@
 #define TORQUE_APP_VERSION_STRING  "26.06.23.0"
 #define TORQUE_DISABLE_MEMORY_MANAGER
 
-#define ELFSCRIPT_STRICT_SLOT_TYPE
-
-// lot of changes .. instable and no enhancements!
-#define ELFSCRIPT_CALLFUNC_CACHED
 
 /* #undef TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM */
 /* #undef TORQUE_DISABLE_FIND_ROOT_WITHIN_ZIP */
