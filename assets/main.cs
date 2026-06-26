@@ -1,6 +1,6 @@
 // Main Script
-$MODULES = "Eyes";
-$MODULES = $MODULES SPC "RenderMap BatchTest looptest";
+$MODULES = "looptest Eyes";
+$MODULES = $MODULES SPC "RenderMap BatchTest";
 $MODULES = $MODULES SPC "blank DeltaTime shapes_starfield_effect shapes_starfield_batch shapes_starfield_nativ";
 
 // LOADFAILTEST shapes_starfield_effect_v1

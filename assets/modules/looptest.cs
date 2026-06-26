@@ -31,9 +31,9 @@ function createlooptest() {
     %obj = new BatchRender(L) {
         class = "looptest";
 
-        count = _LOOP_COUNT_;
-        method = 0;
-        methodCount = 20;
+        TypeS32 count = _LOOP_COUNT_;
+        TypeS32 method = 17;
+        TypeS32 methodCount = 20;
 
         TypeF32 lX = 0.0;
         TypeF32 lY = 0.0;
@@ -250,10 +250,13 @@ function looptest::Render(%this) {
         // i dont get why it works in my test script in
         // ElfScript demo code and not here ?!
         // %testObj = $testObj;
+        %foo = 0.1;
         for ( %i = 0 ; %i < _LOOP_COUNT_ ; %i++) {
-            // 20.1 is a string for the parser :(
-            %this.x += 0.1;
-            %this.y *= 0.1;
+            // OP = 10.1 is a string for the parser :(
+            // OP = variable can be a float
+            // %this.x = 20.1; // 500
+            %this.x = %foo;
+            // %this.y *= 0.1;
             // %this.push(%i);
 
              // %testObj.testFloat += 0.1;

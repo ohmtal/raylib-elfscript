@@ -58,7 +58,7 @@ endif()
 
 
 # ----------- Elf/TorqueScript
-set(ELFSCRIPT_PATH "/opt/TorqueScript" CACHE PATH "Path to TorqueScript")
+set(ELFSCRIPT_PATH "/opt/ElfScript" CACHE PATH "Path to ElfScript")
 set(ELF_MODULE ${ELFSCRIPT_PATH}/ElfScript)
 set(ELF_CMAKE ${ELF_MODULE}/ElfScript.cmake)
 # set(ELF_MODULE ${ELFSCRIPT_PATH}/TorqueScript)
@@ -68,7 +68,7 @@ if(NOT EXISTS ${ELF_CMAKE})
     message(FATAL_ERROR
         "\n TorqueScript path is not set! "
         "\n Please provide the path using: "
-        "\n cmake -B build -DELFSCRIPT_PATH=/path/to/TorqueScript"
+        "\n cmake -B build -DELFSCRIPT_PATH=/path/to/ElfScript"
     )
 else()
  #  defines TORQUESCRIPT_SRC
