@@ -18,11 +18,10 @@ class LightObject : public SimObject
 public:
     DECLARE_CONOBJECT(LightObject);
 
-    Light mLight;
+    Light mLight = { 0 };
     S32 mShaderId = 0;;
 
     bool onAdd() override ;
-    void onPostAdd() override;
     void onRemove() override;
 
     static void initPersistFields()
@@ -44,8 +43,7 @@ bool LightObject::onAdd() {
     if (!Parent::onAdd() || gLightsCount >= MAX_LIGHTS) return false;
     Shader* shader = ElfResource::ShadersMap.get(mShaderId);
     if (!shader) return false;
-    // mLight.enabled = true;
-    // Con::printf("Add light #%d", gLightsCount);
+
 
     // NOTE: Lighting shader naming must be the provided ones
     mLight.enabledLoc = GetShaderLocation(*shader, TextFormat("lights[%i].enabled", gLightsCount));
@@ -54,19 +52,13 @@ bool LightObject::onAdd() {
     mLight.targetLoc = GetShaderLocation(*shader, TextFormat("lights[%i].target", gLightsCount));
     mLight.colorLoc = GetShaderLocation(*shader, TextFormat("lights[%i].color", gLightsCount));
 
+    UpdateLightValues(*shader, mLight);
+
     gLightsCount++;
 
     return true;
 }
-void LightObject::onPostAdd()
-{
-    Parent::onPostAdd();
-    Shader* shader = ElfResource::ShadersMap.get(mShaderId);
-    if (shader)
-    {
-        UpdateLightValues(*shader, mLight);
-    }
-}
+
 // -----------------------------------------------------------------------------
 void LightObject::onRemove() {
     gLightsCount--;

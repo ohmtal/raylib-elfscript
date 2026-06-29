@@ -1,8 +1,10 @@
-# raylib-elfscript (WiP) 
+# raylib-elfscript 
  
 Raylib binding of Elf(Torque)Script.
 
+2026-09-29: Added Gui Object from RayTal and Lights Demo
 2026-06-20: A lot (80-90% excluding VR stuff) of bindings are implemented but not tested.  
+
 
 ## Setup: 
 
@@ -17,6 +19,9 @@ and then
     cmake --build build
     ./raylib-elfscript
 
+## Lights Demo
+
+![Lights](./docu/Screenshot_2026-06-29_16-07-31.png)
     
 ## First Script assets/main.cs
 

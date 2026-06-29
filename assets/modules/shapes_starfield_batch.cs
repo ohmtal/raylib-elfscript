@@ -109,7 +109,7 @@ function shapes_starfield_batch::Render(%this) {
     {
 
         // NOTE: method 3 via setting global vars : fastest!
-        %this.getVector4_1GlobalV(%i, "x", "y", "z", "w");
+        %this.getVector4_1GlobalV(%i, "$x", "$y", "$z", "$w");
 
         $z -= %moveVal; // Update depth when setting local var **optimize**
 
@@ -149,7 +149,7 @@ function shapes_starfield_batch::Render(%this) {
             %this.setVector4(%i, %screenPos_X, %screenPos_Y, %radius, %radius);
         }
 
-        %this.setVector4_1GlobalV(%i, "x", "y", "z", "w");
+        %this.setVector4_1GlobalV(%i, "$x", "$y", "$z", "$w");
         // %this.setVector4_1(%i, $x,$y,$z,0); // store the position on the secound vector4
     }
 

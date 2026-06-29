@@ -21,6 +21,8 @@ set(PROJECT_SRC
     src/interface/elfBatchRender.cpp
     src/interface/elfLights.cpp
 
+    src/gui/Gui.cpp
+
     src/objects/starfield.cpp
 )
 
