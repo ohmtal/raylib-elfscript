@@ -1,4 +1,10 @@
-#include "elfObjects.h"
+//-----------------------------------------------------------------------------
+// Copyright (c) 2026 Thomas Hühn (XXTH)
+// SPDX-License-Identifier: MIT
+//-----------------------------------------------------------------------------
+// Camera Objects
+//-----------------------------------------------------------------------------
+#include "elfCamera.h"
 #include "math/mMathFn.h"
 #include "ConsoleTypes.h"
 #include "elfResource.h"
@@ -75,85 +81,7 @@ DefineEngineFunction( BeginMode3D, void, (S32 cameraId), , "Begins 3D mode with 
 DefineEngineFunction(EndMode3D, void, (),,"End 3D mode with custom camera") {
     EndMode3D();
 }
-//-----------------------------------------------------------------------------
-// RenderTextureObject
-//-----------------------------------------------------------------------------
-// * RenderTexture2D target = LoadRenderTexture(screenWidth, screenHeight);
-// *  BeginTextureMode(target);
-// *  EndTextureMode();
 
-
-IMPLEMENT_CONOBJECT(RenderTextureObject);
-//-----------------------------------------------------------------------------
-bool RenderTextureObject::onAdd(){
-    if (!Parent::onAdd() || mWidth <=0 || mHeight <=0) return false;
-    mRenderTexture = LoadRenderTexture(mWidth, mHeight);
-    if (!IsRenderTextureValid(mRenderTexture)) return false;
-
-    mTextureId = ElfResource::TextureMap.add(mRenderTexture.texture);
-
-    return true;
-}
-//-----------------------------------------------------------------------------
-void RenderTextureObject::onRemove(){
-    ElfResource::TextureMap.removeId(mTextureId);
-    UnloadRenderTexture(mRenderTexture);
-    Parent::onRemove();
-}
-//-----------------------------------------------------------------------------
-bool RenderTextureObject::resize(S32 width, S32 height, bool copyContent, Color copyColor) {
-     if (width <= 0 || height <= 0 ) return false;
-
-    // 1. sav old data:
-    S32 oldId = mTextureId;
-    RenderTexture oldTexture = mRenderTexture;
-    if (!IsRenderTextureValid(mRenderTexture)) {
-        mRenderTexture = oldTexture;
-        return false;
-    }
-
-    // 2. update size
-    mWidth = width;
-    mHeight = height;
-
-    // 3. create new:
-    mRenderTexture = LoadRenderTexture(mWidth, mHeight);
-    if (!IsRenderTextureValid(mRenderTexture)) return false;
-    mTextureId = ElfResource::TextureMap.add(mRenderTexture.texture);
-
-    // 3. draw old content on the new texture;
-    if (copyContent) {
-        BeginTextureMode(mRenderTexture);
-        ClearBackground(copyColor);
-
-        Rectangle source = { 0, 0, (float)oldTexture.texture.width, -(float)oldTexture.texture.height };
-        Rectangle dest = { 0, 0, (float)mWidth, (float)mHeight };
-        Vector2 origin = { 0, 0 };
-
-        DrawTexturePro(oldTexture.texture, source, dest, origin, 0.0f, WHITE);
-        EndTextureMode();
-    }
-
-    // 4. remove old stuff
-    ElfResource::TextureMap.removeId(oldId);
-    UnloadRenderTexture(oldTexture);
-
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-DefineEngineMethod(RenderTextureObject, Resize, bool
-        , (S32 width,S32 height, bool copyImage, Color copyColor) , (true, WHITE)
-        , "resize (recreate) a render texture") {
-    return object->resize(width, height, copyImage, copyColor);
-}
-
-DefineEngineMethod(RenderTextureObject, BeginTextureMode, void, (), , "Begins drawing to render texture") {
-    BeginTextureMode(object->mRenderTexture);
-}
-DefineEngineMethod(RenderTextureObject, EndTextureMode, void, (),, " End drawing to render texture") {
-    EndTextureMode();
-}
 // //-----------------------------------------------------------------------------
 // // TextureObject
 // //-----------------------------------------------------------------------------

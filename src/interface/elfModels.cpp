@@ -7,7 +7,7 @@
 #include <console/console.h>
 #include "console/engineAPI.h"
 #include "ConsoleTypes.h"
-#include "elfObjects.h"
+#include "elfCamera.h"
 #include "raymath.h"
 
 using namespace ElfResource;

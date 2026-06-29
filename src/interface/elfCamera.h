@@ -68,49 +68,5 @@ public:
 
 };
 
-//-----------------------------------------------------------------------------
-// RenderTextureObject
-//-----------------------------------------------------------------------------
-class RenderTextureObject : public SimObject
-{
-    typedef SimObject Parent;
 
-public:
-
-    RenderTexture mRenderTexture;
-    S32 mTextureId = 0;
-    S32 mWidth = 0; //no default the script must set it!
-    S32 mHeight = 0;
-
-    // RenderTextureObject();
-    // ~RenderTextureObject();
-
-    DECLARE_CONOBJECT(RenderTextureObject);
-
-    bool onAdd() override ;
-    void onRemove() override;
-
-    bool resize(S32 width, S32 height, bool copyContent = true, Color copyColor = WHITE); //resize ==> recreate!
-
-    static void initPersistFields()
-    {
-        Parent::initPersistFields();
-        addField("width", TypeS32, Offset(mWidth, RenderTextureObject), "Set the width of the RenderTexture");
-        addField("height", TypeS32, Offset(mHeight, RenderTextureObject), "Set the width of the RenderTexture");
-        addProtectedField("Texture", TypeS32, Offset(mTextureId, RenderTextureObject),
-                          defaultProtectedNotSetFn,&defaultProtectedGetFn,
-                          "get the Id of the Texture (readonly )");
-    }
-
-};
-//-----------------------------------------------------------------------------
-// TextureObject
-//-----------------------------------------------------------------------------
-// class TextureObject : public SimObject
-// {
-//     typedef SimObject Parent;
-//
-// public:
-//     DECLARE_CONOBJECT(TextureObject);
-// };
 

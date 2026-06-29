@@ -12,7 +12,7 @@ function Blank::onAdd(%this) {
 }
 //----------------------------------------------------------------------
 function Blank::OnRemove(%this) {
-
+    SetTargetFPS(60);
 }
 //----------------------------------------------------------------------
 function Blank::Render(%this) {
