@@ -65,6 +65,35 @@ DefineEngineFunction( GetShaderLocation, int, (S32 shaderId, String uniformName)
     return GetShaderLocation(*shader, uniformName.c_str());
 }
 
+// shaderLocationIndex NOTE ElfScript like C: mShader.locs[SHADER_LOC_VECTOR_VIEW] =
+DefineEngineFunction( SetShaderLocation, bool, (S32 shaderId, S32 shaderLocationIndex, S32 shaderLocation),
+                      , "set shader uniform location by index") {
+    Shader* shader = ShadersMap.get(shaderId);
+    if (!shader) return false;
+    shader->locs[shaderLocationIndex] = shaderLocation;
+
+    return true;
+}
+
+// NOTE ElfScript like C:   mShader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(mShader, "viewPos");
+DefineEngineFunction( SetShaderLocationByUniformName, bool,
+        (S32 shaderId, S32 shaderLocationIndex, String uniformName),
+        , "set shader uniform location by uniformName") {
+    Shader* shader = ShadersMap.get(shaderId);
+    if (!shader) return false;
+    shader->locs[shaderLocationIndex] = GetShaderLocation(*shader, uniformName);
+
+    return true;
+}
+// NOTE ElfScript like C: mShader.locs[SHADER_LOC_VECTOR_VIEW]
+DefineEngineFunction( GetShaderLocsLocation, S32, (S32 shaderId, S32 shaderLocationIndex),
+            , "Get shader uniform location from shader locs ") {
+    Shader* shader = ShadersMap.get(shaderId);
+    if (!shader) return -1;
+    return shader->locs[shaderLocationIndex];
+}
+
+
 // RLAPI int GetShaderLocationAttrib(Shader shader, const char *attribName);  // Get shader attribute location
 DefineEngineFunction( GetShaderLocationAttrib, int, (S32 shaderId, String attribName), , "Get shader attribute location index") {
     Shader* shader = ShadersMap.get(shaderId);
@@ -73,23 +102,35 @@ DefineEngineFunction( GetShaderLocationAttrib, int, (S32 shaderId, String attrib
 }
 
 // RLAPI void SetShaderValue(Shader shader, int locIndex, const void *value, int uniformType);
-DefineEngineFunction( SetShaderValue, void, (S32 shaderId, int locIndex, String valueStr, int uniformType), , "Set shader uniform value from a string based on uniformType") {
+DefineEngineFunction( SetShaderValue, bool, (S32 shaderId, int locIndex, String valueStr, int uniformType), , "Set shader uniform value from a string based on uniformType") {
     Shader* shader = ShadersMap.get(shaderId);
-    if (!shader || locIndex < 0) return;
+    if (!shader || locIndex < 0) return false;
 
-    // Wir konvertieren den TorqueScript-String basierend auf dem Raylib Uniform-Typ
-    // (SHADER_UNIFORM_FLOAT = 0, SHADER_UNIFORM_VEC2 = 1, SHADER_UNIFORM_VEC3 = 2, SHADER_UNIFORM_VEC4 = 3, SHADER_UNIFORM_INT = 4 ...)
+    // (SHADER_UNIFORM_FLOAT = 0,
+    // SHADER_UNIFORM_VEC2 = 1,
+    // SHADER_UNIFORM_VEC3 = 2,
+    // SHADER_UNIFORM_VEC4 = 3,
+    // SHADER_UNIFORM_INT = 4 ...)
     float fValues[4] = { 0.0f };
     int iValues[4] = { 0 };
 
-    if (uniformType <= 3) { // Es ist ein Float, Vec2, Vec3 oder Vec4
-        dSscanf(valueStr.c_str(), "%g %g %g %g", &fValues[0], &fValues[1], &fValues[2], &fValues[3]);
+    if (uniformType <= 3) {
+        if (uniformType == 0)      dSscanf(valueStr.c_str(), "%g", &fValues[0]);
+        else if (uniformType == 1) dSscanf(valueStr.c_str(), "%g %g", &fValues[0], &fValues[1]);
+        else if (uniformType == 2) dSscanf(valueStr.c_str(), "%g %g %g", &fValues[0], &fValues[1], &fValues[2]);
+        else if (uniformType == 3) dSscanf(valueStr.c_str(), "%g %g %g %g", &fValues[0], &fValues[1], &fValues[2], &fValues[3]);
+
         SetShaderValue(*shader, locIndex, fValues, uniformType);
     }
+
     else if (uniformType == 4) { // SHADER_UNIFORM_INT
         dSscanf(valueStr.c_str(), "%d %d %d %d", &iValues[0], &iValues[1], &iValues[2], &iValues[3]);
         SetShaderValue(*shader, locIndex, iValues, uniformType);
+    } else {
+        Con::errorf("unknown uniformtype %d", uniformType);
+        return false;
     }
+    return true;
 }
 
 // RLAPI void SetShaderValueV(Shader shader, int locIndex, const void *value, int uniformType, int count);
@@ -97,7 +138,6 @@ DefineEngineFunction( SetShaderValueV, void, (S32 shaderId, int locIndex, Vector
     Shader* shader = ShadersMap.get(shaderId);
     if (!shader || locIndex < 0 || dataValues.size() == 0) return;
 
-    // Wir reichen den Zeiger auf das flache Float-Array direkt an Raylib durch
     SetShaderValueV(*shader, locIndex, dataValues.address(), uniformType, count);
 }
 
