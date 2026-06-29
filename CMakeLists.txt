@@ -11,6 +11,7 @@ set(PROJECT_SRC
     src/interface/elfBase.cpp
     src/interface/elfEnum.cpp
     src/interface/elfResource.cpp
+    src/interface/elfTexture.cpp
     src/interface/elfImageResource.cpp
     src/interface/elfObjects.cpp
     src/interface/elfDrawing.cpp

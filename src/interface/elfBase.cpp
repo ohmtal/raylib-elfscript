@@ -18,21 +18,6 @@
 // -----------------------------------------------------------------------------
 // TraceLog raylib log to Con::.. log.
 // -----------------------------------------------------------------------------
-//FIXME what it that ? =>
-//  TEXTURE: [ID 125595416] Texture loaded successfully (125595416x-2118071736 | UH��H�� �}�H�u�H�U��}�tn�}��� | -2118068406 mipmaps)
-// void CustomTraceLog(int msgType, const char *text, va_list args)
-// {
-//     switch (msgType)
-//     {
-//         case LOG_INFO: Con::infof(text,args); break;
-//         case LOG_ERROR: Con::errorf(text,args); break;
-//         case LOG_FATAL: Con::errorf(text,args); break;
-//         case LOG_WARNING: Con::warnf(text,args); break;
-//         case LOG_DEBUG: ; break;
-//         default: break;
-//     }
-// }
-
 void CustomTraceLog(int msgType, const char *text, va_list args)
 {
 

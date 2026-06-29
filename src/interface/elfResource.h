@@ -12,7 +12,7 @@
 #include "core/util/tVector.h"
 #include <vector>
 #include <console/console.h>
-#include "elfObjects.h"
+// #include "elfObjects.h"
 
 namespace ElfResource {
 
@@ -187,10 +187,7 @@ inline void UnloadElfAnimationBlock(ElfAnimationBlock block) {
 // -----------------------------------------------------------------------------------
 
 inline ElfStorage<Image, UnloadImage> ImageMap;
-inline ElfStorage<Texture2D, UnloadTexture> TextureMap;
-
-// inline ElfStorage<RenderTexture, UnloadRenderTexture> RenderTextureMap;
-
+inline ElfStorage<Texture, UnloadTexture> TextureMap;
 inline ElfStorage<Font, UnloadFont> FontMap;
 inline ElfStorage<Model, UnloadModel> ModelMap;
 inline ElfStorage<Mesh, UnloadMesh> MeshMap;

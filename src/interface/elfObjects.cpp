@@ -84,7 +84,7 @@ DefineEngineFunction(EndMode3D, void, (),,"End 3D mode with custom camera") {
 
 
 IMPLEMENT_CONOBJECT(RenderTextureObject);
-
+//-----------------------------------------------------------------------------
 bool RenderTextureObject::onAdd(){
     if (!Parent::onAdd() || mWidth <=0 || mHeight <=0) return false;
     mRenderTexture = LoadRenderTexture(mWidth, mHeight);
@@ -94,13 +94,13 @@ bool RenderTextureObject::onAdd(){
 
     return true;
 }
-
+//-----------------------------------------------------------------------------
 void RenderTextureObject::onRemove(){
     ElfResource::TextureMap.removeId(mTextureId);
     UnloadRenderTexture(mRenderTexture);
     Parent::onRemove();
 }
-
+//-----------------------------------------------------------------------------
 bool RenderTextureObject::resize(S32 width, S32 height, bool copyContent, Color copyColor) {
      if (width <= 0 || height <= 0 ) return false;
 
@@ -141,7 +141,7 @@ bool RenderTextureObject::resize(S32 width, S32 height, bool copyContent, Color 
     return true;
 }
 
-
+//-----------------------------------------------------------------------------
 DefineEngineMethod(RenderTextureObject, Resize, bool
         , (S32 width,S32 height, bool copyImage, Color copyColor) , (true, WHITE)
         , "resize (recreate) a render texture") {
@@ -154,3 +154,7 @@ DefineEngineMethod(RenderTextureObject, BeginTextureMode, void, (), , "Begins dr
 DefineEngineMethod(RenderTextureObject, EndTextureMode, void, (),, " End drawing to render texture") {
     EndTextureMode();
 }
+// //-----------------------------------------------------------------------------
+// // TextureObject
+// //-----------------------------------------------------------------------------
+// IMPLEMENT_CONOBJECT(TextureObject);

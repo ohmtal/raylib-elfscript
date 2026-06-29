@@ -103,4 +103,14 @@ public:
     }
 
 };
+//-----------------------------------------------------------------------------
+// TextureObject
+//-----------------------------------------------------------------------------
+// class TextureObject : public SimObject
+// {
+//     typedef SimObject Parent;
+//
+// public:
+//     DECLARE_CONOBJECT(TextureObject);
+// };
 

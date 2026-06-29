@@ -3,9 +3,14 @@
 class EmptyObject : public SimObject
 {
     typedef SimObject Parent;
-
 public:
     DECLARE_CONOBJECT(EmptyObject);
+
+    bool onAdd() override;
+    void onRemove() override;
+
+    static void initPersistFields();
+
 };
 IMPLEMENT_CONOBJECT(EmptyObject);
 //--------------
