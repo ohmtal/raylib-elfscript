@@ -24,8 +24,11 @@ set(PROJECT_SRC
     src/interface/elfLights.cpp
 
     src/gui/Gui.cpp
-
     src/objects/starfield.cpp
+
+    lib/ohmflux/grid/basicgrid.cpp
+    src/objects/Grid.cpp
+
 )
 
 
@@ -103,8 +106,9 @@ add_executable(${PROJECT_NAME}
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}/
+    # ${CMAKE_CURRENT_LIST_DIR}/
     ${CMAKE_CURRENT_LIST_DIR}/src/
+    ${CMAKE_CURRENT_LIST_DIR}/lib/ohmflux/
     ${CMAKE_CURRENT_LIST_DIR}/lib/rayspice/
     ${ELFSCRIPT_INCLUDES}
 )

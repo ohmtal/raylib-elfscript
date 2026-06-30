@@ -189,7 +189,7 @@ namespace RayTal {
     DefineEngineMethod(Gui, checkBoxVar,bool, (String text, String variable),
                        , "variable example: $MyValue or %this.object.getId() @ \".enabled\"") {
         StringTable->insert(variable);
-        static bool value = Con::getBoolVariable(variable.c_str());
+        bool value = Con::getBoolVariable(variable.c_str());
         if (object->CheckBox( text.c_str(), &value)) {
             Con::setBoolVariable(variable.c_str(), value);
             return true;
