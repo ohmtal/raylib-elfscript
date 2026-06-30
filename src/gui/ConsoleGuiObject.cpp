@@ -62,6 +62,7 @@ namespace ConsoleGui {
             if ( gHistoryNeedle >= 0 && gHistoryNeedle < gHistory.size()) {
                 // Con::printf("COMMAND SHOULD BE %s", gHistory[gHistoryNeedle].c_str());
                 dSprintf(gConsolePtr->ConsoleInputText, 256, "%s",  gHistory[gHistoryNeedle].c_str());
+                gConsolePtr->setCursorPos = gHistory[gHistoryNeedle].length();
             } else {
                 dStrcpy(gConsolePtr->ConsoleInputText, "", 256);
             }
@@ -74,6 +75,7 @@ namespace ConsoleGui {
     void ConsoleGuiObject::initPersistFields() {
         Parent::initPersistFields();
         addField("key", TypeS32, Offset(mConsole.toggle_key, ConsoleGuiObject), "Shortcut to open console");
+        addField("fontSize", TypeF32, Offset(mConsole.fontSize, ConsoleGuiObject), "font size");
     }
 
     bool ConsoleGuiObject::onAdd() {
@@ -81,7 +83,7 @@ namespace ConsoleGui {
         if (gConsolePtr) return false;
         gConsolePtr = &mConsole;
 
-        mImUI.theme = &DK_ImUISolarizedTheme;
+        mImUI.theme = &DK_ImUIDefaultTheme;
         mImUI.style = &DK_ImUIDefaultStyle;
 
         static Font font = GetFontDefault();

@@ -40,6 +40,10 @@ extern "C"
     int scroll;
     KeyboardKey toggle_key;
     char ConsoleInputText[1024];
+    float fontSize;
+    // .........
+    float fontSpacing;
+    int setCursorPos;
   } Console;
 
   void DK_ConsoleInit(Console* console, int log_size);
@@ -56,6 +60,9 @@ extern "C"
     console->is_open = false;
     console->log_index = 0;
     console->scroll = 0;
+    console->fontSize = 20;
+    console->fontSpacing = 25;
+    console->setCursorPos = -1;
     console->logs = (Log*)malloc(sizeof(Log) * log_size);
     for (int i = 0; i < log_size; i++) {
       console->logs[i].text = (char*)malloc(1024);
@@ -87,12 +94,12 @@ extern "C"
                   0,
                   GetScreenWidth(),
                   console->ui.height,
-                  Fade(imui->theme->background, 0.75f /*1.0f*/));
+                  Fade(imui->theme->background, 0.90f /*1.0f*/));
 
     if (console->is_open) {
 
       static bool dp_is_open = false;
-      static int dp_selected = 0;
+      static int dp_selected = 3; //XXTH FIXME should be detected ...3=default
 
 #define DP_OPTIONS_COUNT 7
 
@@ -170,13 +177,13 @@ extern "C"
         Clamp(console->scroll, min_scroll_val, console->log_index);
 
       static int scroll_offset = 0;
-      int real_scroll = ((console->log_index - console->scroll) * 30);
+      int real_scroll = ((console->log_index - console->scroll) * (int)console->fontSpacing);
 
       scroll_offset = real_scroll;
       scroll_offset =
         Clamp((float)scroll_offset,
               0.0f,
-              (console->log_index * 30.0f) - (console->ui.height - 30.0f));
+              (console->log_index * console->fontSpacing) - (console->ui.height - console->fontSpacing));
 
       // Colors array based on log type
       Color colors[4] = {
@@ -185,29 +192,31 @@ extern "C"
         RED,               // error
         imui->theme->text, // info
       };
-
+      console->fontSpacing = console->fontSize + 5;
       for (int i = 0; i < console->log_index; i++) {
-        Vector2 pos = { 10, 0 - scroll_offset + (float)i * 30 };
+        Vector2 pos = { 10, 0 - scroll_offset + (float)i * console->fontSpacing };
         if (pos.y > console->ui.height - 45)
           break;
+        //shadow=>  DrawTextEx(*imui->font, console->logs[i].text, pos + Vector2(1.f,1.f), console->fontSize, 1, DARKGRAY);
         if (console->logs[i].type == LOG_INFO) {
-          DrawTextEx(*imui->font, console->logs[i].text, pos, 20, 1, colors[3]);
+          DrawTextEx(*imui->font, console->logs[i].text, pos, console->fontSize, 1, colors[3]);
         } else if (console->logs[i].type == LOG_WARNING) {
-          DrawTextEx(*imui->font, console->logs[i].text, pos, 20, 1, colors[1]);
+          DrawTextEx(*imui->font, console->logs[i].text, pos, console->fontSize, 1, colors[1]);
         } else if (console->logs[i].type == LOG_ERROR) {
-          DrawTextEx(*imui->font, console->logs[i].text, pos, 20, 1, colors[2]);
+          DrawTextEx(*imui->font, console->logs[i].text, pos, console->fontSize, 1, colors[2]);
         } else if (console->logs[i].type == LOG_DEBUG) {
-          DrawTextEx(*imui->font, console->logs[i].text, pos, 20, 1, colors[0]);
+          DrawTextEx(*imui->font, console->logs[i].text, pos, console->fontSize, 1, colors[0]);
         } else {
           // XXTH default ...
-           DrawTextEx(*imui->font, console->logs[i].text, pos, 20, 1, colors[3]);
+           DrawTextEx(*imui->font, console->logs[i].text, pos, console->fontSize, 1, colors[3]);
         }
       }
 
       // static char text[1024] = "";
-      Vector2 input_pos = { 0.0f, console->ui.height - 31.0f };
-      DK_DrawInputField(imui, input_pos, GetScreenWidth(), 20, console->ConsoleInputText, &focused, NULL);
-
+      Vector2 input_pos = { 0.0f, console->ui.height - console->fontSpacing + 1.0f };
+      DK_DrawInputField(imui, input_pos, GetScreenWidth(), console->fontSize
+        , console->ConsoleInputText, &focused, NULL, console->setCursorPos);
+      console->setCursorPos = -1;
       if (IsKeyPressed(KEY_ENTER)) {
         if (strlen( console->ConsoleInputText ) > 0) {
           if (console->log_index >= LOG_SIZE) {

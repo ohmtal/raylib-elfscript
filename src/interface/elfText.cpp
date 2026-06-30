@@ -9,6 +9,7 @@
 #include <console/console.h>
 #include "console/engineAPI.h"
 #include "ConsoleTypes.h"
+#include "raymath.h"
 
 namespace ElfText {
     using namespace ElfResource;
@@ -35,8 +36,10 @@ namespace ElfText {
     DefineEngineFunction( LoadFontEx, S32, (String fileName, int fontSize, Vector<S32> codepointValues, int codepointCount), , "Load font from file with extended parameters. Pass 0 for codepointCount to use default set.") {
 
         Font font;
-
-        if (codepointCount <= 0 || codepointValues.size() == 0) {
+        bool valuesEmpty = codepointValues.size() == 1 && codepointValues[0] == 0;
+        if ( valuesEmpty && codepointCount > 0) {
+             font = LoadFontEx(fileName.c_str(), fontSize, nullptr, codepointCount);
+        } else  if (codepointCount <= 0 || valuesEmpty) {
             font = LoadFontEx(fileName.c_str(), fontSize, nullptr, 0);
         } else {
             if (codepointValues.size() < (size_t)codepointCount) {
@@ -106,11 +109,12 @@ namespace ElfText {
 
     // RLAPI void DrawTextEx(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint); // Draw text using font and additional parameters
     DefineEngineFunction( DrawTextEx, void, (S32 fontId, const char *text, Vector2 position
-    , float fontSize, float spacing, Color tint)
-    , (RAYWHITE), "Draw text using font and additional parameters, fontId 0 means default font")
+    , float fontSize, float spacing, Color tint, bool doShadow, Color shadowColor )
+    , (20.f ,1.f, RAYWHITE, false, DARKGRAY), "Draw text using font and additional parameters, fontId 0 means default font")
     {
         Font* font = ElfResource::FontMap.get(fontId);
         if (!font) return;
+        if (doShadow) DrawTextEx(*font,text, position + Vector2(1.f, 1.f), fontSize, spacing, shadowColor);
         DrawTextEx(*font, text, position, fontSize, spacing, tint);
     }
 

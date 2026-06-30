@@ -245,7 +245,10 @@ extern "C"
   void DK_DrawSlider(ImUI* io, Vector2 position, float width, float height, float* value, float min, float max, float step, bool* focused);
   int DK_DrawButton(ImUI* io, Vector2 position, float width, float height, const char* text);
   int DK_DrawDropdown(ImUI* io, Vector2 position, float width, float height, const char* text, const char** options, size_t el_size, int* selected, bool* is_open);
-  const char* DK_DrawInputField(ImUI* io, Vector2 position, float width, float height, char* text, bool* focused, void (*callback)(const char*));
+  const char* DK_DrawInputField(ImUI* io, Vector2 position
+    , float width, float height, char* text, bool* focused
+    , void (*callback)(const char*)
+    , int setCursorPos = -1);
 
 #if defined(DK_UI_IMPLEMENTATION)
 
@@ -599,15 +602,16 @@ extern "C"
                                 float height,
                                 char* text,
                                 bool* focused,
-                                void (*callback)(const char*))
+                                void (*callback)(const char*)
+                                ,int setCursorPos )
   {
     // @Color definitions from theme
     Color bgColor = Fade(io->theme->background, 0.2);
     Color borderColor = Fade(io->theme->border, 0.5);
     Color textColor = Fade(io->theme->text, 0.8);
     Color activeColor = Fade(io->theme->buttonActive, 0.8);
-    Color cursorColor = Fade(io->theme->textFiledCursor, 0.8);
-    Color selectionColor = Fade(io->theme->textFiledSelection, 0.2);
+    Color cursorColor = Fade(io->theme->textFiledCursor, 0.4f /*0.8*/);
+    Color selectionColor = Fade(io->theme->textFiledSelection, 0.1f /*0.2*/);
 
     // @Clickable area for @Focus
     Rectangle buttonBounds = { position.x, position.y, width, height };
@@ -616,6 +620,11 @@ extern "C"
     static int framesCounter = 0;
     static int cursorOffset = 0;
     static int cursorPos = 0;
+
+    if (setCursorPos >=0 ) {
+      if ( setCursorPos <= strlen(text)) cursorPos = setCursorPos;
+      else cursorPos = strlen(text);
+    }
 
     // @Focus on @Click
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -732,14 +741,28 @@ extern "C"
       }
 
       // @Cursor movement (left arrow)
-      if (IsKeyPressed(KEY_LEFT)) {
-        if (cursorPos > 0) --cursorPos;
+      static float keyTimer = 0;
+      keyTimer += GetFrameTime();
+      if (keyTimer > 0.1f) {
+        if (IsKeyDown(KEY_LEFT)) {
+          if ( cursorPos > 0) --cursorPos;
+           keyTimer = 0.f;
+        }
+
+        // @Cursor movement (right arrow)
+        if (IsKeyDown(KEY_RIGHT)) {
+          if (cursorPos < strlen(text)) ++cursorPos;
+          keyTimer = 0.f;
+        }
+      } // timer
+
+      if (IsKeyPressed(KEY_HOME)) {
+        cursorPos = 0;
+      }
+      if (IsKeyPressed(KEY_END)) {
+        cursorPos = strlen(text);
       }
 
-      // @Cursor movement (right arrow)
-      if (IsKeyPressed(KEY_RIGHT)) {
-        if (cursorPos < strlen(text)) ++cursorPos;
-      }
 
       char temp[1024];
       memcpy(temp, text, sizeof(temp));
@@ -795,7 +818,9 @@ extern "C"
 
     // @Text buffer drawing
     Vector2 textPos = { position.x + 5, position.y + height / 2 - height / 2 };
+    // shadow-> DrawTextEx(*io->font,text, textPos + Vector2(1.f,1.f), height, 1, DARKGRAY);
     DrawTextEx(*io->font,text, textPos, height, 1, textColor);
+
 
     if (strlen(text) != 0) { cursorOffset = 8; }
     else { cursorOffset = 5; }

@@ -21,7 +21,11 @@ function Main::init(%this) {
     // It's unloaded when programm ends automaticly
     //  UnloadImage(%this.iconImg);
 
+    // %this.fontHackNerd = LoadFontEx("assets/font/HackNerdFontPropo-Regular.ttf", 32, 0, 250);
+    %this.fontJetBrains= LoadFontEx("assets/font/JetBrainsMono-Regular.ttf", 20, 0, 250);
+
     %this.ConsoleGui = singleton ConsoleGuiObject();
+    %this.ConsoleGui.setFont( %this.fontJetBrains);
 
 
     // SetExitKey(0); // i want to use escape to unload module and display a module list
@@ -87,7 +91,8 @@ function Main::loop(%this) {
         ClearBackground("20 100 100");
         DrawText("Failed to load module:" SPC %this.moduleName, 5, GetScreenHeight() - 30, 20, RED);
     }
-    DrawText("CTRL + UP or DOWN to load an other module. FPS:" SPC GetFPS()  , 5, GetScreenHeight() - 50, 20, BLACK, true, DARKGRAY);
+    DrawTextEx(%this.fontJetBrains, "CTRL + UP or DOWN to load an other module. FPS:" SPC GetFPS()
+        , 5 SPC GetScreenHeight() - 50, 20, 1,  BLACK, true, GREEN);
 
     %this.ConsoleGui.update();
     EndDrawing();
