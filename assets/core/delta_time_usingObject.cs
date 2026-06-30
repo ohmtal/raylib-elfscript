@@ -16,6 +16,7 @@
 // $BLUE = "0 0 255 128";
 // $DARKGRAY = "64 64 64 255";
 
+
 function MainInit() {
 
     $Game = new ScriptObject() {
@@ -37,18 +38,7 @@ function MainInit() {
     // echo($Game.deltaCircle SPC $Game.frameCircle);
     // return false;
 
-    %flags = $FLAG_WINDOW_RESIZABLE; // | $FLAG_WINDOW_MAXIMIZED;
-
-    echo( "undecorated:" SPC $FLAG_WINDOW_UNDECORATED
-          SPC "hidden:" SPC $FLAG_WINDOW_HIDDEN SPC "mini" SPC $FLAG_WINDOW_MINIMIZED
-          SPC  "resize:" SPC  $FLAG_WINDOW_RESIZABLE SPC "max:"
-          SPC  $FLAG_WINDOW_MAXIMIZED SPC "flags:" SPC %flags);
-
-    echo("KEY_KP_0:" SPC $KEY_KP_0
-        SPC "GAMEPAD_BUTTON_RIGHT_THUMB" SPC $GAMEPAD_BUTTON_RIGHT_THUMB
-        SPC "MOUSE_BUTTON_BACK" SPC $MOUSE_BUTTON_BACK
-    );
-    // return;
+    %flags = FLAG_WINDOW_RESIZABLE; // | $FLAG_WINDOW_MAXIMIZED;
 
     SetConfigFlags(%flags );
 
@@ -63,8 +53,8 @@ function MainInit() {
     // It's unloaded when programm ends automaticly
     //  UnloadImage($Game.iconImg);
 
-    $Game.Eyes = createEyes();
-    $Game.Eyes.init();
+    // $Game.Eyes = createEyes();
+    // $Game.Eyes.init();
 
     return true;
 }
@@ -78,8 +68,8 @@ function MainLoop() {
 
     // Update
     //----------------------------------------------------------------------------------
-    $Game.Eyes.update($Game.frameCircle);
-    $Game.Eyes.render();
+    // $Game.Eyes.update($Game.frameCircle);
+    // $Game.Eyes.render();
     //----------------------------------------------------------------------------------
     // Adjust the FPS target based on the mouse wheel
     %mouseWheel = GetMouseWheelMove();
@@ -104,14 +94,14 @@ function MainLoop() {
     if ($Game.deltaCircle.x > $Game.screenWidth) $Game.deltaCircle.x = 0;
     if ($Game.frameCircle.x > $Game.screenWidth) $Game.frameCircle.x = 0;
 
-    if (IsKeyPressed($KEY_R))
+    if (IsKeyPressed( KEY_R))
     {
         $Game.deltaCircle.x = 0;
         $Game.frameCircle.x = 0;
         $Game.currentFps = 60;
         SetTargetFPS($Game.currentFps);
     }
-    if (IsKeyPressed($KEY_U))
+    if (IsKeyPressed(KEY_U))
     {
         $Game.currentFps = 0;
         SetTargetFPS($Game.currentFps);
@@ -123,21 +113,21 @@ function MainLoop() {
     ClearBackground("120 120 120");
 
     // Draw both circles to the screen
-    DrawCircleV($Game.deltaCircle, $Game.circleRadius + 2, $RED);
-    DrawCircleV($Game.frameCircle, $Game.circleRadius, $BLUE);
+    DrawCircleV($Game.deltaCircle, $Game.circleRadius + 2, RED);
+    DrawCircleV($Game.frameCircle, $Game.circleRadius, BLUE);
 
     // Draw the help text
     // Determine what help text to show depending on the current FPS target
     // NOTE strFormat only takes ONE parameter so I use SPC concat in second
     if ($Game.currentFps <= 0) %fpsText = strFormat("FPS: unlimited (%i)", GetFPS());
     else %fpsText = "FPS: " SPC GetFPS() SPC "target: " SPC $Game.currentFps;
-    DrawText(%fpsText, 10, 10, 20, $DARKGRAY);
-    DrawText(strFormat("Frame time: %02.02f ms", GetFrameTime()), 10, 30, 20, $DARKGRAY);
-    DrawText("Use the scroll wheel to change the fps limit, r to reset, u for unlimited", 10, 50, 20, $DARKGRAY);
+    DrawText(%fpsText, 10, 10, 20, DARKGRAY);
+    DrawText(strFormat("Frame time: %02.02f ms", GetFrameTime()), 10, 30, 20, DARKGRAY);
+    DrawText("Use the scroll wheel to change the fps limit, r to reset, u for unlimited", 10, 50, 20, DARKGRAY);
 
     // Draw the text above the circles
-    DrawText("FUNC: x += GetFrameTime()*speed", 10, 90, 20, $RED);
-    DrawText("FUNC: x += speed", 10, 240, 20, $BLUE);
+    DrawText("FUNC: x += GetFrameTime()*speed", 10, 90, 20, RED);
+    DrawText("FUNC: x += speed", 10, 240, 20, BLUE);
 
     EndDrawing();
 

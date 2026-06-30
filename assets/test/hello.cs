@@ -1,5 +1,6 @@
 // Example without the default calls - so it's a pure script call only
 // called with: ./raylib-elfscript --noloop --script assets/test/hello.cs
+// WARNING since the c-source loop does not run. schedule does not work!
 
 // Initialization
 //--------------------------------------------------------------------------------------

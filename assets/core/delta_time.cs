@@ -16,10 +16,10 @@
  *          - [ ] DrawCircleV($deltaCircle, $circleRadius, $RED);
  *
  ********************************************************************************************/
-$RAYWHITE = "255 255 255 255";
-$RED = "255 0 0 255";
-$BLUE = "0 0 255 255";
-$DARKGRAY = "64 64 64 255";
+// $RAYWHITE = "255 255 255 255";
+// $RED = "255 0 0 255";
+// $BLUE = "0 0 255 255";
+// $DARKGRAY = "64 64 64 255";
 
 function MainInit() {
 
@@ -33,10 +33,10 @@ function MainInit() {
 
     // Store the position for the both of the circles
     //NOTE: using Stuct helper class
-    $deltaCircle = new Struct() {
+    $deltaCircle = new SimObject() {
         Vector2 = 0 SPC $screenHeight / 3.0 ;
     };
-    $frameCircle = new Struct() {
+    $frameCircle = new SimObject() {
         Vector2 = 0 SPC $screenHeight * 2.0 / 3.0 ;
     };
 
@@ -82,7 +82,7 @@ function MainLoop() {
         if ($deltaCircle.Vector2.x > $screenWidth) $deltaCircle.Vector2.x = 0;
         if ($frameCircle.Vector2.x > $screenWidth) $frameCircle.Vector2.x = 0;
 
-        if (IsKeyPressed($KEY_R))
+        if (IsKeyPressed(KEY_R))
         {
             $deltaCircle.Vector2.x = 0;
             $frameCircle.Vector2.x = 0;
@@ -104,7 +104,7 @@ function MainLoop() {
         // if (%fcX> $screenWidth) %fcX = 0;
         //
         // // Reset both circles positions
-        // if (IsKeyPressed($KEY_R))
+        // if (IsKeyPressed(KEY_R))
         // {
         //     %dcX = 0;
         //     %fcX = 0;
@@ -117,24 +117,24 @@ function MainLoop() {
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
-        ClearBackground($RAYWHITE);
+        ClearBackground(RAYWHITE);
 
         // Draw both circles to the screen
-        DrawCircleV($deltaCircle.Vector2, $circleRadius, $RED);
-        DrawCircleV($frameCircle.Vector2, $circleRadius, $BLUE);
+        DrawCircleV($deltaCircle.Vector2, $circleRadius, RED);
+        DrawCircleV($frameCircle.Vector2, $circleRadius, BLUE);
 
         // Draw the help text
         // Determine what help text to show depending on the current FPS target
         // NOTE strFormat only takes ONE parameter so I use SPC concat in second
         if ($currentFps <= 0) %fpsText = strFormat("FPS: unlimited (%i)", GetFPS());
         else %fpsText = "FPS: " SPC GetFPS() SPC "target: " SPC $currentFps;
-        DrawText(%fpsText, 10, 10, 20, $DARKGRAY);
-        DrawText(strFormat("Frame time: %02.02f ms", GetFrameTime()), 10, 30, 20, $DARKGRAY);
-        DrawText("Use the scroll wheel to change the fps limit, r to reset", 10, 50, 20, $DARKGRAY);
+        DrawText(%fpsText, 10, 10, 20, DARKGRAY);
+        DrawText(strFormat("Frame time: %02.02f ms", GetFrameTime()), 10, 30, 20, DARKGRAY);
+        DrawText("Use the scroll wheel to change the fps limit, r to reset", 10, 50, 20, DARKGRAY);
 
         // Draw the text above the circles
-        DrawText("FUNC: x += GetFrameTime()*speed", 10, 90, 20, $RED);
-        DrawText("FUNC: x += speed", 10, 240, 20, $BLUE);
+        DrawText("FUNC: x += GetFrameTime()*speed", 10, 90, 20, RED);
+        DrawText("FUNC: x += speed", 10, 240, 20, BLUE);
 
         EndDrawing();
 
