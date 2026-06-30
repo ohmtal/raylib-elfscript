@@ -27,9 +27,14 @@ namespace ElfResource { extern void shutDown(); }
 
 int argParser(int argc, char* argv[]) {
 
+    // pass to script in TGE/OGE3D  it is called Game::!,
+    Con::setIntVariable("Main::argc", argc);
+    for (S32 i = 0; i < argc; i++)
+        Con::setVariable(avar("Main::argv%d", i), argv[i]);
+
     String argStr;
     // argv[0] is program name
-    for (int i = 1; i < argc; ++i) {
+    for (S32 i = 1; i < argc; ++i) {
         if (!argv[i]) continue;
         argStr = argv[i];
 
@@ -52,6 +57,7 @@ int argParser(int argc, char* argv[]) {
             }
             continue;
         }
+
 
     } //for ...
     return 0;

@@ -106,8 +106,8 @@ function MainInit() {
         class = "Main";
         // dynamic fields:
         TypeString caption = "raylib-elfScript Demo Loader";
-        TypeS32 screenWidth = 800;
-        TypeS32 screenHeight = 450;
+        TypeS32 screenWidth = 1152;
+        TypeS32 screenHeight = 648;
         TypeS32 currentFps = 60;
         TypeS32 flags = FLAG_WINDOW_RESIZABLE;
         TypeS32 moduleIndex = 0;
