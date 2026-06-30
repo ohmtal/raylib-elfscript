@@ -20,7 +20,9 @@ namespace ConsoleGui {
 
     static void ConsoleConsumer(/*ConsoleLogEntry::Level*/ U32 level, const char *line)
     {
-        if (!gConsolePtr || !gConsolePtr->logs) return;
+        if (!gConsolePtr || !gConsolePtr->logs
+            || !line || line[0] == 0
+        ) return;
         //FIXME level matching imgui/elfscript
         char* finalBuffer = (char*)dMalloc(256);
         dMemset(finalBuffer, 0, 256);
@@ -58,13 +60,17 @@ namespace ConsoleGui {
         static void initPersistFields();
 
         void pushCommand() {
-            if (!gConsolePtr) return;
+            if (!gConsolePtr || gHistory.size() == 0) return;
             if ( gHistoryNeedle >= 0 && gHistoryNeedle < gHistory.size()) {
                 // Con::printf("COMMAND SHOULD BE %s", gHistory[gHistoryNeedle].c_str());
-                dSprintf(gConsolePtr->ConsoleInputText, 256, "%s",  gHistory[gHistoryNeedle].c_str());
+                dSprintf(gConsolePtr->ConsoleInputText, 1024, "%s",  gHistory[gHistoryNeedle].c_str());
                 gConsolePtr->setCursorPos = gHistory[gHistoryNeedle].length();
             } else {
-                dStrcpy(gConsolePtr->ConsoleInputText, "", 256);
+                //FIXME both cause the object to die ?! ... mem corruption ?
+                //TODO rewirte the pointer to lines to a Vector!!!!
+                //BUG?!  dStrcpy(gConsolePtr->ConsoleInputText, "", 256);
+                 // dSprintf(gConsolePtr->ConsoleInputText, 1024, "%s",  "");
+                // strcpy( gConsolePtr->ConsoleInputText, "");
             }
 
         }
