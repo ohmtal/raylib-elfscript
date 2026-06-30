@@ -734,6 +734,9 @@ extern "C"
         char str[2] = { 0 };
         str[0] = (char)key;
 
+
+        // XXTH WTF! adding check
+        if (strlen(text) < cursorPos ) cursorPos = strlen(text);
         memmove(&text[cursorPos + 1], &text[cursorPos], strlen(text) - cursorPos + 1);
         text[cursorPos] = str[0];
 

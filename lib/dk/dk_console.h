@@ -72,10 +72,11 @@ extern "C"
 
   void DK_ConsoleUpdate(Console* console, ImUI* imui, void (*callback)(const char*))
   {
-
-    // if (IsKeyPressed(console->toggle_key)) {
-    //   console->is_open = !console->is_open;
-    // }
+    bool key_handled = false;
+    if (IsKeyPressed(console->toggle_key) && console->is_open) {
+      console->is_open = false;
+      key_handled = true;
+    }
 
     static bool focused = false;
 
@@ -217,7 +218,7 @@ extern "C"
       DK_DrawInputField(imui, input_pos, GetScreenWidth(), console->fontSize
         , console->ConsoleInputText, &focused, NULL, console->setCursorPos);
       console->setCursorPos = -1;
-      if (IsKeyPressed(KEY_ENTER)) {
+      if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER)) {
         if (strlen( console->ConsoleInputText ) > 0) {
           if (console->log_index >= LOG_SIZE) {
             console->log_index = 0;
@@ -232,7 +233,7 @@ extern "C"
       }
     }
     //XXTH moved down so the open key is not pushed on the input
-    if (IsKeyPressed(console->toggle_key)) {
+    if (!key_handled && IsKeyPressed(console->toggle_key)) {
       console->is_open = !console->is_open;
     }
   }

@@ -28,10 +28,19 @@ namespace ConsoleGui {
         dMemset(finalBuffer, 0, 256);
         dSprintf(finalBuffer, 256, "%s",  line);
 
+        S32 finalLevel = LOG_INFO;
+        switch (level)
+        {
+            case ConsoleLogEntry::Normal: finalLevel = LOG_INFO; break;
+            case ConsoleLogEntry::Warning: finalLevel = LOG_WARNING; break;
+            case ConsoleLogEntry::Error: finalLevel = LOG_ERROR; break;
+            default: finalLevel = LOG_INFO; break;
+        }
+
         gConsolePtr->logs[gConsolePtr->log_index++] =
         (Log){
             .text = finalBuffer
-            , .type = (S32)level
+            , .type = finalLevel
         };
     }
 
@@ -66,11 +75,8 @@ namespace ConsoleGui {
                 dSprintf(gConsolePtr->ConsoleInputText, 1024, "%s",  gHistory[gHistoryNeedle].c_str());
                 gConsolePtr->setCursorPos = gHistory[gHistoryNeedle].length();
             } else {
-                //FIXME both cause the object to die ?! ... mem corruption ?
-                //TODO rewirte the pointer to lines to a Vector!!!!
-                //BUG?!  dStrcpy(gConsolePtr->ConsoleInputText, "", 256);
-                 // dSprintf(gConsolePtr->ConsoleInputText, 1024, "%s",  "");
-                // strcpy( gConsolePtr->ConsoleInputText, "");
+                dStrcpy(gConsolePtr->ConsoleInputText, "", 1024);
+                gConsolePtr->setCursorPos = 0;
             }
 
         }

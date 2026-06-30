@@ -18,6 +18,7 @@
 String gScriptFile = "assets/main.cs";
 bool gShutDownRequest = false;
 bool gNoDefaultCalls  = false;
+bool gEnableConsole = false;
 
 extern void initEnum();
 extern void CustomTraceLog(int msgType, const char *text, va_list args);
@@ -36,7 +37,10 @@ int argParser(int argc, char* argv[]) {
             gNoDefaultCalls = false;
             continue;
         }
-
+        if (argStr.equal("--console")) {
+            gEnableConsole = true;
+            continue;
+        }
         // filename test
         if (argStr.equal("--script")) {
             if (i + 1 < argc) {
@@ -71,9 +75,12 @@ int defaultMain(int argc, char* argv[])
 
         #if defined(__unix__)
         // console test:
-        StdConsole::create();
-        stdConsole->enable(!gShutDownRequest);
-        stdConsole->enableInput(!gShutDownRequest);
+        if (gEnableConsole) {
+            StdConsole::create();
+            stdConsole->enable(!gShutDownRequest);
+            stdConsole->enableInput(!gShutDownRequest);
+        }
+
         #endif
 
         if (!Con::isFunction("MainLoop")) {
@@ -93,7 +100,7 @@ int defaultMain(int argc, char* argv[])
         {
             Con::executef("MainLoop");
             #if defined(__unix__)
-            stdConsole->process();
+            if (gEnableConsole && stdConsole) stdConsole->process();
             #endif
             engineGlue::process(GetFrameTime());
             if (gShutDownRequest) break;
