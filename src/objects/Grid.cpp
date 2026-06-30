@@ -200,7 +200,7 @@ DefineEngineMethod(Grid, getNodesByRect, const char*, (Rectangle area), , "x y w
 
 }
 
-DefineEngineMethod(Grid, getNeighbour, const char*, (S32 nodeIndex, S32 direction), , "S32 NodeIndex, S32 Direction,  return nodeidx x y z flags "
+DefineEngineMethod(Grid, getNeighbour, const char*, (S32 nodeIndex, S32 direction), , "S32 NodeIndex, S32 Direction,  return nodeidx x y flags "
 "Directions:"
 "1  2  3"
 "4  X  5"

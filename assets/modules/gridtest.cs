@@ -49,9 +49,12 @@ function GridTest::Render(%this) {
                 %weight = %this.grid.getWeightByNodeId( %idx );
                 // %this.writeText(65 + 50 * %j,%i*30 + 50,byteToHex(%weight), $align::left ,  %weight SPC "0.5 0.2");
 
-                %rect = 65 + 50 * %j SPC %i*30 + 40 SPC 35 SPC 28;
+                %x = 65 + 50 * %j;
+                %y = %i*30 + 40;
+                %rect = %x SPC %y SPC 35 SPC 28;
                 %color = %weight  SPC "128 0";
                 DrawRectangleRec(%rect, %color);
+                DrawText(%weight, %x + 2 , %y + 2, 10, BLACK, false);
                 %idx++;
             }
         }
