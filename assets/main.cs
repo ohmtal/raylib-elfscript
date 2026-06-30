@@ -21,6 +21,9 @@ function Main::init(%this) {
     // It's unloaded when programm ends automaticly
     //  UnloadImage(%this.iconImg);
 
+    %this.ConsoleGui = singleton ConsoleGuiObject();
+
+
     // SetExitKey(0); // i want to use escape to unload module and display a module list
     %this.loadModule();
 }
@@ -72,6 +75,7 @@ function Main::loop(%this) {
         }
     }
 
+
     BeginDrawing();
 
     // DrawFPS(10, 10); //2500 fps without the module stuff below. Also > 2.4k  with
@@ -84,6 +88,8 @@ function Main::loop(%this) {
         DrawText("Failed to load module:" SPC %this.moduleName, 5, GetScreenHeight() - 30, 20, RED);
     }
     DrawText("CTRL + UP or DOWN to load an other module. FPS:" SPC GetFPS()  , 5, GetScreenHeight() - 50, 20, BLACK, true, DARKGRAY);
+
+    %this.ConsoleGui.update();
     EndDrawing();
 }
 

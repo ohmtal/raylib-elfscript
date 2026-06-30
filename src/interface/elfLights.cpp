@@ -9,7 +9,8 @@
 #include "elfResource.h"
 
 #define RLIGHTS_IMPLEMENTATION
-#include "rlights.h"
+#include "rayspice/rlights.h"
+
 static S32 gLightsCount = 0;
 
 class LightObject : public SimObject
