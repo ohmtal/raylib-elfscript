@@ -39,6 +39,7 @@ extern "C"
     bool is_open;
     int scroll;
     KeyboardKey toggle_key;
+    char ConsoleInputText[1024];
   } Console;
 
   void DK_ConsoleInit(Console* console, int log_size);
@@ -148,10 +149,11 @@ extern "C"
       int scroll_step = 1;
       int min_scroll_val = 0;
 
+      //XXTH changed to page up/down
       if (focused) {
-        if (IsKeyDown(KEY_DOWN)) {
+        if (IsKeyDown(KEY_PAGE_UP)) {
           console->scroll += scroll_step;
-        } else if (IsKeyDown(KEY_UP)) {
+        } else if (IsKeyDown(KEY_PAGE_DOWN)) {
           console->scroll -= scroll_step;
         }
       }
@@ -202,21 +204,21 @@ extern "C"
         }
       }
 
-      static char text[1024] = "";
+      // static char text[1024] = "";
       Vector2 input_pos = { 0.0f, console->ui.height - 31.0f };
-      DK_DrawInputField(imui, input_pos, GetScreenWidth(), 20, text, &focused, NULL);
+      DK_DrawInputField(imui, input_pos, GetScreenWidth(), 20, console->ConsoleInputText, &focused, NULL);
 
       if (IsKeyPressed(KEY_ENTER)) {
-        if (strlen(text) > 0) {
+        if (strlen( console->ConsoleInputText ) > 0) {
           if (console->log_index >= LOG_SIZE) {
             console->log_index = 0;
           }
 
           if (callback != NULL) {
-            callback(text);
+            callback( console->ConsoleInputText);
           }
 
-          strcpy(text, "");
+          strcpy( console->ConsoleInputText, "");
         }
       }
     }

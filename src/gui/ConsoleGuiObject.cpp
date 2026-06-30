@@ -13,6 +13,8 @@ namespace ConsoleGui {
 
 
     Console* gConsolePtr = nullptr;
+    Vector<String> gHistory;
+    S32 gHistoryNeedle;
 
 
 
@@ -33,7 +35,11 @@ namespace ConsoleGui {
 
     void  ConsoleHandler(const char* command)
     {
-        if (command)  Con::evaluate(command);
+        if (command && command[0] != 0){
+            gHistory.push_back(command);
+            gHistoryNeedle = gHistory.size(); // - 1;
+            Con::evaluate(command);
+        }
     }
 
     class ConsoleGuiObject : public SimObject
@@ -51,6 +57,16 @@ namespace ConsoleGui {
 
         static void initPersistFields();
 
+        void pushCommand() {
+            if (!gConsolePtr) return;
+            if ( gHistoryNeedle >= 0 && gHistoryNeedle < gHistory.size()) {
+                // Con::printf("COMMAND SHOULD BE %s", gHistory[gHistoryNeedle].c_str());
+                dSprintf(gConsolePtr->ConsoleInputText, 256, "%s",  gHistory[gHistoryNeedle].c_str());
+            } else {
+                dStrcpy(gConsolePtr->ConsoleInputText, "", 256);
+            }
+
+        }
 
     };
     IMPLEMENT_CONOBJECT(ConsoleGuiObject);
@@ -95,6 +111,16 @@ namespace ConsoleGui {
     DefineEngineMethod(ConsoleGuiObject, Update, void, (), , "update the console") {
         if (!gConsolePtr) return ;
         DK_ConsoleUpdate(gConsolePtr, &object->mImUI,ConsoleHandler);
+        if (gConsolePtr->is_open) {
+            if (IsKeyPressed(KEY_UP)) {
+                if (gHistoryNeedle > 0) gHistoryNeedle--;
+                object->pushCommand();
+            } else if (IsKeyPressed(KEY_DOWN)) {
+                if (gHistoryNeedle < gHistory.size()) gHistoryNeedle++;
+                object->pushCommand();
+            }
+        }
+
     }
 
 } //namespace
