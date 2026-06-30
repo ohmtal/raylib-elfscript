@@ -7,7 +7,7 @@ function createBlank() {
 }
 //----------------------------------------------------------------------
 function Blank::onAdd(%this) {
-    SetTargetFPS(0); //FPS TEST only calling module
+    SetTargetFPS(60); //FPS TEST only calling module
     return true;
 }
 //----------------------------------------------------------------------
