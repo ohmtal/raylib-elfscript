@@ -116,7 +116,7 @@ function Grid::addRandomMud(%this) {
         %this.setWeightByNodeId(%i, 0);
     }  
     
-    for( %i = 0; %i < %cnt / 1.5; %i++ ) {
+    for( %i = 0; %i < %cnt * 0.75; %i++ ) {
         %n = getRandom(%cnt - 1);
         // %w = getRandom(50,250);
         // let think about 7 ground textures:
@@ -127,96 +127,7 @@ function Grid::addRandomMud(%this) {
     }
    
 }
-// -----------------------------------------------------------------------------
-// function GridTest::onInputEvent( %this, %deviceString, %actionString, %mouseX, %mouseY, %keyValue ) {
-//     if (%keyValue == 0  ) { //mouse up on left button
-//         if (%actionString $= "R") {
-//             exec("./gridtest.cs");
-//         }
-//         else
-//         if (%actionString $= "button1" && pointInRect( %this.LabelNew.ButtonRect, %mouseX SPC %mouseY)) {
-//             %this.newTerrain();
-//         }
-//     }
-//
-//
-// }
-// -----------------------------------------------------------------------------
-// function GridTest::onRender(%this,%dt) {
-//
-//
-//   %this.writeText(5,25, "Grid + Pathfinding Demo ",  $FontAlign_left, "0.5 0.2 0.5" );
-//   %this.writeText(900, 150, getFPS() @ "fps" );
-//    // %this.Line("5 35", "595 35", "0 1 0");
-//
-//
-//     if (!%this.hideTerrain) {
-//         %vert = %this.countX;
-//         %hor  = %this.countY;
-//
-//         %idx = 0;
-//         %weight = 0;
-//         for (%i = 0; %i < %vert; %i++) {
-//             // %line = "";
-//             for (%j=0; %j < %hor; %j++) {
-//                 %weight = %this.grid.getWeightByNodeId( %idx );
-//                 // %this.writeText(65 + 50 * %j,%i*30 + 50,byteToHex(%weight), $align::left ,  %weight SPC "0.5 0.2");
-//
-//                 %rect = 65 + 50 * %j SPC %i*30 + 40 SPC 35 SPC 28;
-//                 %color = (%weight / 255.0) SPC "0.5 0";
-//                 %this.rect(%rect, %color, true);
-//
-//                 %idx++;
-//             }
-//         }
-//     }
-//
-//     // path
-//     %lastPoint = "";
-//     if ( isObject(%this.path) ) {
-//         %cnt = %this.path.getDynamicFieldCount();
-//         for (%i = 0; %i < %cnt; %i++) {
-//             %pos = %this.path.getFieldValue("node" @ %i);
-//             // %realPos = getWord(%pos,0) * 50  + 85 SPC  getWord(%pos,1) * 30 + 55;
-//             %realPos = %pos.x * 50  + 85 SPC  %pos.y * 30 + 55;
-//             if ( %lastPoint ) %this.Line(%lastPoint, %realPos  );
-//             %lastPoint = %realPos;
-//
-//             // if ( %pos !$= "" ) {
-//             //     %this.writeText(getWord(%pos,0) * 50  + 52, getWord(%pos,1) * 30 + 50,"x", $align::left, "0 0 255" );
-//             // }
-//         }
-//     }
-//
-//     %this.Rect( %this.LabelNew.ButtonRect,%this.labelNew.color , false);
-//     // %this.ElipseRect( %this.LabelNew.ButtonRect,%this.labelNew.color );
-// }
-// -----------------------------------------------------------------------------
-// function GridTest::onUpdate(%this, %dt) {
-//     if (%this.crazy) %this.newTerrain();
-//
-//     // not really good performance!! >> i need a mouse move event
-//     // or better an object which track it on c++ like MouseRect ...
-//     if (pointInRect( %this.LabelNew.ButtonRect,getMousePos())) {
-//         %this.labelNew.color = "0.5 1 0.5";
-//     } else {
-//         %this.labelNew.color = "1 1 1";
-//     }
-// }
-// -----------------------------------------------------------------------------
-// function GridTest::onRemove(%this) {
-//     %this.deleteObjects();
-// }
 
-// --------------- TEST update  all 32 ms --------
-function GridTest::start(%this) {
-    if (%this.crazy) return;
-    %this.crazy = true;
-    // %this.crazyLoop();
-}
-function GridTest::stop(%this) {
-    %this.crazy = false;
-}
 
 
 

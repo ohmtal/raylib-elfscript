@@ -10,15 +10,6 @@ namespace ElfGrid {
 
 IMPLEMENT_CONOBJECT(Grid);
 
-// void Grid::Update(const double& dt) {
-//     if (!mGrid.isInitialized()) return;
-// }
-//
-// void Grid::Draw()
-// {
-//     //FIXME debug render
-//     if (!mGrid.isInitialized()) return;
-// }
 
 bool Grid::onAdd()
 {
@@ -129,7 +120,7 @@ DefineEngineMethod(Grid, getFlags, S32, (F32 x, F32 y), , "x,y; return flags ") 
     return lResult;
 }
 
-DefineEngineMethod(Grid, getNodeByPos, const char*, (F32 x, F32 y), , "x,y; return nodeidx x y z flags ")
+DefineEngineMethod(Grid, getNodeByPos, const char*, (F32 x, F32 y), , "x,y; return nodeidx x y flags ")
 {
     char* rbuf = Con::getReturnBuffer(256);
     BasicGridNode *lNode;
@@ -254,7 +245,7 @@ DefineEngineMethod(Grid, setFlags, bool, (F32 x, F32 y, U32 flags), , "x,y; set 
     return false;
 }
 
-DefineEngineMethod(Grid, setIntValue, bool, (F32 x, F32 y, S32 idx, S32 value), , "x,y, idx[0..9], Value; set flags ")
+DefineEngineMethod(Grid, setIntValue, bool, (F32 x, F32 y, S32 idx, S32 value), , "x,y, idx[0..9], Value; set int value ")
 {
     if (idx > 9 || idx < 0)
         return false;
