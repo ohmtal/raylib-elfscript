@@ -37,21 +37,37 @@ namespace ConsoleGui {
             case ConsoleLogEntry::Error: finalLevel = LOG_ERROR; break;
             default: finalLevel = LOG_INFO; break;
         }
-
         U32 unitCount = StringUnit::getUnitCount(line, "\n");
 
         for (U32 i = 0; i < unitCount; i++) {
-            char* finalBuffer = (char*)dMalloc(256);
-            dMemset(finalBuffer, 0, 256);
+            // 1. Hole den aktuellen Slot (und schütze dich vor Array-Überlauf)
+            U32 slot = gConsolePtr->log_index % gConsolePtr->logSize;
+            gConsolePtr->log_index++;
 
-            // Holt die einzelne Zeile direkt in deinen finalBuffer
-            StringUnit::getUnit(line, i, "\n", finalBuffer, 256);
+            // empty curent line
+            dMemset(gConsolePtr->logs[slot].text, 0, DKCONSOLE_LINELENGTH);
 
-            gConsolePtr->logs[gConsolePtr->log_index++] = (Log){
-                .text = finalBuffer,
-                .type = finalLevel
-            };
+            // write so line
+            StringUnit::getUnit(line, i, "\n", gConsolePtr->logs[slot].text, DKCONSOLE_LINELENGTH);
+
+            // set log level
+            gConsolePtr->logs[slot].type = finalLevel;
         }
+
+        // U32 unitCount = StringUnit::getUnitCount(line, "\n");
+        //
+        // for (U32 i = 0; i < unitCount; i++) {
+        //     char* finalBuffer = (char*)dMalloc(256);
+        //     dMemset(finalBuffer, 0, 256);
+        //
+        //     // Holt die einzelne Zeile direkt in deinen finalBuffer
+        //     StringUnit::getUnit(line, i, "\n", finalBuffer, 256);
+        //
+        //     gConsolePtr->logs[gConsolePtr->log_index++] = (Log){
+        //         .text = finalBuffer,
+        //         .type = finalLevel
+        //     };
+        // }
 
 
 //         bool isMultiLine = dStrchr(line, '\n');
@@ -119,13 +135,13 @@ namespace ConsoleGui {
         static Font font = GetFontDefault();
         mImUI.font = &font;
 
-        DK_ConsoleInit(gConsolePtr, LOG_SIZE);
+        DK_ConsoleInit(gConsolePtr, DKCONSOLE_LOG_SIZE);
         Con::addConsumer(ConsoleConsumer);
         return true;
     }
     //-----------------------------------------------------------------------------
     void ConsoleGuiObject::onRemove() {
-        DK_ConsoleShutdown(gConsolePtr, LOG_SIZE);
+        DK_ConsoleShutdown(gConsolePtr);
         gConsolePtr = nullptr;
         Parent::onRemove();
     }
@@ -134,10 +150,10 @@ namespace ConsoleGui {
         if (!gConsolePtr || gHistory.size() == 0) return;
         if ( gHistoryNeedle >= 0 && gHistoryNeedle < gHistory.size()) {
             // Con::printf("COMMAND SHOULD BE %s", gHistory[gHistoryNeedle].c_str());
-            dSprintf(gConsolePtr->ConsoleInputText, 1024, "%s",  gHistory[gHistoryNeedle].c_str());
+            dSprintf(gConsolePtr->ConsoleInputText, DKCONSOLE_LINELENGTH, "%s",  gHistory[gHistoryNeedle].c_str());
             gConsolePtr->setCursorPos = gHistory[gHistoryNeedle].length();
         } else {
-            dStrcpy(gConsolePtr->ConsoleInputText, "", 1024);
+            dStrcpy(gConsolePtr->ConsoleInputText, "", DKCONSOLE_LINELENGTH);
             gConsolePtr->setCursorPos = 0;
         }
     }

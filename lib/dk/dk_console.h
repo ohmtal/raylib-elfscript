@@ -22,7 +22,12 @@ extern "C"
 #endif
 
 #if !defined(LOG_SIZE)
-#define LOG_SIZE 1080 * 1080 // size of log buffer
+// insane 1080x1080 lines ?! => 1.166.400 Slots x 1024 bytes WTF!
+#define DKCONSOLE_LOG_SIZE 512 //1080 * 1080 // size of log buffer
+#endif
+
+#if !defined(DKCONSOLE_LINELENGTH)
+#define DKCONSOLE_LINELENGTH 256
 #endif
 
   typedef struct
@@ -39,19 +44,20 @@ extern "C"
     bool is_open;
     int scroll;
     KeyboardKey toggle_key;
-    char ConsoleInputText[1024];
+    char ConsoleInputText[DKCONSOLE_LINELENGTH];
     float fontSize;
     float heightDiv; // example: 2 =>half height, 1 => full height
     // .........
     float fontSpacing;
     int setCursorPos;
+    int logSize;
   } Console;
 
   void DK_ConsoleInit(Console* console, int log_size);
 
   void DK_ConsoleUpdate(Console* console, ImUI* imui, void (*callback)(const char*));
 
-  void DK_ConsoleShutdown(Console* console, int log_size);
+  void DK_ConsoleShutdown(Console* console);
 
 #if defined(DK_CONSOLE_IMPLEMENTATION)
   void DK_ConsoleInit(Console* console, int log_size)
@@ -65,15 +71,34 @@ extern "C"
     console->heightDiv = 1;
     console->fontSpacing = 25;
     console->setCursorPos = -1;
-    console->logs = (Log*)malloc(sizeof(Log) * log_size);
-    for (int i = 0; i < log_size; i++) {
-      console->logs[i].text = (char*)malloc(1024);
-      memset(console->logs[i].text, 0, 1024);
+    console->logSize = log_size;
+    console->logs = (Log*)malloc(sizeof(Log) * console->logSize);
+    for (int i = 0; i < console->logSize; i++) {
+      console->logs[i].text = (char*)malloc(DKCONSOLE_LINELENGTH);
+      memset(console->logs[i].text, 0, DKCONSOLE_LINELENGTH);
     }
   }
 
   void DK_ConsoleUpdate(Console* console, ImUI* imui, void (*callback)(const char*))
   {
+    //XXTH  moved up and out of if enter ...
+    if (console->log_index >= console->logSize) {
+      // console->log_index = 0; //this kill the old log completely
+
+      //better move half up (using torque function -- nu isses auch egal):
+      U32 halfSize = console->logSize / 2;
+      for (U32 i = 0; i < halfSize; i++) {
+        U32 sourceSlot = halfSize + i;
+        U32 targetSlot = i;
+        // fast copy
+        dStrcpy(console->logs[targetSlot].text, console->logs[sourceSlot].text, DKCONSOLE_LINELENGTH);
+        console->logs[targetSlot].type = console->logs[sourceSlot].type;
+      }
+      // now to half size
+      console->log_index = halfSize;
+    }
+
+
     bool key_handled = false;
     if (IsKeyPressed(console->toggle_key) && console->is_open) {
       console->is_open = false;
@@ -220,16 +245,14 @@ extern "C"
         }
       }
 
-      // static char text[1024] = "";
-      // Vector2 input_pos = { 0.0f, console->ui.height - console->fontSpacing + 1.0f };
       DK_DrawInputField(imui, input_pos, GetScreenWidth(), console->fontSize
         , console->ConsoleInputText, &focused, NULL, console->setCursorPos);
       console->setCursorPos = -1;
       if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER)) {
         if (strlen( console->ConsoleInputText ) > 0) {
-          if (console->log_index >= LOG_SIZE) {
-            console->log_index = 0;
-          }
+          // if (console->log_index >= console->logSize) {
+          //   console->log_index = 0;
+          // }
 
           if (callback != NULL) {
             callback( console->ConsoleInputText);
@@ -251,8 +274,8 @@ extern "C"
     console->scroll = 0;
   }
 
-  void DK_ConsoleShutdown(Console* console, int log_size) {
-    for (int i = 0; i < log_size; i++) {
+  void DK_ConsoleShutdown(Console* console) {
+    for (int i = 0; i < console->logSize; i++) {
       free(console->logs[i].text);
     }
     free(console->logs);

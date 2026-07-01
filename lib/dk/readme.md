@@ -1,6 +1,10 @@
 # Dev Console
 
-## NOTE this version is modified by XXTH
+---
+
+## NOTE: This version is heavily modified by XXTH for raylib-elfscript
+
+---
 
 DK Console is a super simple drop-in dev console for your Raylib game/engine.
 
