@@ -24,8 +24,8 @@ function Main::init(%this) {
     // %this.fontHackNerd = LoadFontEx("assets/font/HackNerdFontPropo-Regular.ttf", 32, 0, 250);
 
     %this.ConsoleGui = singleton ConsoleGuiObject();
-    %this.fontJetBrains= LoadFontEx("assets/font/JetBrainsMono-Regular.ttf", 16, 0, 250);
-    %this.ConsoleGui.setFont( %this.fontJetBrains);
+    %this.ConsoleFont= LoadFontEx("assets/font/JetBrainsMono-Regular.ttf", 16, 0, 250);
+    %this.ConsoleGui.setFont( %this.ConsoleFont);
     %this.ConsoleGui.heightDiv = 2; //must be set here !!
     %this.ConsoleGui.fontsize = 16.0; //must be set here !!
 

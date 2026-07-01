@@ -16,6 +16,10 @@ extern "C"
 #include "raylib.h"
 #endif
 
+#if !defined(DKCONSOLE_LINELENGTH)
+#define DKCONSOLE_LINELENGTH 256
+#endif
+
 #include <math.h>   // floorf, ceilf, roundf
 #include <stdio.h>  // sprintf
 #include <string.h> // strlen, strcpy, strcat
@@ -248,7 +252,7 @@ extern "C"
   const char* DK_DrawInputField(ImUI* io, Vector2 position
     , float width, float height, char* text, bool* focused
     , void (*callback)(const char*)
-    , int setCursorPos = -1);
+    , int& cursorPos );
 
 #if defined(DK_UI_IMPLEMENTATION)
 
@@ -603,7 +607,7 @@ extern "C"
                                 char* text,
                                 bool* focused,
                                 void (*callback)(const char*)
-                                ,int setCursorPos )
+                                ,int& cursorPos )
   {
     // @Color definitions from theme
     Color bgColor = Fade(io->theme->background, 0.2);
@@ -617,14 +621,11 @@ extern "C"
     Rectangle buttonBounds = { position.x, position.y, width, height };
 
     int cursorPosEnd = 0;
-    static int framesCounter = 0;
     static int cursorOffset = 0;
-    static int cursorPos = 0;
 
-    if (setCursorPos >=0 ) {
-      if ( setCursorPos <= strlen(text)) cursorPos = setCursorPos;
-      else cursorPos = strlen(text);
-    }
+    if (cursorPos < 0 )  cursorPos = 0;
+    else if ( cursorPos > strlen(text)) cursorPos = strlen(text);
+
 
     // @Focus on @Click
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -640,7 +641,6 @@ extern "C"
     DrawRectangleRounded(buttonBounds, io->style->roundness, 10, bgColor);
 
     if (*focused) {
-      ++framesCounter;
 
       // @Background for text input
       DrawRectangleRounded(buttonBounds, io->style->roundness, 10, activeColor);
@@ -735,8 +735,6 @@ extern "C"
         str[0] = (char)key;
 
 
-        // XXTH WTF! adding check
-        if (strlen(text) < cursorPos ) cursorPos = strlen(text);
         memmove(&text[cursorPos + 1], &text[cursorPos], strlen(text) - cursorPos + 1);
         text[cursorPos] = str[0];
 
@@ -757,38 +755,9 @@ extern "C"
           if (cursorPos < strlen(text)) ++cursorPos;
           keyTimer = 0.f;
         }
-      } // timer
 
-      if (IsKeyPressed(KEY_HOME)) {
-        cursorPos = 0;
-      }
-      if (IsKeyPressed(KEY_END)) {
-        cursorPos = strlen(text);
-      }
-
-
-      char temp[1024];
-      memcpy(temp, text, sizeof(temp));
-      temp[cursorPos] = '\0';
-      cursorPosEnd = MeasureTextEx(*io->font, temp, height, 1).x + cursorOffset;
-
-      // @Delete
-      if (IsKeyPressed(KEY_BACKSPACE)) {
-        int len = strlen(text);
-        if (len > 0) {
-          if (cursorPos != 0) {
-            for (int i = cursorPos; i < len; i++) {
-              text[i - 1] = text[i];
-            }
-            text[len - 1] = '\0';
-            cursorPos--;
-          }
-        }
-      }
-
-      // @Delete (key repeat on backspce)
-      if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_BACKSPACE)) {
-        if (framesCounter / 20 % 2) {
+        // @Delete
+        if (IsKeyDown(KEY_BACKSPACE)) {
           int len = strlen(text);
           if (len > 0) {
             if (cursorPos != 0) {
@@ -799,8 +768,40 @@ extern "C"
               cursorPos--;
             }
           }
-        }
+          keyTimer = 0.f;
+        } //BACKSPACE
+      } // timer
+
+      if (IsKeyPressed(KEY_HOME)) {
+        cursorPos = 0;
       }
+      if (IsKeyPressed(KEY_END)) {
+        cursorPos = strlen(text);
+      }
+
+
+      char temp[DKCONSOLE_LINELENGTH];
+      memcpy(temp, text, sizeof(temp));
+      temp[cursorPos] = '\0';
+      cursorPosEnd = MeasureTextEx(*io->font, temp, height, 1).x + cursorOffset;
+
+
+
+      // // @Delete (key repeat on backspce)
+      // if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_BACKSPACE)) {
+      //   if (framesCounter / 20 % 2) {
+      //     int len = strlen(text);
+      //     if (len > 0) {
+      //       if (cursorPos != 0) {
+      //         for (int i = cursorPos; i < len; i++) {
+      //           text[i - 1] = text[i];
+      //         }
+      //         text[len - 1] = '\0';
+      //         cursorPos--;
+      //       }
+      //     }
+      //   }
+      // }
 
       // @Copy (CTRL+C)
       if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_C)) {
@@ -825,12 +826,24 @@ extern "C"
     DrawTextEx(*io->font,text, textPos, height, 1, textColor);
 
 
-    if (strlen(text) != 0) { cursorOffset = 8; }
+    if (strlen(text) != 0) { cursorOffset = 5 /*8*/; }
     else { cursorOffset = 5; }
 
-    // @Cursor drawing (blinking animation every 20 frames)
-    if (framesCounter / 20 % 2) {
-      Rectangle cursorRec = { position.x + cursorPosEnd, (position.y + 2.5f), 10, height - 5 };
+    // @Cursor drawing
+    static float blinkTimer = 0;
+    static bool cursorOn = false;
+    blinkTimer += GetFrameTime();
+    if (blinkTimer > 0.5f) {
+      blinkTimer -= 0.5f;
+      cursorOn = !cursorOn;
+    }
+    const float cursorHeight = 3.f;
+    if (cursorOn) {
+      Rectangle cursorRec = {
+        position.x + cursorPosEnd,
+        (position.y + height - cursorHeight),
+        height * 0.5f /*10*/,
+        cursorHeight };
       DrawRectangleRec(cursorRec, cursorColor);
     }
 

@@ -90,7 +90,7 @@ namespace ConsoleGui {
         if (command && command[0] != 0){
             gHistory.push_back(command);
             gHistoryNeedle = gHistory.size(); // - 1;
-            Con::evaluate(command);
+            Con::evalAutoComplete(command);
         }
     }
     //-----------------------------------------------------------------------------
@@ -111,6 +111,7 @@ namespace ConsoleGui {
         void onRemove() override;
 
         void pushCommand();
+        void update();
 
     };
     //-----------------------------------------------------------------------------
@@ -151,12 +152,35 @@ namespace ConsoleGui {
         if ( gHistoryNeedle >= 0 && gHistoryNeedle < gHistory.size()) {
             // Con::printf("COMMAND SHOULD BE %s", gHistory[gHistoryNeedle].c_str());
             dSprintf(gConsolePtr->ConsoleInputText, DKCONSOLE_LINELENGTH, "%s",  gHistory[gHistoryNeedle].c_str());
-            gConsolePtr->setCursorPos = gHistory[gHistoryNeedle].length();
+            gConsolePtr->cursorPos = gHistory[gHistoryNeedle].length();
         } else {
             dStrcpy(gConsolePtr->ConsoleInputText, "", DKCONSOLE_LINELENGTH);
-            gConsolePtr->setCursorPos = 0;
+            gConsolePtr->cursorPos = 0;
         }
     }
+    //-----------------------------------------------------------------------------
+    void ConsoleGuiObject::update() {
+        if (!gConsolePtr) return ;
+        DK_ConsoleUpdate(gConsolePtr, &mImUI,ConsoleHandler);
+        if (gConsolePtr->is_open) {
+            if (IsKeyPressed(KEY_UP)) {
+                if (gHistoryNeedle > 0) gHistoryNeedle--;
+                    pushCommand();
+            } else if (IsKeyPressed(KEY_DOWN)) {
+                if (gHistoryNeedle < gHistory.size()) gHistoryNeedle++;
+                    pushCommand();
+            } else if (IsKeyPressed(KEY_TAB)) {
+                bool backward =  (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT));
+
+                gConsolePtr->cursorPos = Con::tabComplete(gConsolePtr->ConsoleInputText
+                        , gConsolePtr->cursorPos, DKCONSOLE_LINELENGTH - 1, !backward);
+
+
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------
+    // Console functions
     //-----------------------------------------------------------------------------
     DefineEngineMethod(ConsoleGuiObject, setFont, bool, (S32 fontId), , "set the console font") {
         if (!gConsolePtr) return false;
@@ -170,17 +194,7 @@ namespace ConsoleGui {
 
     //-----------------------------------------------------------------------------
     DefineEngineMethod(ConsoleGuiObject, Update, void, (), , "update the console") {
-        if (!gConsolePtr) return ;
-        DK_ConsoleUpdate(gConsolePtr, &object->mImUI,ConsoleHandler);
-        if (gConsolePtr->is_open) {
-            if (IsKeyPressed(KEY_UP)) {
-                if (gHistoryNeedle > 0) gHistoryNeedle--;
-                object->pushCommand();
-            } else if (IsKeyPressed(KEY_DOWN)) {
-                if (gHistoryNeedle < gHistory.size()) gHistoryNeedle++;
-                object->pushCommand();
-            }
-        }
+        object->update();
 
     }
 

@@ -47,9 +47,9 @@ extern "C"
     char ConsoleInputText[DKCONSOLE_LINELENGTH];
     float fontSize;
     float heightDiv; // example: 2 =>half height, 1 => full height
+    int cursorPos; // the cursor pos in the input widget
 
     float fontSpacing; // auto calculated
-    int setCursorPos; //handle with care
     int logSize;  //WARNING do not change this !
   } Console;
 
@@ -70,7 +70,7 @@ extern "C"
     console->fontSize = 20;
     console->heightDiv = 1;
     console->fontSpacing = 25;
-    console->setCursorPos = -1;
+    console->cursorPos = -1;
     console->logSize = log_size;
     console->logs = (Log*)malloc(sizeof(Log) * console->logSize);
     for (int i = 0; i < console->logSize; i++) {
@@ -246,8 +246,7 @@ extern "C"
       }
 
       DK_DrawInputField(imui, input_pos, GetScreenWidth(), console->fontSize
-        , console->ConsoleInputText, &focused, NULL, console->setCursorPos);
-      console->setCursorPos = -1;
+        , console->ConsoleInputText, &focused, NULL, console->cursorPos);
       if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER)) {
         if (strlen( console->ConsoleInputText ) > 0) {
           // if (console->log_index >= console->logSize) {
@@ -261,7 +260,7 @@ extern "C"
           strcpy( console->ConsoleInputText, "");
         }
       }
-    }
+    } //is_open
     //XXTH moved down so the open key is not pushed on the input
     if (!key_handled && IsKeyPressed(console->toggle_key)) {
       console->is_open = !console->is_open;
