@@ -2,7 +2,7 @@
 // Author: David Kviloria
 // ClangFormat: Mozilla
 //
-// XXTH updated to raylib 6,  and some more
+// XXTH updated to raylib 6 and much more
 
 #if !defined(DK_CONSOLE_H)
 #define DK_CONSOLE_H
@@ -47,10 +47,10 @@ extern "C"
     char ConsoleInputText[DKCONSOLE_LINELENGTH];
     float fontSize;
     float heightDiv; // example: 2 =>half height, 1 => full height
-    // .........
-    float fontSpacing;
-    int setCursorPos;
-    int logSize;
+
+    float fontSpacing; // auto calculated
+    int setCursorPos; //handle with care
+    int logSize;  //WARNING do not change this !
   } Console;
 
   void DK_ConsoleInit(Console* console, int log_size);
