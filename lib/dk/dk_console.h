@@ -41,6 +41,7 @@ extern "C"
     KeyboardKey toggle_key;
     char ConsoleInputText[1024];
     float fontSize;
+    float heightDiv; // example: 2 =>half height, 1 => full height
     // .........
     float fontSpacing;
     int setCursorPos;
@@ -61,6 +62,7 @@ extern "C"
     console->log_index = 0;
     console->scroll = 0;
     console->fontSize = 20;
+    console->heightDiv = 1;
     console->fontSpacing = 25;
     console->setCursorPos = -1;
     console->logs = (Log*)malloc(sizeof(Log) * log_size);
@@ -81,10 +83,9 @@ extern "C"
     static bool focused = false;
 
     if (console->is_open) {
-      console->ui.height =
-        Clamp(Lerp(console->ui.height, GetScreenHeight(), 0.5f),
-              0.0f,
-              GetScreenHeight());
+      console->heightDiv  = Clamp(console->heightDiv, 1.f,5.f); //1/5 is max!
+      float maxHeight = GetScreenHeight() / console->heightDiv;
+      console->ui.height = Clamp(Lerp(console->ui.height, maxHeight, 0.1f), 0.0f, maxHeight );
       focused = true;
     } else {
       console->ui.height = Lerp(console->ui.height, 0.0f, 0.5f);
@@ -166,6 +167,7 @@ extern "C"
         }
       }
 
+      //XXTH FIXME this does not work at all !
       if (CheckCollisionPointRec(GetMousePosition(), DrawingTextArea)) {
         if (GetMouseWheelMove() > 0) {
           console->scroll += scroll_step;
@@ -194,9 +196,13 @@ extern "C"
         imui->theme->text, // info
       };
       console->fontSpacing = console->fontSize + 5;
+
+      Vector2 input_pos = { 0.0f, console->ui.height - console->fontSpacing + 1.0f };
+
+
       for (int i = 0; i < console->log_index; i++) {
         Vector2 pos = { 10, 0 - scroll_offset + (float)i * console->fontSpacing };
-        if (pos.y > console->ui.height - 45)
+        if (pos.y > input_pos.y)
           break;
         //shadow=>  DrawTextEx(*imui->font, console->logs[i].text, pos + Vector2(1.f,1.f), console->fontSize, 1, DARKGRAY);
         if (console->logs[i].type == LOG_INFO) {
@@ -214,7 +220,7 @@ extern "C"
       }
 
       // static char text[1024] = "";
-      Vector2 input_pos = { 0.0f, console->ui.height - console->fontSpacing + 1.0f };
+      // Vector2 input_pos = { 0.0f, console->ui.height - console->fontSpacing + 1.0f };
       DK_DrawInputField(imui, input_pos, GetScreenWidth(), console->fontSize
         , console->ConsoleInputText, &focused, NULL, console->setCursorPos);
       console->setCursorPos = -1;

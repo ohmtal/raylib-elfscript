@@ -515,7 +515,7 @@ DefineEngineFunction( GetRayCollisionQuad, const char*, (Ray ray, Vector3 p1, Ve
 
 
 // -----------------------------------------------------------------------------
-// Model animations loading/unloading functions
+// NOTE: Elfscript: Model animations loading/unloading functions
 // -----------------------------------------------------------------------------
 // RLAPI void UpdateModelAnimationEx(Model model, ModelAnimation animA, float frameA, ModelAnimation animB, float frameB, float blend); // Update model animation pose, blending two animations
 

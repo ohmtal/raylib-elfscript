@@ -56,7 +56,8 @@ void process()
 
 void shutdown()
 {
-   Con::warnf("%s not implemented", __func__);
+  // NOTE: silent
+  // Con::warnf("%s not implemented", __func__);
 }
 
 void sleep(U32 ms)

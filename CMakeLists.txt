@@ -9,13 +9,14 @@ set(PROJECT_SRC
     src/interface/platformProcess.cpp
     src/interface/ConsoleTypes.cpp
     src/interface/elfBase.cpp
+    src/interface/elfCore.cpp
     src/interface/elfEnum.cpp
     src/interface/elfResource.cpp
     src/interface/elfTextures.cpp
     src/interface/elfText.cpp
     src/interface/elfImageResource.cpp
     src/interface/elfCamera.cpp
-    src/interface/elfDrawing.cpp
+    src/interface/elfShapes.cpp
     src/interface/elfModels.cpp
     src/interface/elfAudio.cpp
     src/interface/elfShader.cpp

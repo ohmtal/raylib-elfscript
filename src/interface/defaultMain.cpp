@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
 // FIXME emscripten loop
-// FIXME commandline parameter for path and script
+// FIXME commandline parameter for path
 //-----------------------------------------------------------------------------
 #include "raylib.h"
 #include "main/engineGlue.h"
@@ -20,8 +20,8 @@ bool gShutDownRequest = false;
 bool gNoDefaultCalls  = false;
 bool gEnableConsole = false;
 
-extern void initEnum();
-extern void CustomTraceLog(int msgType, const char *text, va_list args);
+extern void initEnum();  //elfEnum.cpp
+extern void CustomTraceLog(int msgType, const char *text, va_list args); //elfBase.cpp
 namespace ElfResource { extern void shutDown(); }
 
 
@@ -113,7 +113,7 @@ int defaultMain(int argc, char* argv[])
         }
 
         Con::executef("MainShutdown");
-    }
+    } // !gNoDefaultCalls
 
 
     // -------- finallize

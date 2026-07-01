@@ -1,32 +1,33 @@
+//-----------------------------------------------------------------------------
+// Copyright (c) 2026 Thomas Hühn (XXTH)
+// SPDX-License-Identifier: MIT
+//-----------------------------------------------------------------------------
+// ConsoleGuiObject using modified dk_console
+//-----------------------------------------------------------------------------
 #include "console/engineAPI.h"
 #include "console/script.h"
 #include "interface/elfResource.h"
 #include "raylib.h"
 #include "raymath.h"
+#include "core/strings/stringUnit.h"
 
 #define DK_CONSOLE_IMPLEMENTATION
 #include "dk/dk_console.h"
+
 namespace ConsoleGui {
 
     //XXTH globals hackfest
-    // static ImUI gImui;
-
-
     Console* gConsolePtr = nullptr;
     Vector<String> gHistory;
     S32 gHistoryNeedle;
 
 
-
+    //-----------------------------------------------------------------------------
     static void ConsoleConsumer(/*ConsoleLogEntry::Level*/ U32 level, const char *line)
     {
         if (!gConsolePtr || !gConsolePtr->logs
             || !line || line[0] == 0
         ) return;
-        //FIXME level matching imgui/elfscript
-        char* finalBuffer = (char*)dMalloc(256);
-        dMemset(finalBuffer, 0, 256);
-        dSprintf(finalBuffer, 256, "%s",  line);
 
         S32 finalLevel = LOG_INFO;
         switch (level)
@@ -37,13 +38,37 @@ namespace ConsoleGui {
             default: finalLevel = LOG_INFO; break;
         }
 
-        gConsolePtr->logs[gConsolePtr->log_index++] =
-        (Log){
-            .text = finalBuffer
-            , .type = finalLevel
-        };
-    }
+        U32 unitCount = StringUnit::getUnitCount(line, "\n");
 
+        for (U32 i = 0; i < unitCount; i++) {
+            char* finalBuffer = (char*)dMalloc(256);
+            dMemset(finalBuffer, 0, 256);
+
+            // Holt die einzelne Zeile direkt in deinen finalBuffer
+            StringUnit::getUnit(line, i, "\n", finalBuffer, 256);
+
+            gConsolePtr->logs[gConsolePtr->log_index++] = (Log){
+                .text = finalBuffer,
+                .type = finalLevel
+            };
+        }
+
+
+//         bool isMultiLine = dStrchr(line, '\n');
+//         //FIXME multie line needs multiple entries:
+// StringUnit
+//         char* finalBuffer = (char*)dMalloc(256);
+//         dMemset(finalBuffer, 0, 256);
+//         dSprintf(finalBuffer, 256, "%s",  line);
+//
+//
+//         gConsolePtr->logs[gConsolePtr->log_index++] =
+//         (Log){
+//             .text = finalBuffer
+//             , .type = finalLevel
+//         };
+    }
+    //-----------------------------------------------------------------------------
     void  ConsoleHandler(const char* command)
     {
         if (command && command[0] != 0){
@@ -52,7 +77,9 @@ namespace ConsoleGui {
             Con::evaluate(command);
         }
     }
-
+    //-----------------------------------------------------------------------------
+    // Class
+    //-----------------------------------------------------------------------------
     class ConsoleGuiObject : public SimObject
     {
         typedef SimObject Parent;
@@ -63,33 +90,24 @@ namespace ConsoleGui {
          ImUI mImUI;
 
 
+        static void initPersistFields();
         bool onAdd() override;
         void onRemove() override;
 
-        static void initPersistFields();
-
-        void pushCommand() {
-            if (!gConsolePtr || gHistory.size() == 0) return;
-            if ( gHistoryNeedle >= 0 && gHistoryNeedle < gHistory.size()) {
-                // Con::printf("COMMAND SHOULD BE %s", gHistory[gHistoryNeedle].c_str());
-                dSprintf(gConsolePtr->ConsoleInputText, 1024, "%s",  gHistory[gHistoryNeedle].c_str());
-                gConsolePtr->setCursorPos = gHistory[gHistoryNeedle].length();
-            } else {
-                dStrcpy(gConsolePtr->ConsoleInputText, "", 1024);
-                gConsolePtr->setCursorPos = 0;
-            }
-
-        }
+        void pushCommand();
 
     };
+    //-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
     IMPLEMENT_CONOBJECT(ConsoleGuiObject);
-
+    //-----------------------------------------------------------------------------
     void ConsoleGuiObject::initPersistFields() {
         Parent::initPersistFields();
         addField("key", TypeS32, Offset(mConsole.toggle_key, ConsoleGuiObject), "Shortcut to open console");
         addField("fontSize", TypeF32, Offset(mConsole.fontSize, ConsoleGuiObject), "font size");
+        addField("heightDiv", TypeF32, Offset(mConsole.heightDiv, ConsoleGuiObject), "2=half height, 1= full heigth");
     }
-
+    //-----------------------------------------------------------------------------
     bool ConsoleGuiObject::onAdd() {
         if (!Parent::onAdd()) return false;
         if (gConsolePtr) return false;
@@ -105,13 +123,25 @@ namespace ConsoleGui {
         Con::addConsumer(ConsoleConsumer);
         return true;
     }
-
+    //-----------------------------------------------------------------------------
     void ConsoleGuiObject::onRemove() {
         DK_ConsoleShutdown(gConsolePtr, LOG_SIZE);
         gConsolePtr = nullptr;
         Parent::onRemove();
     }
-
+    //-----------------------------------------------------------------------------
+    void ConsoleGuiObject::pushCommand() {
+        if (!gConsolePtr || gHistory.size() == 0) return;
+        if ( gHistoryNeedle >= 0 && gHistoryNeedle < gHistory.size()) {
+            // Con::printf("COMMAND SHOULD BE %s", gHistory[gHistoryNeedle].c_str());
+            dSprintf(gConsolePtr->ConsoleInputText, 1024, "%s",  gHistory[gHistoryNeedle].c_str());
+            gConsolePtr->setCursorPos = gHistory[gHistoryNeedle].length();
+        } else {
+            dStrcpy(gConsolePtr->ConsoleInputText, "", 1024);
+            gConsolePtr->setCursorPos = 0;
+        }
+    }
+    //-----------------------------------------------------------------------------
     DefineEngineMethod(ConsoleGuiObject, setFont, bool, (S32 fontId), , "set the console font") {
         if (!gConsolePtr) return false;
         Font* font = ElfResource::FontMap.get(fontId);
@@ -122,6 +152,7 @@ namespace ConsoleGui {
         return false;
     }
 
+    //-----------------------------------------------------------------------------
     DefineEngineMethod(ConsoleGuiObject, Update, void, (), , "update the console") {
         if (!gConsolePtr) return ;
         DK_ConsoleUpdate(gConsolePtr, &object->mImUI,ConsoleHandler);

@@ -319,7 +319,7 @@ DefineEngineFunction( GetMusicTimePlayed, float, (S32 musicId), , "Get current m
     return GetMusicTimePlayed(*music);
 }
 //------------------------------------------------------------------------------------
-// AudioStream management functions
+// AudioStream management functions NOTE: most not implemented!
 //------------------------------------------------------------------------------------
 // RLAPI void SetAudioStreamBufferSizeDefault(int size); // Default size for new audio streams
 DefineEngineFunction( SetAudioStreamBufferSizeDefault, void, (int size), , "Set default buffer size for new audio streams (in samples)") {

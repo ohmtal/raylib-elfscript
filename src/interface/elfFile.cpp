@@ -2,7 +2,8 @@
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
-// NOTE only parts implemented ....
+// Module: Core
+// NOTE only some parts implemented ....
 //-----------------------------------------------------------------------------
 
 #include "elfResource.h"

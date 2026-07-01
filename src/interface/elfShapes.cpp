@@ -2,6 +2,9 @@
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------------
+// Basic Shapes Drawing Functions (Module: shapes)
+//------------------------------------------------------------------------------------
 
 #include "elfResource.h"
 #include <console/console.h>
@@ -39,8 +42,8 @@ DefineEngineFunction( GetShapesTextureRectangle, Rectangle, (), , "Get texture s
 }
 
 // -----------------------------------------------------------------------------
+// Basic shapes drawing functions
 // -----------------------------------------------------------------------------
-
 
 // RLAPI void DrawPixel(int posX, int posY, Color color);                                                   // Draw a pixel using geometry [Can be slow, use with care]
 DefineEngineFunction( DrawPixel, void, (int posX, int posY, Color color), (RAYWHITE), "Draw a pixel using geometry [Can be slow, use with care]") {
@@ -326,6 +329,9 @@ DefineEngineFunction( DrawSplineSegmentBezierQuadratic, void, (Vector2 p1, Vecto
 DefineEngineFunction( DrawSplineSegmentBezierCubic, void, (Vector2 p1, Vector2 c2, Vector2 c3, Vector2 p4, float thick, Color color), (RAYWHITE), "Draw spline segment: Cubic Bezier, 2 points, 2 control points") {
     DrawSplineSegmentBezierCubic(p1, c2, c3, p4, thick, color);
 }
+// -----------------------------------------------------------------------------
+// Spline segment point evaluation functions, for a given t [0.0f .. 1.0f]
+// -----------------------------------------------------------------------------
 
 // RLAPI Vector2 GetSplinePointLinear(Vector2 startPos, Vector2 endPos, float t);                           // Get (evaluate) spline point: Linear
 DefineEngineFunction( GetSplinePointLinear, Vector2, (Vector2 startPos, Vector2 endPos, float t), , "Get (evaluate) spline point: Linear") {
@@ -351,3 +357,69 @@ DefineEngineFunction( GetSplinePointBezierQuadratic, Vector2, (Vector2 p1, Vecto
 DefineEngineFunction( GetSplinePointBezierCubic, Vector2, (Vector2 p1, Vector2 c2, Vector2 c3, Vector2 p4, float t), , "Get (evaluate) spline point: Cubic Bezier") {
     return GetSplinePointBezierCubic(p1, c2, c3, p4, t);
 }
+// -----------------------------------------------------------------------------
+// Basic shapes collision detection functions
+// -----------------------------------------------------------------------------
+// RLAPI bool CheckCollisionRecs(Rectangle rec1, Rectangle rec2);                                           // Check collision between two rectangles
+DefineEngineFunction( CheckCollisionRecs, bool, (Rectangle rec1, Rectangle rec2), , "Check collision between two rectangles") {
+    return CheckCollisionRecs(rec1, rec2);
+}
+
+// RLAPI bool CheckCollisionCircles(Vector2 center1, float radius1, Vector2 center2, float radius2);        // Check collision between two circles
+DefineEngineFunction( CheckCollisionCircles, bool, (Vector2 center1, float radius1, Vector2 center2, float radius2), , "Check collision between two circles") {
+    return CheckCollisionCircles(center1, radius1, center2, radius2);
+}
+
+// RLAPI bool CheckCollisionCircleRec(Vector2 center, float radius, Rectangle rec);                         // Check collision between circle and rectangle
+DefineEngineFunction( CheckCollisionCircleRec, bool, (Vector2 center, float radius, Rectangle rec), , "Check collision between circle and rectangle") {
+    return CheckCollisionCircleRec(center, radius, rec);
+}
+
+// RLAPI bool CheckCollisionCircleLine(Vector2 center, float radius, Vector2 p1, Vector2 p2);               // Check if circle collides with a line created between two points [p1] and [p2]
+DefineEngineFunction( CheckCollisionCircleLine, bool, (Vector2 center, float radius, Vector2 p1, Vector2 p2), , "Check if circle collides with a line created between two points [p1] and [p2]") {
+    return CheckCollisionCircleLine(center, radius, p1, p2);
+}
+
+// RLAPI bool CheckCollisionPointRec(Vector2 point, Rectangle rec);                                         // Check if point is inside rectangle
+DefineEngineFunction( CheckCollisionPointRec, bool, (Vector2 point, Rectangle rec), , "Check if point is inside rectangle") {
+    return CheckCollisionPointRec(point, rec);
+}
+
+// RLAPI bool CheckCollisionPointCircle(Vector2 point, Vector2 center, float radius);                       // Check if point is inside circle
+DefineEngineFunction( CheckCollisionPointCircle, bool, (Vector2 point, Vector2 center, float radius), , "Check if point is inside circle") {
+    return CheckCollisionPointCircle(point, center, radius);
+}
+
+// RLAPI bool CheckCollisionPointTriangle(Vector2 point, Vector2 p1, Vector2 p2, Vector2 p3);               // Check if point is inside a triangle
+DefineEngineFunction( CheckCollisionPointTriangle, bool, (Vector2 point, Vector2 p1, Vector2 p2, Vector2 p3), , "Check if point is inside a triangle") {
+    return CheckCollisionPointTriangle(point, p1, p2, p3);
+}
+
+// RLAPI bool CheckCollisionPointLine(Vector2 point, Vector2 p1, Vector2 p2, int threshold);                // Check if point belongs to line created between two points [p1] and [p2] with defined margin in pixels [threshold]
+DefineEngineFunction( CheckCollisionPointLine, bool, (Vector2 point, Vector2 p1, Vector2 p2, int threshold), , "Check if point belongs to line created between two points [p1] and [p2] with defined margin in pixels [threshold]") {
+    return CheckCollisionPointLine(point, p1, p2, threshold);
+}
+
+// RLAPI bool CheckCollisionPointPoly(Vector2 point, const Vector2 *points, int pointCount);                // Check if point is within a polygon described by array of vertices
+DefineEngineFunction( CheckCollisionPointPoly, bool, (Vector2 point, Vector<F32> pointValues, int pointCount), , "Check if point is within a polygon described by array of vertices") {
+    auto points = ElfResource::getVector2List(pointValues, pointCount);
+    if (points.size() != (size_t) pointCount ) return false;
+
+    return CheckCollisionPointPoly(point, points.data(), pointCount);
+}
+
+// RLAPI bool CheckCollisionLines(Vector2 startPos1, Vector2 endPos1, Vector2 startPos2, Vector2 endPos2, Vector2 *collisionPoint); // Check the collision between two lines defined by two points each, returns collision point by reference
+DefineEngineFunction( CheckCollisionLines, Vector2, (Vector2 startPos1, Vector2 endPos1, Vector2 startPos2, Vector2 endPos2), , "Check the collision between two lines. Returns 'x y' string if colliding, or empty string if not.") {
+    Vector2 collisionPoint = { 0.0f, 0.0f };
+
+    CheckCollisionLines(startPos1, endPos1, startPos2, endPos2, &collisionPoint);
+    return collisionPoint;
+
+}
+
+
+// RLAPI Rectangle GetCollisionRec(Rectangle rec1, Rectangle rec2);                                         // Get collision rectangle for two rectangles collision
+DefineEngineFunction( GetCollisionRec, Rectangle, (Rectangle rec1, Rectangle rec2), , "Get collision rectangle for two rectangles collision") {
+    return GetCollisionRec(rec1, rec2);
+}
+

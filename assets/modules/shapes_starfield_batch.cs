@@ -5,7 +5,7 @@
 // -----------------------------------------------------------------------------
 
 // orig 420
-#define STAR_COUNT 420
+#define STAR_COUNT 120
 
 function createshapes_starfield_batch() {
     %obj = new BatchRender() { //NOTE BatchRender!!
@@ -52,7 +52,7 @@ function shapes_starfield_batch::OnAdd(%this) {
     }
 
 
-    SetTargetFPS(0);
+    // SetTargetFPS(0);
     return true;
 }
 // -----------------------------------------------------------------------------

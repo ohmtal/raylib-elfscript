@@ -20,10 +20,9 @@ namespace ElfText {
     // Font loading/unloading functions
     //------------------------------------------------------------------------------------
     // RLAPI Font GetFontDefault(void);                                                            // Get the default Font
-    // DefineEngineFunction( GetFontDefault, S32, (), , "Get the default Raylib Font and return the FontID") {
-    //     Font font = GetFontDefault();
-    //     return FontMap.add(font);
-    // }
+    DefineEngineFunction( GetFontDefault, S32, (), , "Get the default Raylib Font and return the FontID") {
+        return 0; // when get is calles it use the default font on 0
+    }
 
     // RLAPI Font LoadFont(const char *fileName);                                                  // Load font from file into GPU memory (VRAM)
     DefineEngineFunction( LoadFont, S32, (String fileName), , "Load font from file into GPU memory (VRAM) and return the FontID") {
@@ -235,5 +234,62 @@ namespace ElfText {
         dSprintf(ret, 128, "%d %d %d", glyph.offsetX, glyph.offsetY, glyph.advanceX);
         return ret;
     }
+
+    //------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------
+    // FIXME ?
+    //------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------
+    // // Text codepoints management functions (unicode characters)
+    // RLAPI char *LoadUTF8(const int *codepoints, int length);                                    // Load UTF-8 text encoded from codepoints array
+    // RLAPI void UnloadUTF8(char *text);                                                          // Unload UTF-8 text encoded from codepoints array
+    // RLAPI int *LoadCodepoints(const char *text, int *count);                                    // Load all codepoints from a UTF-8 text string, codepoints count returned by parameter
+    // RLAPI void UnloadCodepoints(int *codepoints);                                               // Unload codepoints data from memory
+    // RLAPI int GetCodepointCount(const char *text);                                              // Get total number of codepoints in a UTF-8 encoded string
+    // RLAPI int GetCodepoint(const char *text, int *codepointSize);                               // Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+    // RLAPI int GetCodepointNext(const char *text, int *codepointSize);                           // Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+    // RLAPI int GetCodepointPrevious(const char *text, int *codepointSize);                       // Get previous codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+    // RLAPI const char *CodepointToUTF8(int codepoint, int *utf8Size);                            // Encode one codepoint into UTF-8 byte array (array length returned as parameter)
+
+    // Text strings management functions (no UTF-8 strings, only byte chars)
+    // WARNING 1: Most of these functions use internal static buffers[], it's recommended to store returned data on user-side for re-use
+    // WARNING 2: Some functions allocate memory internally for the returned strings, those strings must be freed by user using MemFree()
+    // RLAPI char **LoadTextLines(const char *text, int *count);                                   // Load text as separate lines ('\n')
+    // RLAPI void UnloadTextLines(char **text, int lineCount);                                     // Unload text lines
+    // RLAPI int TextCopy(char *dst, const char *src);                                             // Copy one string to another, returns bytes copied
+    // RLAPI bool TextIsEqual(const char *text1, const char *text2);                               // Check if two text strings are equal
+    // RLAPI unsigned int TextLength(const char *text);                                            // Get text length, checks for '\0' ending
+    // RLAPI const char *TextFormat(const char *text, ...);                                        // Text formatting with variables (sprintf() style)
+    // not really usable ... use strFormat also if it's only one parameter
+    // ConsoleFunction( TextFormat, const char *, 3, 0, "Text formatting with variables (sprintf() style)")
+    // {
+    //     // argc is the argument count
+    //     // argv[1] is text
+    //     // argv[2..n] are the parameters
+    //     // *TextFormat(const char *text, ...);
+    // }
+
+    // RLAPI const char *TextSubtext(const char *text, int position, int length);                  // Get a piece of a text string
+    // RLAPI const char *TextRemoveSpaces(const char *text);                                       // Remove text spaces, concat words
+    // RLAPI char *GetTextBetween(const char *text, const char *begin, const char *end);           // Get text between two strings
+    // RLAPI char *TextReplace(const char *text, const char *search, const char *replacement);     // Replace text string with new string
+    // RLAPI char *TextReplaceAlloc(const char *text, const char *search, const char *replacement); // Replace text string with new string, memory must be MemFree()
+    // RLAPI char *TextReplaceBetween(const char *text, const char *begin, const char *end, const char *replacement); // Replace text between two specific strings
+    // RLAPI char *TextReplaceBetweenAlloc(const char *text, const char *begin, const char *end, const char *replacement); // Replace text between two specific strings, memory must be MemFree()
+    // RLAPI char *TextInsert(const char *text, const char *insert, int position);                 // Insert text in a defined byte position
+    // RLAPI char *TextInsertAlloc(const char *text, const char *insert, int position);            // Insert text in a defined byte position, memory must be MemFree()
+    // RLAPI char *TextJoin(char **textList, int count, const char *delimiter);                    // Join text strings with delimiter
+    // RLAPI char **TextSplit(const char *text, char delimiter, int *count);                       // Split text into multiple strings, using MAX_TEXTSPLIT_COUNT static strings
+    // RLAPI void TextAppend(char *text, const char *append, int *position);                       // Append text at specific position and move cursor
+    // RLAPI int TextFindIndex(const char *text, const char *search);                              // Find first text occurrence within a string, -1 if not found
+    // RLAPI char *TextToUpper(const char *text);                                                  // Get upper case version of provided string
+    // RLAPI char *TextToLower(const char *text);                                                  // Get lower case version of provided string
+    // RLAPI char *TextToPascal(const char *text);                                                 // Get Pascal case notation version of provided string
+    // RLAPI char *TextToSnake(const char *text);                                                  // Get Snake case notation version of provided string
+    // RLAPI char *TextToCamel(const char *text);                                                  // Get Camel case notation version of provided string
+    // RLAPI int TextToInteger(const char *text);                                                  // Get integer value from text
+    // RLAPI float TextToFloat(const char *text);                                                  // Get float value from text
+
+
 
 } // ElfText
