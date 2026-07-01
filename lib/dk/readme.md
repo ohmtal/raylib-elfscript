@@ -1,5 +1,7 @@
 # Dev Console
 
+## NOTE this version is modified by XXTH
+
 DK Console is a super simple drop-in dev console for your Raylib game/engine.
 
 Webassembly Demo: https://dkvilo.github.io/dk_console/wasm-build/console.html

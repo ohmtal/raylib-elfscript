@@ -100,56 +100,57 @@ extern "C"
 
     if (console->is_open) {
 
-      static bool dp_is_open = false;
-      static int dp_selected = 3; //XXTH FIXME should be detected ...3=default
-
-#define DP_OPTIONS_COUNT 7
-
-      static const char* dp_options[DP_OPTIONS_COUNT] = {
-        "Solarized", "Dark", "Light", "Default", "Nord", "Monkai", "White",
-      };
-
-      Vector2 dp_pos = { (float)GetScreenWidth() - 130.0f, 10.f };
-      float dp_width = 120.0f;
-      float dp_height = 20.0f;
-
-      static int dp_status = 0;
-      dp_status = DK_DrawDropdown(imui,
-                                  dp_pos,
-                                  dp_width,
-                                  dp_height,
-                                  dp_options[dp_selected],
-                                  dp_options,
-                                  DP_OPTIONS_COUNT,
-                                  &dp_selected,
-                                  &dp_is_open);
-      if (dp_status) {
-        switch (dp_selected) {
-          case 0:
-            imui->theme = &DK_ImUISolarizedTheme;
-            break;
-          case 1:
-            imui->theme = &DK_ImUIDarkTheme;
-            break;
-          case 2:
-            imui->theme = &DK_ImUILightTheme;
-            break;
-          case 3:
-            imui->theme = &DK_ImUIDefaultTheme;
-            break;
-          case 4:
-            imui->theme = &DK_ImUINordTheme;
-            break;
-          case 5:
-            imui->theme = &DK_ImUIMonokaiTheme;
-            break;
-          case 6:
-            imui->theme = &DK_ImUIWhiteTheme;
-            break;
-        }
-      }
-
-#undef DP_OPTIONS_COUNT
+// XXTH i dont need this
+//      static bool dp_is_open = false;
+//      static int dp_selected = 3; //XXTH FIXME should be detected ...3=default
+//
+// #define DP_OPTIONS_COUNT 7
+//
+//       static const char* dp_options[DP_OPTIONS_COUNT] = {
+//         "Solarized", "Dark", "Light", "Default", "Nord", "Monkai", "White",
+//       };
+//
+//       Vector2 dp_pos = { (float)GetScreenWidth() - 130.0f, 10.f };
+//       float dp_width = 120.0f;
+//       float dp_height = 20.0f;
+//
+//       static int dp_status = 0;
+//       dp_status = DK_DrawDropdown(imui,
+//                                   dp_pos,
+//                                   dp_width,
+//                                   dp_height,
+//                                   dp_options[dp_selected],
+//                                   dp_options,
+//                                   DP_OPTIONS_COUNT,
+//                                   &dp_selected,
+//                                   &dp_is_open);
+//       if (dp_status) {
+//         switch (dp_selected) {
+//           case 0:
+//             imui->theme = &DK_ImUISolarizedTheme;
+//             break;
+//           case 1:
+//             imui->theme = &DK_ImUIDarkTheme;
+//             break;
+//           case 2:
+//             imui->theme = &DK_ImUILightTheme;
+//             break;
+//           case 3:
+//             imui->theme = &DK_ImUIDefaultTheme;
+//             break;
+//           case 4:
+//             imui->theme = &DK_ImUINordTheme;
+//             break;
+//           case 5:
+//             imui->theme = &DK_ImUIMonokaiTheme;
+//             break;
+//           case 6:
+//             imui->theme = &DK_ImUIWhiteTheme;
+//             break;
+//         }
+//       }
+//
+// #undef DP_OPTIONS_COUNT
 
       Rectangle DrawingTextArea = {
         0.0f, 0.0f, (float)GetScreenWidth(), console->ui.height
