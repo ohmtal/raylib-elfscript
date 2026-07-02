@@ -101,37 +101,76 @@ DefineEngineFunction( GetShaderLocationAttrib, int, (S32 shaderId, String attrib
     return GetShaderLocationAttrib(*shader, attribName.c_str());
 }
 
-// RLAPI void SetShaderValue(Shader shader, int locIndex, const void *value, int uniformType);
-DefineEngineFunction( SetShaderValue, bool, (S32 shaderId, int locIndex, String valueStr, int uniformType), , "Set shader uniform value from a string based on uniformType") {
-    Shader* shader = ShadersMap.get(shaderId);
-    if (!shader || locIndex < 0) return false;
 
-    // (SHADER_UNIFORM_FLOAT = 0,
-    // SHADER_UNIFORM_VEC2 = 1,
-    // SHADER_UNIFORM_VEC3 = 2,
-    // SHADER_UNIFORM_VEC4 = 3,
-    // SHADER_UNIFORM_INT = 4 ...)
+// ElfScript ==> SetShaderValue($shaderId, $locIndex, "1.0 0.5 0.0", MATERIAL_MAP_DIFFUSE) // bzw. Uniform-Typ Enum
+DefineEngineFunction( SetShaderValue, bool, (S32 shaderId, int locIndex, String valueStr, int uniformType), ,
+                      "Sets a shader uniform value parsed from a space-separated string based on uniformType."
+) {
+    Shader* shader = ShadersMap.get(shaderId);
+    if (!shader) {
+        Con::errorf("SetShaderValue: Invalid shaderId: %d", shaderId);
+        return false;
+    }
+    if (locIndex < 0) {
+        Con::errorf("SetShaderValue: Invalid location index: %d", locIndex);
+        return false;
+    }
+
     float fValues[4] = { 0.0f };
     int iValues[4] = { 0 };
 
-    if (uniformType <= 3) {
+    if (uniformType >= 0 && uniformType <= 3) {
         if (uniformType == 0)      dSscanf(valueStr.c_str(), "%g", &fValues[0]);
         else if (uniformType == 1) dSscanf(valueStr.c_str(), "%g %g", &fValues[0], &fValues[1]);
         else if (uniformType == 2) dSscanf(valueStr.c_str(), "%g %g %g", &fValues[0], &fValues[1], &fValues[2]);
         else if (uniformType == 3) dSscanf(valueStr.c_str(), "%g %g %g %g", &fValues[0], &fValues[1], &fValues[2], &fValues[3]);
 
-        SetShaderValue(*shader, locIndex, fValues, uniformType);
+        ::SetShaderValue(*shader, locIndex, fValues, uniformType);
     }
-
-    else if (uniformType == 4) { // SHADER_UNIFORM_INT
-        dSscanf(valueStr.c_str(), "%d %d %d %d", &iValues[0], &iValues[1], &iValues[2], &iValues[3]);
-        SetShaderValue(*shader, locIndex, iValues, uniformType);
-    } else {
-        Con::errorf("unknown uniformtype %d", uniformType);
+    else if (uniformType == 4) {
+        dSscanf(valueStr.c_str(), "%d", &iValues[0]); // Nur 1 Wert für standardmäßigen SHADER_UNIFORM_INT
+        ::SetShaderValue(*shader, locIndex, iValues, uniformType);
+    }
+    else {
+        Con::errorf("SetShaderValue: Unknown or unsupported uniformType %d", uniformType);
         return false;
     }
+
     return true;
 }
+
+
+// // RLAPI void SetShaderValue(Shader shader, int locIndex, const void *value, int uniformType);
+// DefineEngineFunction( SetShaderValue, bool, (S32 shaderId, int locIndex, String valueStr, int uniformType), , "Set shader uniform value from a string based on uniformType") {
+//     Shader* shader = ShadersMap.get(shaderId);
+//     if (!shader || locIndex < 0) return false;
+//
+//     // (SHADER_UNIFORM_FLOAT = 0,
+//     // SHADER_UNIFORM_VEC2 = 1,
+//     // SHADER_UNIFORM_VEC3 = 2,
+//     // SHADER_UNIFORM_VEC4 = 3,
+//     // SHADER_UNIFORM_INT = 4 ...)
+//     float fValues[4] = { 0.0f };
+//     int iValues[4] = { 0 };
+//
+//     if (uniformType <= 3) {
+//         if (uniformType == 0)      dSscanf(valueStr.c_str(), "%g", &fValues[0]);
+//         else if (uniformType == 1) dSscanf(valueStr.c_str(), "%g %g", &fValues[0], &fValues[1]);
+//         else if (uniformType == 2) dSscanf(valueStr.c_str(), "%g %g %g", &fValues[0], &fValues[1], &fValues[2]);
+//         else if (uniformType == 3) dSscanf(valueStr.c_str(), "%g %g %g %g", &fValues[0], &fValues[1], &fValues[2], &fValues[3]);
+//
+//         SetShaderValue(*shader, locIndex, fValues, uniformType);
+//     }
+//
+//     else if (uniformType == 4) { // SHADER_UNIFORM_INT
+//         dSscanf(valueStr.c_str(), "%d %d %d %d", &iValues[0], &iValues[1], &iValues[2], &iValues[3]);
+//         SetShaderValue(*shader, locIndex, iValues, uniformType);
+//     } else {
+//         Con::errorf("unknown uniformtype %d", uniformType);
+//         return false;
+//     }
+//     return true;
+// }
 
 // RLAPI void SetShaderValueV(Shader shader, int locIndex, const void *value, int uniformType, int count);
 DefineEngineFunction( SetShaderValueV, void, (S32 shaderId, int locIndex, Vector<F32> dataValues, int uniformType, int count), , "Set shader uniform array/vector using a flat float list") {

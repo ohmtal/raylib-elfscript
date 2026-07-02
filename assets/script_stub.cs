@@ -2748,8 +2748,28 @@ namespace Global {
    S32 LoadModel( String fileName ) {}
    /*! Load model from generated mesh (default material) and return ModelID */
    S32 LoadModelFromMesh( int meshId ) {}
-   /*! set a texture for a modal material map like model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;SetModelTexture($model, $texture) << matIndex default 0,  matMap default MATERIAL_MAP_DIFFUSE  */
-   bool SetModelTexture( int modelId, int textureId, int matIndex=0, int mapMap=(S32)MATERIAL_MAP_DIFFUSE ) {}
+   /*! Gets the texture ID from a model material map.
+GetModelMapTexture(modelId, [matIndex=0], [mapMap=MATERIAL_MAP_DIFFUSE]) */
+   S32 GetModelMapTexture( int modelId, int matIndex=0, int mapMap=(S32)MATERIAL_MAP_DIFFUSE ) {}
+   /*! set a texture for a model material map like model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;SetModelMapTexture($model, $texture) << matIndex default 0,  matMap default MATERIAL_MAP_DIFFUSE  */
+   bool SetModelMapTexture( int modelId, int textureId, int matIndex=0, int mapMap=(S32)MATERIAL_MAP_DIFFUSE ) {}
+   /*! Gets the color from a model material map.
+GetModelMapColor(modelId, [matIndex=0], [mapMap=MATERIAL_MAP_DIFFUSE]) */
+   Color GetModelMapColor( int modelId, int matIndex=0, int mapMap=(S32)MATERIAL_MAP_DIFFUSE ) {}
+   /*! set a color for a modal material map like model.materials[0].maps[MATERIAL_MAP_DIFFUSE].color = BLUE;SetModelMapColor($model, BLUE) << matIndex default 0,  matMap default MATERIAL_MAP_DIFFUSE  */
+   bool SetModelMapColor( int modelId, Color color, int matIndex=0, int mapMap=(S32)MATERIAL_MAP_DIFFUSE ) {}
+   /*! Gets the float value from a model material map.
+GetModelMapValue(modelId, [matIndex=0], [mapMap=MATERIAL_MAP_DIFFUSE]) */
+   F32 GetModelMapValue( int modelId, int matIndex=0, int mapMap=(S32)MATERIAL_MAP_DIFFUSE ) {}
+   /*! Sets the float value for a model material map (e.g., roughness or metalness factor).
+SetModelMapValue(modelId, value [, matIndex=0, mapMap=MATERIAL_MAP_DIFFUSE]) */
+   bool SetModelMapValue( int modelId, float value, int matIndex=0, int mapMap=(S32)MATERIAL_MAP_DIFFUSE ) {}
+   /*! Gets the shader ID from a model material.
+GetModelShader(modelId [, matIndex=0]) */
+   S32 GetModelShader( int modelId, int matIndex=0 ) {}
+   /*! Sets a shader for a model material like model.materials[matIndex].shader = shader;
+SetModelShader(modelId, shaderId [, matIndex=0]) */
+   bool SetModelShader( int modelId, int shaderId, int matIndex=0 ) {}
    /*! Check if a model is valid (loaded in GPU, VAO/VBOs) */
    bool IsModelValid( int modelId ) {}
    /*! Unload model (including meshes) from memory (RAM and/or VRAM) */
@@ -2956,7 +2976,7 @@ namespace Global {
    S32 GetShaderLocsLocation( int shaderId, int shaderLocationIndex ) {}
    /*! Get shader attribute location index */
    int GetShaderLocationAttrib( int shaderId, String attribName ) {}
-   /*! Set shader uniform value from a string based on uniformType */
+   /*! Sets a shader uniform value parsed from a space-separated string based on uniformType. */
    bool SetShaderValue( int shaderId, int locIndex, String valueStr, int uniformType ) {}
    /*! Set shader uniform array/vector using a flat float list */
    void SetShaderValueV( int shaderId, int locIndex, Vector<F32> dataValues, int uniformType, int count ) {}

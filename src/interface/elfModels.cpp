@@ -149,36 +149,213 @@ DefineEngineFunction( LoadModelFromMesh, S32, (S32 meshId), , "Load model from g
 
     return ModelMap.add(model);
 }
+//------------------------------------------------------------------------------------
+// ElfScript ==> textureId = ModelGetTexture($model [, matIndex=0, mapMap=MATERIAL_MAP_DIFFUSE]);
+DefineEngineFunction( GetModelMapTexture, S32, (S32 modelId, S32 matIndex, S32 mapMap), (0, (S32)MATERIAL_MAP_DIFFUSE),
+                      "Gets the texture ID from a model material map.\n"
+                      "GetModelMapTexture(modelId, [matIndex=0], [mapMap=MATERIAL_MAP_DIFFUSE])"
+) {
+    Model* model = ModelMap.get(modelId);
+    if (!model) {
+        Con::errorf("GetModelMapTexture: Invalid modelID: %d", modelId);
+        return 0;
+    }
 
+    if (matIndex < 0 || matIndex >= model->materialCount) {
+        Con::errorf("GetModelMapTexture: matIndex %d out of bounds (model has %d materials)", matIndex, model->materialCount);
+        return 0;
+    }
+    if (mapMap < 0 || mapMap > (S32)MATERIAL_MAP_BRDF) {
+        Con::errorf("GetModelMapTexture: mapMap %d out of bounds (allowed: 0-%d)", mapMap, (S32)MATERIAL_MAP_BRDF);
+        return 0;
+    }
+
+    Texture raylibTex = model->materials[matIndex].maps[mapMap].texture;
+
+    if (raylibTex.id == 0) {
+        return 0;
+    }
+
+    S32 textureId = TextureMap.add(raylibTex);
+
+    return textureId;
+}
+//------------------------------------------------------------------------------------
 // ElfScript ==> model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
-DefineEngineFunction( SetModelTexture, bool, (S32 modelId,S32 textureId, S32 matIndex, S32 mapMap),(0,(S32)MATERIAL_MAP_DIFFUSE) ,
-             "set a texture for a modal material map like model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;"
-             "SetModelTexture($model, $texture) << matIndex default 0,  matMap default MATERIAL_MAP_DIFFUSE "
+DefineEngineFunction( SetModelMapTexture, bool, (S32 modelId,S32 textureId, S32 matIndex, S32 mapMap),(0,(S32)MATERIAL_MAP_DIFFUSE) ,
+             "set a texture for a model material map like model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;"
+             "SetModelMapTexture($model, $texture) << matIndex default 0,  matMap default MATERIAL_MAP_DIFFUSE "
  ) {
     Model* model = ModelMap.get(modelId);
     if (!model) {
-        Con::errorf("SetModelTexture: Invalid modelID: %d", modelId);
+        Con::errorf("SetModelMapTexture: Invalid modelID: %d", modelId);
         return false;
     }
     Texture* tex = TextureMap.get(textureId);
     if (!tex) {
-        Con::errorf("SetModelTexture: Invalid textureID: %d", textureId);
+        Con::errorf("SetModelMapTexture: Invalid textureID: %d", textureId);
         return false;
     }
     if (matIndex < 0 || matIndex >= model->materialCount) {
-        Con::errorf("SetModelTexture: matIndex %d out of bounds (model has %d materials)", matIndex, model->materialCount);
+        Con::errorf("SetModelMapTexture: matIndex %d out of bounds (model has %d materials)", matIndex, model->materialCount);
         return false;
     }
 
     if (mapMap < 0 || mapMap > (S32)MATERIAL_MAP_BRDF) {
-        Con::errorf("SetModelTexture: mapMap %d out of bounds (allowed: 0-11)", mapMap);
+        Con::errorf("SetModelMapTexture: mapMap %d out of bounds (allowed: 0-11)", mapMap);
         return false;
     }
 
     model->materials[matIndex].maps[mapMap].texture = *tex;
     return true;
 }
+//------------------------------------------------------------------------------------
+// ElfScript ==> color = ModelGetColor($model [, matIndex=0, mapMap=MATERIAL_MAP_DIFFUSE]);
+DefineEngineFunction( GetModelMapColor, Color, (S32 modelId, S32 matIndex, S32 mapMap), (0, (S32)MATERIAL_MAP_DIFFUSE),
+                      "Gets the color from a model material map.\n"
+                      "GetModelMapColor(modelId, [matIndex=0], [mapMap=MATERIAL_MAP_DIFFUSE])"
+) {
+    Model* model = ModelMap.get(modelId);
+    if (!model) {
+        Con::errorf("GetModelMapColor: Invalid modelID: %d", modelId);
+        return RAYWHITE;
+    }
 
+    if (matIndex < 0 || matIndex >= model->materialCount) {
+        Con::errorf("GetModelMapColor: matIndex %d out of bounds (model has %d materials)", matIndex, model->materialCount);
+        return RAYWHITE;
+    }
+
+    if (mapMap < 0 || mapMap > (S32)MATERIAL_MAP_BRDF) {
+        Con::errorf("GetModelMapColor: mapMap %d out of bounds (allowed: 0-%d)", mapMap, (S32)MATERIAL_MAP_BRDF);
+        return RAYWHITE;
+    }
+
+    return model->materials[matIndex].maps[mapMap].color;
+}
+//------------------------------------------------------------------------------------
+// ElfScript ==> model.materials[0].maps[MATERIAL_MAP_DIFFUSE].color
+DefineEngineFunction( SetModelMapColor, bool, (S32 modelId, Color color, S32 matIndex, S32 mapMap),(0,(S32)MATERIAL_MAP_DIFFUSE) ,
+                      "set a color for a modal material map like model.materials[0].maps[MATERIAL_MAP_DIFFUSE].color = BLUE;"
+                      "SetModelMapColor($model, BLUE) << matIndex default 0,  matMap default MATERIAL_MAP_DIFFUSE "
+) {
+    Model* model = ModelMap.get(modelId);
+    if (!model) {
+        Con::errorf("SetModelMapColor: Invalid modelID: %d", modelId);
+        return false;
+    }
+    if (matIndex < 0 || matIndex >= model->materialCount) {
+        Con::errorf("SetModelMapColor: matIndex %d out of bounds (model has %d materials)", matIndex, model->materialCount);
+        return false;
+    }
+
+    if (mapMap < 0 || mapMap > (S32)MATERIAL_MAP_BRDF) {
+        Con::errorf("SetModelMapColor: mapMap %d out of bounds (allowed: 0-11)", mapMap);
+        return false;
+    }
+
+    model->materials[matIndex].maps[mapMap].color = color;
+    return true;
+}
+//------------------------------------------------------------------------------------
+// ElfScript ==> value = GetModelMapValue($model [, matIndex=0, mapMap=MATERIAL_MAP_DIFFUSE]);
+DefineEngineFunction( GetModelMapValue, F32, (S32 modelId, S32 matIndex, S32 mapMap), (0, (S32)MATERIAL_MAP_DIFFUSE),
+                      "Gets the float value from a model material map.\n"
+                      "GetModelMapValue(modelId, [matIndex=0], [mapMap=MATERIAL_MAP_DIFFUSE])"
+) {
+    Model* model = ModelMap.get(modelId);
+    if (!model) {
+        Con::errorf("GetModelMapValue: Invalid modelID: %d", modelId);
+        return 0.0f;
+    }
+
+    if (matIndex < 0 || matIndex >= model->materialCount) {
+        Con::errorf("GetModelMapValue: matIndex %d out of bounds (model has %d materials)", matIndex, model->materialCount);
+        return 0.0f;
+    }
+
+    if (mapMap < 0 || mapMap > (S32)MATERIAL_MAP_BRDF) {
+        Con::errorf("GetModelMapValue: mapMap %d out of bounds (allowed: 0-%d)", mapMap, (S32)MATERIAL_MAP_BRDF);
+        return 0.0f;
+    }
+
+    return model->materials[matIndex].maps[mapMap].value;
+}
+//------------------------------------------------------------------------------------
+// ElfScript ==> SetModelMapValue($model, 0.5 [, matIndex=0, mapMap=MATERIAL_MAP_DIFFUSE])
+DefineEngineFunction( SetModelMapValue, bool, (S32 modelId, F32 value, S32 matIndex, S32 mapMap), (0, (S32)MATERIAL_MAP_DIFFUSE),
+                      "Sets the float value for a model material map (e.g., roughness or metalness factor).\n"
+                      "SetModelMapValue(modelId, value [, matIndex=0, mapMap=MATERIAL_MAP_DIFFUSE])"
+) {
+    Model* model = ModelMap.get(modelId);
+    if (!model) {
+        Con::errorf("SetModelMapValue: Invalid modelID: %d", modelId);
+        return false;
+    }
+
+    if (matIndex < 0 || matIndex >= model->materialCount) {
+        Con::errorf("SetModelMapValue: matIndex %d out of bounds (model has %d materials)", matIndex, model->materialCount);
+        return false;
+    }
+
+    if (mapMap < 0 || mapMap > (S32)MATERIAL_MAP_BRDF) {
+        Con::errorf("SetModelMapValue: mapMap %d out of bounds (allowed: 0-%d)", mapMap, (S32)MATERIAL_MAP_BRDF);
+        return false;
+    }
+
+    model->materials[matIndex].maps[mapMap].value = value;
+    return true;
+}
+//------------------------------------------------------------------------------------
+// ElfScript ==> shaderId = ModelGetShader($model [, matIndex=0])
+DefineEngineFunction( GetModelShader, S32, (S32 modelId, S32 matIndex), (0),
+                      "Gets the shader ID from a model material.\n"
+                      "GetModelShader(modelId [, matIndex=0])"
+) {
+    Model* model = ModelMap.get(modelId);
+    if (!model) {
+        Con::errorf("GetModelShader: Invalid modelID: %d", modelId);
+        return 0;
+    }
+
+    if (matIndex < 0 || matIndex >= model->materialCount) {
+        Con::errorf("GetModelShader: matIndex %d out of bounds (model has %d materials)", matIndex, model->materialCount);
+        return 0;
+    }
+
+    Shader raylibShader = model->materials[matIndex].shader;
+
+    return ShadersMap.add(raylibShader);
+}
+
+//------------------------------------------------------------------------------------
+// ElfScript ==> ModelSetShader($model, $shader [, matIndex=0])
+DefineEngineFunction( SetModelShader, bool, (S32 modelId, S32 shaderId, S32 matIndex), (0),
+                      "Sets a shader for a model material like model.materials[matIndex].shader = shader;\n"
+                      "SetModelShader(modelId, shaderId [, matIndex=0])"
+) {
+    Model* model = ModelMap.get(modelId);
+    if (!model) {
+        Con::errorf("SetModelShader: Invalid modelID: %d", modelId);
+        return false;
+    }
+
+    Shader* shd = ShadersMap.get(shaderId);
+    if (!shd) {
+        Con::errorf("SetModelShader: Invalid shaderID: %d", shaderId);
+        return false;
+    }
+
+    if (matIndex < 0 || matIndex >= model->materialCount) {
+        Con::errorf("SetModelShader: matIndex %d out of bounds (model has %d materials)", matIndex, model->materialCount);
+        return false;
+    }
+
+    model->materials[matIndex].shader = *shd;
+    return true;
+}
+
+//------------------------------------------------------------------------------------
 
 // RLAPI bool IsModelValid(Model model);                                                       // Check if a model is valid (loaded in GPU, VAO/VBOs)
 DefineEngineFunction( IsModelValid, bool, (S32 modelId), , "Check if a model is valid (loaded in GPU, VAO/VBOs)") {

@@ -80,6 +80,44 @@ struct ElfStorage {
 
 };
 // -------------------------------------------------------------------------
+// Special for texture check already added
+// -------------------------------------------------------------------------
+template<>
+inline S32 ElfStorage<Texture, UnloadTexture>::add(Texture item) {
+
+    if (item.id == 0) {
+        return 0;
+    }
+
+    for (const auto& pair : mMap) {
+        if (pair.second.id == item.id) {
+            return pair.first;
+        }
+    }
+
+    mMap[++mId] = item;
+    return mId;
+}
+// -------------------------------------------------------------------------
+// Special for shader check already added
+// -------------------------------------------------------------------------
+template<>
+inline S32 ElfStorage<Shader, UnloadShader>::add(Shader item) {
+    if (item.id == 0) {
+        return 0;
+    }
+
+    for (const auto& pair : mMap) {
+        if (pair.second.id == item.id) {
+            return pair.first;
+        }
+    }
+
+    mMap[++mId] = item;
+    return mId;
+}
+
+// -------------------------------------------------------------------------
 // Special for default font when id <=0 !
 // -------------------------------------------------------------------------
 template<>
@@ -89,7 +127,6 @@ inline Font* ElfStorage<Font, UnloadFont>::get(S32 id) {
         return &defaultFont;
     }
 
-    // Das ist der originale Code aus Ihrem Template für alle anderen IDs
     auto it = mMap.find(id);
     if (it != mMap.end()) {
         return &it->second;

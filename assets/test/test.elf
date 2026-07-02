@@ -30,7 +30,8 @@ function MainInit() {
     $mesh = GenMeshPlane(1.0, 1.0, 20, 20); // width, length, subdivisions
     $model = LoadModelFromMesh($mesh);
     // $model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = tex; =>
-    SetModelTexture($model, $iconTex);
+    SetModelMapTexture($model, $iconTex);
+    SetModelMapColor($model, VIOLET);
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
 
@@ -80,6 +81,7 @@ function MainShutDown() {
 // -----------------------------------------------------------------------------
 function rl() {
     exec("assets/test/test.elf");
+    echo("reloaded ?!");
 }
 // -----------------------------------------------------------------------------
 function MainLoop()
@@ -113,6 +115,7 @@ function MainLoop()
 
     $ConsoleGui.update();
     EndDrawing();
+
 
     return 0;
 }
