@@ -150,6 +150,36 @@ DefineEngineFunction( LoadModelFromMesh, S32, (S32 meshId), , "Load model from g
     return ModelMap.add(model);
 }
 
+// ElfScript ==> model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+DefineEngineFunction( SetModelTexture, bool, (S32 modelId,S32 textureId, S32 matIndex, S32 mapMap),(0,(S32)MATERIAL_MAP_DIFFUSE) ,
+             "set a texture for a modal material map like model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;"
+             "SetModelTexture($model, $texture) << matIndex default 0,  matMap default MATERIAL_MAP_DIFFUSE "
+ ) {
+    Model* model = ModelMap.get(modelId);
+    if (!model) {
+        Con::errorf("SetModelTexture: Invalid modelID: %d", modelId);
+        return false;
+    }
+    Texture* tex = TextureMap.get(textureId);
+    if (!tex) {
+        Con::errorf("SetModelTexture: Invalid textureID: %d", textureId);
+        return false;
+    }
+    if (matIndex < 0 || matIndex >= model->materialCount) {
+        Con::errorf("SetModelTexture: matIndex %d out of bounds (model has %d materials)", matIndex, model->materialCount);
+        return false;
+    }
+
+    if (mapMap < 0 || mapMap > (S32)MATERIAL_MAP_BRDF) {
+        Con::errorf("SetModelTexture: mapMap %d out of bounds (allowed: 0-11)", mapMap);
+        return false;
+    }
+
+    model->materials[matIndex].maps[mapMap].texture = *tex;
+    return true;
+}
+
+
 // RLAPI bool IsModelValid(Model model);                                                       // Check if a model is valid (loaded in GPU, VAO/VBOs)
 DefineEngineFunction( IsModelValid, bool, (S32 modelId), , "Check if a model is valid (loaded in GPU, VAO/VBOs)") {
     Model* model = ModelMap.get(modelId);

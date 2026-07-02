@@ -1,0 +1,118 @@
+// -----------------------------------------------------------------------------
+//  A Script with .elf extension 
+// ./raylib-elfscript --console --script assets/test/test.elf
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+function CenterText(%text, %fontsize) {
+    %textWidth = MeasureText(%text,%fontSize);
+    %x = GetScreenWidth() / 2 - %textWidth / 2;
+    %y = GetScreenHeight() / 2 - %fontSize / 2;
+    echo("TextWidth:" SPC $textWidth SPC "x:" SPC $x);
+    return %x SPC %y;
+}
+// -----------------------------------------------------------------------------
+function Label::Draw(%this) {
+
+    DrawText(%this.text, %this.x, %this.y, %this.fontsize, %this.color, true, %this.shadowColor);
+}
+// -----------------------------------------------------------------------------
+function MainInit() {
+    $screenWidth = 800;
+    $screenHeight = 450;
+
+    SetConfigFlags( FLAG_WINDOW_RESIZABLE );
+    InitWindow($screenWidth, $screenHeight, "raylib-elfScript [core] example - basic window");
+    $iconImg = LoadImage("assets/texture/raylib_32x32.png");
+    SetWindowIcon($iconImg);
+    $iconTex = LoadTextureFromImage($iconImg);
+    UnloadImage($iconImg);
+
+    $mesh = GenMeshPlane(1.0, 1.0, 20, 20); // width, length, subdivisions
+    $model = LoadModelFromMesh($mesh);
+    // $model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = tex; =>
+    SetModelTexture($model, $iconTex);
+
+    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+
+    // setup text with center
+    $text  = "Hello World from raylib-elfScript!";
+    $fontSize = 30;
+    $Position = CenterText($text, $fontSize);
+
+    // example with simple Object:
+    %infoLabel = new ScriptObject() {
+        class = "Label";
+        x = 100;
+        y = 10;
+        text = "Press grave key (^) to open console";
+        fontsize = 20;
+        color = GRAY;
+        shadowColor = "100 100 150";
+    };
+    $Labels = new SimSet();
+    $Labels.add(%infoLabel);
+
+
+
+    // ---- camera
+    $camera = new Camera3DObject() {
+        position = "2.0 4.0 6.0 ";    // Camera position
+        target = "0.0 0.5 0.0";      // Camera looking at point
+        up = "0.0 1.0 0.0";          // Camera up vector (rotation towards target)
+        fovy = 45.0;                  // Camera field-of-view Y
+        projection = CAMERA_PERSPECTIVE;  // Camera projection type
+    };
+
+    // setup console 
+    $ConsoleGui = singleton ConsoleGuiObject();
+    $ConsoleFont= LoadFontEx("assets/font/JetBrainsMono-Regular.ttf", 16, 0, 250);
+    $ConsoleGui.setFont( $ConsoleFont);
+    $ConsoleGui.heightDiv = 2; //must be set here !!
+    $ConsoleGui.fontsize = 16.0; //must be set here !!
+
+    return true;
+}
+// -----------------------------------------------------------------------------
+function MainShutDown() {
+    // no worries raylib-elfScript make the garbage collection for you :)
+    CloseWindow();        // Close window and OpenGL context
+}
+// -----------------------------------------------------------------------------
+function rl() {
+    exec("assets/test/test.elf");
+}
+// -----------------------------------------------------------------------------
+function MainLoop()
+{
+    // ----- Update
+    if (IsWindowResized()) {
+        $position = CenterText($text, $fontSize);
+    }
+
+    // ----- Draw
+    BeginDrawing();
+    ClearBackground("30 20 60");
+
+    $camera.update(CAMERA_ORBITAL);
+    BeginMode3D($camera);
+    DrawSphere("0 1.0 0", 1.0, BLUE);
+    // DrawPlane("0 0 0", "10.0 10.0", GRAY);
+    DrawModel($model, "0 0 0", "10 10", WHITE);
+    DrawCubeV("4 1 0", "1 2 1", GREEN);
+    DrawCubeV("-4 1 0", "1 2 1", BLACK);
+    DrawCubeV("0 1 4", "1 2 1", YELLOW);
+    DrawCubeV("0 1 -4", "1 2 1", PURPLE);
+    EndMode3D();
+
+    DrawFPS(10, 10);
+    DrawText($text, $position.x, $position.y, $fontsize, LIGHTGRAY, true, BLACK);
+
+    for (%i = 0; %i < $Labels.getCount(); %i++) {
+        $Labels.getObject(%i).Draw();
+    }
+
+    $ConsoleGui.update();
+    EndDrawing();
+
+    return 0;
+}

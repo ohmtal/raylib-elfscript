@@ -39,7 +39,7 @@ int argParser(int argc, char* argv[]) {
         argStr = argv[i];
 
         if (argStr.equal("--noloop")) {
-            gNoDefaultCalls = false;
+            gNoDefaultCalls = true;
             continue;
         }
         if (argStr.equal("--console")) {

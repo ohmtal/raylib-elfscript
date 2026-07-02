@@ -320,6 +320,8 @@ void initEnum() {
     Con::registerEnumS32<GamepadButton>("");
     Con::registerEnumS32<GamepadAxis>("");
     Con::registerEnumS32<MaterialMapIndex>("");
+    Con::setScriptConstant("MATERIAL_MAP_DIFFUSE", MATERIAL_MAP_DIFFUSE);
+    Con::setScriptConstant("MATERIAL_MAP_SPECULAR", MATERIAL_MAP_SPECULAR);
     Con::registerEnumS32<ShaderLocationIndex>("");
     Con::registerEnumS32<ShaderUniformDataType>("");
     Con::registerEnumS32<ShaderAttributeDataType>("");
