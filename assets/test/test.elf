@@ -7,7 +7,6 @@ function CenterText(%text, %fontsize) {
     %textWidth = MeasureText(%text,%fontSize);
     %x = GetScreenWidth() / 2 - %textWidth / 2;
     %y = GetScreenHeight() / 2 - %fontSize / 2;
-    echo("TextWidth:" SPC $textWidth SPC "x:" SPC $x);
     return %x SPC %y;
 }
 // -----------------------------------------------------------------------------
@@ -22,6 +21,16 @@ function MainInit() {
 
     SetConfigFlags( FLAG_WINDOW_RESIZABLE );
     InitWindow($screenWidth, $screenHeight, "raylib-elfScript [core] example - basic window");
+
+    // setup console
+    $ConsoleGui = singleton ConsoleGuiObject();
+    $ConsoleFont= LoadFontEx("assets/font/JetBrainsMono-Regular.ttf", 16, 0, 250);
+    $ConsoleGui.setFont( $ConsoleFont);
+    $ConsoleGui.heightDiv = 2; //must be set here !!
+    $ConsoleGui.fontsize = 16.0; //must be set here !!
+
+
+    // icon
     $iconImg = LoadImage("assets/texture/raylib_32x32.png");
     SetWindowIcon($iconImg);
     $iconTex = LoadTextureFromImage($iconImg);
@@ -57,25 +66,25 @@ function MainInit() {
 
     // ---- camera
     $camera = new Camera3DObject() {
-        position = "2.0 4.0 6.0 ";    // Camera position
+        position = "12.0 8.0 10.0 ";    // Camera position
+        // position = "2.0 4.0 8.0 ";    // Camera position
         target = "0.0 0.5 0.0";      // Camera looking at point
         up = "0.0 1.0 0.0";          // Camera up vector (rotation towards target)
         fovy = 45.0;                  // Camera field-of-view Y
         projection = CAMERA_PERSPECTIVE;  // Camera projection type
     };
 
-    // setup console 
-    $ConsoleGui = singleton ConsoleGuiObject();
-    $ConsoleFont= LoadFontEx("assets/font/JetBrainsMono-Regular.ttf", 16, 0, 250);
-    $ConsoleGui.setFont( $ConsoleFont);
-    $ConsoleGui.heightDiv = 2; //must be set here !!
-    $ConsoleGui.fontsize = 16.0; //must be set here !!
+    InitAudioDevice();
+
+    $music = LoadMusicStream("assets/music/fullhouse2026.fms.mp3");
+    if ($music > 0 ) PlayMusicStream($music);
 
     return true;
 }
 // -----------------------------------------------------------------------------
 function MainShutDown() {
     // no worries raylib-elfScript make the garbage collection for you :)
+    CloseAudioDevice();
     CloseWindow();        // Close window and OpenGL context
 }
 // -----------------------------------------------------------------------------
@@ -90,12 +99,18 @@ function MainLoop()
     if (IsWindowResized()) {
         $position = CenterText($text, $fontSize);
     }
+    UpdateMusicStream($music);
+    $camera.update(CAMERA_ORBITAL);
+
+    $hue += 0.3;
+    if ($hue >= 360.0) $hue = 0.0;
 
     // ----- Draw
     BeginDrawing();
-    ClearBackground("30 20 60");
+    // ClearBackground("30 20 60");
+    ClearBackground(ColorFromHSV($hue, 1.0, 1.0));
 
-    $camera.update(CAMERA_ORBITAL);
+
     BeginMode3D($camera);
     DrawSphere("0 1.0 0", 1.0, BLUE);
     // DrawPlane("0 0 0", "10.0 10.0", GRAY);

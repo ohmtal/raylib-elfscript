@@ -238,7 +238,10 @@ DefineEngineFunction( UnloadMusicStream, void, (S32 musicId), , "Unload music st
 // RLAPI void PlayMusicStream(Music music);                              // Start music playing
 DefineEngineFunction( PlayMusicStream, void, (S32 musicId), , "Start playing a music stream") {
     Music* music = MusicMap.get(musicId);
-    if (!music) return;
+    if (!music) {
+        Con::errorf("PlayMusicStream failed to get music by id:%d", musicId);
+        return;
+    }
     PlayMusicStream(*music);
 }
 
