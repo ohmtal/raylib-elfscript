@@ -131,3 +131,20 @@ function MainLoop() {
 }
 
 function rl() { exec("assets/main.cs");}
+
+function updateDocu() { 
+    %file = "assets/script_stub.cs";
+    if (exportConsoleDocu(%file))
+    {
+        echo ("Docu exported to:" SPC %file);
+        echo ("- In vim you can simple open it alongside the other file to use autocomplete");
+        echo (" In VSCode / VSCodium you can install the Script Package (FIXME add URL)");
+        echo (" and it should work automaticly as long you have it opened.");
+        echo (" FIXME: fine out and docu on how to get it work when it's closed.");
+    } else {
+         error("Failed to export" SPC %file SPC "!");
+    }
+      
+    
+}
+
