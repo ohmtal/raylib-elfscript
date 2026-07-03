@@ -31,8 +31,16 @@ set(PROJECT_SRC
     src/objects/starfield.cpp
     src/objects/BatchRender.cpp
     src/objects/Grid.cpp
-    src/objects/Terrain.cpp
-    src/objects/Model.cpp
+
+    # ---- 3D Object -----
+
+    src/objects/3D/SceneObject.h
+    src/objects/3D/SceneObject.cpp
+    src/objects/3D/SceneContainer.h
+    src/objects/3D/SceneContainer.cpp
+
+    src/objects/3D/TerrainObject.cpp
+    src/objects/3D/ModelObject.cpp
 
 
 )

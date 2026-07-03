@@ -6,11 +6,14 @@ function createTerrainDemo() {
     %this = %obj; //map
     // ---- camera
     %this.camera = new Camera3DObject(CAMERA) {
-        position = "18.0 41.0 18.0";    // Camera position
+        position = "-36.0 41.0 -57.0";    // Camera position
         target = "0.0 0.5 0.0";      // Camera looking at point
         up = "0.0 1.0 0.0";          // Camera up vector (rotation towards target)
         fovy = 45.0;                  // Camera field-of-view Y
         projection = CAMERA_PERSPECTIVE;  // Camera projection type
+
+        moveSpeed = 100.0;
+        panSpeed  = 10.0;
     };
 
     %this.terrain = new TerrainObject(TERRAIN) {
@@ -53,6 +56,82 @@ function TerrainDemo::OnRemove(%this) {
     %this.levelObjects.delete();
 }
 //----------------------------------------------------------------------
+function Camera3DObject::updateFly(%this)
+{
+    %dt = getFrameTime();
+
+        // Turbo-Modus mit Shift-Taste für schnelles Navigieren
+        %speed = isKeyDown(KEY_LEFT_SHIFT) ? %this.moveSpeed * 2.0 : %this.moveSpeed;
+
+        // --- Tastatur-Bewegung (Frame-unabhängig via %dt) ---
+        if (isKeyDown(KEY_W)) {
+            %this.moveForward(%dt * %speed, false);
+        }
+        if (isKeyDown(KEY_S)) {
+            %this.moveForward(-%dt * %speed, false);
+        }
+
+        if (isKeyDown(KEY_D)) {
+            %this.moveRight(%dt * %speed, false);
+        }
+        if (isKeyDown(KEY_A)) {
+            %this.moveRight(-%dt * %speed, false);
+        }
+
+        if (isKeyDown(KEY_E)) {
+            %this.moveUp(%dt * %speed);
+        }
+        if (isKeyDown(KEY_Q)) {
+            %this.moveUp(-%dt * %speed);
+        }
+
+    if (IsCursorHidden())
+    {
+        // === SMOOTH MOUSE ROTATION ===
+        %mouseDelta = GetMouseDelta();
+        %deltaX = %mouseDelta.x;
+        %deltaY = %mouseDelta.y;
+
+        %sensitivity = 0.0015;
+
+        %this.targetYaw   = -%deltaX * %this.panSpeed * %sensitivity;
+        %this.targetPitch = -%deltaY * %this.panSpeed * %sensitivity;
+
+        %smoothFactor = 15.0 * %dt;
+        if (%smoothFactor > 1.0) %smoothFactor = 1.0; // Absicherung
+
+        if (%this.targetYaw != 0 || %this.targetPitch != 0) {
+
+            %currentYaw = %this.targetYaw * %smoothFactor;
+            %currentPitch = %this.targetPitch * %smoothFactor;
+
+            %this.yaw(%currentYaw, true);
+            %this.pitch(%currentPitch, true, false, false);
+
+            %this.targetYaw   -= %currentYaw;
+            %this.targetPitch -= %currentPitch;
+        }
+
+//         // --- Maus-Rotation (Smooth ohne %dt) ---
+//         %mouseDelta = GetMouseDelta();
+//         %deltaX = %mouseDelta.x;
+//         %deltaY = %mouseDelta.y;
+// echo("MOUSE DELTE:" SPC %mouseDelta SPC "::" SPC %deltaX SPC %deltaY);
+//         if (%deltaX != 0 || %deltaY != 0) {
+//             %sensitivity = 0.03;
+//   /*
+//             CameraYaw(camera, -mousePositionDelta.x*CAMERA_MOUSE_MOVE_SENSITIVITY, rotateAroundTarget);
+//             CameraPitch(camera, -mousePositionDelta.y*CAMERA_MOUSE_MOVE_SENSITIVITY, lockView, rotateAroundTarget, rotateUp);
+//             */
+//             %this.yaw(-%deltaX *  %sensitivity, true);
+//             %this.pitch(-%deltaY *  %sensitivity, true, false, false);
+//             // %this.yaw(-%deltaX * %this.panSpeed * %sensitivity, true);
+//             // %this.pitch(-%deltaY * %this.panSpeed * %sensitivity, true, false, false);
+//         }
+    }
+}
+
+//----------------------------------------------------------------------
 function TerrainDemo::Render(%this) {
 
     if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))  DisableCursor();
@@ -64,8 +143,8 @@ function TerrainDemo::Render(%this) {
     %cam = %this.camera;
     %ter = %this.terrain;
 
-    %oldCamPos = %cam.position;
-    if (IsCursorHidden()) %cam.update(CAMERA_FREE);
+    %cam.updateFly();
+
 
 
     // %playerPos = %cam.position;
@@ -82,7 +161,7 @@ function TerrainDemo::Render(%this) {
       // level models render:
       %l = %this.levelObjects;
       %cnt = %l.getCount();
-      for (%i = 0; %i < %cnt; %i++) %l.getObject(%i).draw( true );
+      for (%i = 0; %i < %cnt; %i++) %l.getObject(%i).draw(  );
 
 
       // DrawGrid(20, 1.0);
@@ -102,9 +181,10 @@ function TerrainDemo::spawnScriptTree(%this, %worldPos)
         Scale = getRandomF(0.8,1.2) SPC 1.0 SPC getRandomF(0.8,1.2);
     };
 
-    %crownY = %worldPos.y + %trunkHeight;
+    // %crownY = %worldPos.y + %trunkHeight;
+    %relY = %trunkHeight / 2.0 + 0.5; // 0.5 == halve crown height
     %crown = new ModelObject() {
-        Position = %worldPos.x SPC %crownY SPC %worldPos.z;
+        Position = 0 SPC %relY SPC 0;
         ModelId = $TreeCrownModel;
         Scale = getRandomF(0.8,1.2) SPC 1.0 SPC getRandomF(0.8,1.2);
     };
