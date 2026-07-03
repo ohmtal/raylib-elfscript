@@ -15,8 +15,9 @@ function createTerrainDemo() {
 
     %this.terrain = new TerrainObject(TERRAIN) {
         HeightMapFilename = "assets/terrain/ohmtal_HM.png";
-        Size = "256.0 64.0 256.0";
-        Position = "-128 -60 -128";
+        Size = "2048.0 128.0 2048.0";
+        // Size = "256.0 64.0 256.0";
+        Position = "-1024 -0 -1024";
     };
 
     // level ... terrain should be also inside ... but for now this also rocks
@@ -57,7 +58,7 @@ function TerrainDemo::Render(%this) {
     if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))  DisableCursor();
     else if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) EnableCursor();
 
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) %this.onMouseLeftClick();
+    if (!IsCursorHidden() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) %this.onMouseLeftClick();
 
     ClearBackground("60 60 150");
     %cam = %this.camera;
@@ -84,7 +85,7 @@ function TerrainDemo::Render(%this) {
       for (%i = 0; %i < %cnt; %i++) %l.getObject(%i).draw();
 
 
-      DrawGrid(20, 1.0);
+      // DrawGrid(20, 1.0);
     EndMode3D();
 
     DrawText("CAM:" SPC %cam.position,10,10);
@@ -93,11 +94,7 @@ function TerrainDemo::Render(%this) {
 //----------------------------------------------------------------------
 function TerrainDemo::spawnScriptTree(%this, %worldPos)
 {
-    // %treeGroup = new SimGroup() { class = "ScriptTree"; };
-    // %treeGroup.position = %worldPos;
 
-    // FIXME while linking here is good for the current map
-    // but this needs to
     %trunkHeight = getRandomF(1.0,3.0);
     %trunk = new ModelObject() {
         Position = %worldPos.x SPC (%worldPos.y + (%trunkHeight / 2)) SPC %worldPos.z;
@@ -143,6 +140,11 @@ function TerrainDemo::onMouseLeftClick(%this)
     %normX = getWord(%collisionStr, 3);
     %normY = getWord(%collisionStr, 4);
     %normZ = getWord(%collisionStr, 5);
+
+    // or simply as vector3 string:
+    %hitPoint = getWords(%collisionStr, 0,2);
+    %hitNormal = getWords(%collisionStr, 3,5);
+    warn("HITPOINT" SPC %hitPoint SPC "HITNORMAL" SPC %hitNormal);
 
     %distance = getWord(%collisionStr, 6);
 
