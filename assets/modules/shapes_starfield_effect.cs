@@ -3,7 +3,7 @@
 // the loop over starcount is not really the best idea when using interpreted
 // script.
 // -----------------------------------------------------------------------------
-// Benchmark (week only looking on fps)
+// Benchmark (weak: only looking on fps)
 // with 420 stars on a i5-7200U (Thinkpad T570 running arch):
 // nativ c gpu limit lines ~ 2500fps Circles ~ 1000fps
 // optimized torquescript ~75fps cpu limit
