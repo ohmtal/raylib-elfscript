@@ -37,8 +37,11 @@ public:
     virtual void drawTransformed(const Matrix& parentTransform);
 
     static void initPersistFields();
+
 protected:
    void updateWorldBox(const BoundingBox& localBox, const Matrix& worldTransform);
+
+
 };
 
 } //namespace

@@ -7,12 +7,16 @@
 //-----------------------------------------------------------------------------
 
 #include "console/engineAPI.h"
-#include "interface/ConsoleTypes.h"
+#include "math/mMathRand.h"
+#include "console/simSet.h"
+
 #include "raylib.h"
 #include "raymath.h"
-#include "math/mMathRand.h"
+
 #include "interface/elfTools.h"
-#include "console/simSet.h"
+#include "interface/ConsoleTypes.h"
+#include "interface/elfResource.h"
+
 
 namespace ElfObjects {
 
@@ -53,12 +57,15 @@ public:
     Vector3 getNormal(Vector3 worldPos);
     RayCollision getRayCollision(Ray ray);
     // -----
+    S32 getModelId() {return mModelId;}; //model id in resource manager
+    // -----
     bool load() { return loadAutoTexture();}
     bool loadAutoTexture();
     bool loadBasic();
-    void drawBasic();
+    void draw();
 
 private:
+    S32 mModelId = 0; // model id in resource manager
     void unloadInternal();
     void genHeightGrid(Image* image, Color* heightPixels );
 };
@@ -126,7 +133,7 @@ F32 TerrainObject::getHeight(Vector3 worldPos) {
 }
 
 // -----------------------------------------------------------------------------
-void TerrainObject::drawBasic()
+void TerrainObject::draw()
 {
      if (mModel.meshCount > 0) DrawModel(mModel, mPosition, 1.0f, WHITE);
 }
@@ -138,8 +145,10 @@ void TerrainObject::unloadInternal() {
         if (terrainTexture.id > 0) {
             ::UnloadTexture(terrainTexture);
         }
-
-        ::UnloadModel(mModel);
+    }
+    if (mModelId > 0) {
+        ElfResource::ModelMap.remove(mModelId);
+        mModelId = 0;
         mModel = { 0 };
     }
 }
@@ -246,6 +255,10 @@ bool TerrainObject::loadAutoTexture() {
 
     mModel = ::LoadModelFromMesh(mesh);
 
+    if (mModel.meshCount > 0) {
+        mModelId = ElfResource::ModelMap.add(mModel);
+    }
+
     Texture2D terrainTexture = ::LoadTextureFromImage(diffuseImage);
     ::UnloadImage(diffuseImage);
 
@@ -277,6 +290,10 @@ bool TerrainObject::loadBasic() {
     ::UnloadImage(image);
 
     mModel = ::LoadModelFromMesh(mesh);
+
+    if (mModel.meshCount > 0) {
+         mModelId = ElfResource::ModelMap.add(mModel);
+    }
 
     return (mModel.meshCount > 0);
 }
@@ -376,8 +393,8 @@ DefineEngineMethod(TerrainObject, load, bool, (), , "Load or reload the terrain 
     return object->load();
 }
 
-DefineEngineMethod(TerrainObject, drawBasic, void, (), , "Draw basic heightmap") {
-    object->drawBasic();
+DefineEngineMethod(TerrainObject, draw, void, (), , "Draw  heightmap") {
+    object->draw();
 }
 
 // ElfScript ==> %height = %terrain.getHeight(%playerPos);
@@ -396,6 +413,11 @@ DefineEngineMethod(TerrainObject, getRayCollision, String, (Ray ray), ,
                    "and returns 'X Y Z Nx Ny Nz Dist' or empty string.") {
     return ElfTools::FormatRayCollision( object->getRayCollision(ray));
 
+}
+
+DefineEngineMethod(TerrainObject, getModelId, S32, (), ,
+                   "Returns the resource-manager compatible model ID of the terrain's 3D mesh.") {
+    return object->getModelId();
 }
 
 } //namespace ElfTerrain

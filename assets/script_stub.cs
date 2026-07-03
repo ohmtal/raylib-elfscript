@@ -590,6 +590,34 @@ class  SimGroup : public SimSet {
 class  RootGroup : public SimGroup {
   public:
 };
+class  SceneObject : public SimSet {
+  public:
+   /*!
+    */
+   Vector3 Position;
+   /*!
+    */
+   Vector3 Rotation;
+   /*!
+    */
+   Vector3 Scale;
+   /*! @name Ungrouped
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Object
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Editing
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Persistence
+   @{ */
+   /*! */
+   /// @}
+};
 class  RenderTextureObject : public SimObject {
   public:
    /*! resize (recreate) a render texture */
@@ -668,7 +696,7 @@ class  Camera2DObject : public SimObject {
    Camera rotation in degrees
    
     */
-   float rotation;
+   float Rotation;
    /*!
    Camera zoom level
    
@@ -691,6 +719,34 @@ class  Camera3DObject : public SimObject {
    Vector2 getWorldToScreenEx( Vector3 position, int width, int height ) {}
    /*! Get the 3D camera transform matrix (view matrix) */
    Matrix getCameraMatrix() {}
+   /*! BeginMode3D - Begins 3D mode with a Camera3DObject */
+   void Begin() {}
+   /*! EndMode3D - End 3D mode with custom camera */
+   void End() {}
+   /*! GetCameraForward */
+   Vector3 getForwardVector() {}
+   /*! GetCameraUp */
+   Vector3 getUpVector() {}
+   /*! GetCameraRight */
+   Vector3 getRightVector() {}
+   /*! Moves the camera forward/backward based on distance. If moveInWorldPlane is true, movement is locked to the XZ plane. */
+   void moveForward( float distance, bool moveInWorldPlane ) {}
+   /*! Moves the camera up/down along its local up vector. */
+   void moveUp( float distance ) {}
+   /*! Moves the camera right/left based on distance. If moveInWorldPlane is true, movement is locked to the XZ plane. */
+   void moveRight( float distance, bool moveInWorldPlane ) {}
+   /*! Moves the camera closer or further away from its target point. */
+   void moveToTarget( float delta ) {}
+   /*! Rotates the camera horizontally (yaw) around its own axis or around the target point (angle in radians). */
+   void yaw( float angle, bool rotateAroundTarget ) {}
+   /*! Rotates the camera vertically (pitch) with optional view locking (angle in radians). */
+   void pitch( float angle, bool lockView, bool rotateAroundTarget, bool rotateUp ) {}
+   /*! Tilts the camera (roll) along its view axis (angle in radians). */
+   void roll( float angle ) {}
+   /*! Returns the camera's view matrix. */
+   Matrix getViewMatrix() {}
+   /*! Returns the camera's projection matrix based on the given aspect ratio. */
+   Matrix getProjectionMatrix( float aspect ) {}
    /*! @name Ungrouped
    @{ */
    /*! */
@@ -711,7 +767,7 @@ class  Camera3DObject : public SimObject {
    Camera position in world space
    
     */
-   Vector3 position;
+   Vector3 Position;
    /*!
    Camera target point in world space
    
@@ -732,6 +788,130 @@ class  Camera3DObject : public SimObject {
    
     */
    int projection;
+};
+class  LightObject : public SimObject {
+  public:
+   /*! Update the shader with the current values */
+   bool Update() {}
+   /*!
+   Id of the shader object
+   
+    */
+   int shaderId;
+   /*!
+   Type of Light:LIGHT_DIRECTIONAL=0 LIGHT_POINT=1
+   
+    */
+   int type;
+   /*!
+   is enabled
+   
+    */
+   bool enabled;
+   /*!
+   position of the light
+   
+    */
+   Vector3 Position;
+   /*!
+   target of the light
+   
+    */
+   Vector3 target;
+   /*!
+   color of the light
+   
+    */
+   Color color;
+   /*!
+   attenuation of the light
+   
+    */
+   float attenuation;
+};
+class  ConsoleGuiObject : public SimObject {
+  public:
+   /*! set the console font */
+   bool setFont( int fontId ) {}
+   /*! update the console */
+   void Update() {}
+   /*! @name Ungrouped
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Object
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Editing
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Persistence
+   @{ */
+   /*! */
+   /// @}
+   /*!
+   Shortcut to open console
+   
+    */
+   int key;
+   /*!
+   font size
+   
+    */
+   float fontSize;
+   /*!
+   2=half height, 1= full heigth
+   
+    */
+   float heightDiv;
+};
+class  StarField : public SimObject {
+  public:
+   /*! update and render startfield */
+   void loop() {}
+   /*!
+   Set the mStars count.
+   
+    */
+   int count;
+   /*!
+   mode 0=lines, 1=rectangles, 2=circles
+   
+    */
+   int mode;
+   /*!
+   set the mSpeed of the mStars
+   
+    */
+   float speed;
+   /*!
+   color of the mStars
+   
+    */
+   Color color;
+   /*!
+   color of the background
+   
+    */
+   Color BackgroundColor;
+   /*! @name Ungrouped
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Object
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Editing
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Persistence
+   @{ */
+   /*! */
+   /// @}
 };
 class  BatchRender : public SimObject {
   public:
@@ -851,130 +1031,6 @@ class  BatchRender : public SimObject {
    /*! */
    /// @}
 };
-class  LightObject : public SimObject {
-  public:
-   /*! Update the shader with the current values */
-   bool Update() {}
-   /*!
-   Id of the shader object
-   
-    */
-   int shaderId;
-   /*!
-   Type of Light:LIGHT_DIRECTIONAL=0 LIGHT_POINT=1
-   
-    */
-   int type;
-   /*!
-   is enabled
-   
-    */
-   bool enabled;
-   /*!
-   position of the light
-   
-    */
-   Vector3 position;
-   /*!
-   target of the light
-   
-    */
-   Vector3 target;
-   /*!
-   color of the light
-   
-    */
-   Color color;
-   /*!
-   attenuation of the light
-   
-    */
-   float attenuation;
-};
-class  ConsoleGuiObject : public SimObject {
-  public:
-   /*! set the console font */
-   bool setFont( int fontId ) {}
-   /*! update the console */
-   void Update() {}
-   /*! @name Ungrouped
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Object
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Editing
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Persistence
-   @{ */
-   /*! */
-   /// @}
-   /*!
-   Shortcut to open console
-   
-    */
-   int key;
-   /*!
-   font size
-   
-    */
-   float fontSize;
-   /*!
-   2=half height, 1= full heigth
-   
-    */
-   float heightDiv;
-};
-class  StarField : public SimObject {
-  public:
-   /*! update and render startfield */
-   void loop() {}
-   /*!
-   Set the mStars count.
-   
-    */
-   int count;
-   /*!
-   mode 0=lines, 1=rectangles, 2=circles
-   
-    */
-   int mode;
-   /*!
-   set the mSpeed of the mStars
-   
-    */
-   float speed;
-   /*!
-   color of the mStars
-   
-    */
-   Color color;
-   /*!
-   color of the background
-   
-    */
-   Color BackgroundColor;
-   /*! @name Ungrouped
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Object
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Editing
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Persistence
-   @{ */
-   /*! */
-   /// @}
-};
 class  Grid : public SimObject {
   public:
    /*! param: area: x y w h, F32 SquareSize */
@@ -1026,6 +1082,78 @@ class  Grid : public SimObject {
    void compilePathCosts() {}
    /*! return nodecount of to points to calculated closed path it -1 then it failed */
    S32 getNodeToNodeCosts( Vector2 start, Vector2 goal, bool smoothPath=true ) {}
+   /*! @name Ungrouped
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Object
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Editing
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Persistence
+   @{ */
+   /*! */
+   /// @}
+};
+class  TerrainObject : public SimSet {
+  public:
+   /*! Load or reload the terrain from the specified HeightMapFilename. */
+   bool load() {}
+   /*! Draw  heightmap */
+   void draw() {}
+   /*! Returns the exact terrain height (Y-coordinate) at the given world position. */
+   F32 getHeight( Vector3 position ) {}
+   /*! Returns the surface normal vector at the given world position. */
+   Vector3 getNormal( Vector3 position ) {}
+   /*! Performs a raycast collision check against the terrainand returns 'X Y Z Nx Ny Nz Dist' or empty string. */
+   String getRayCollision( Ray ray ) {}
+   /*! Returns the resource-manager compatible model ID of the terrain's 3D mesh. */
+   S32 getModelId() {}
+   /*!
+   You need to call load() after changing it.
+   
+    */
+   string HeightMapFilename;
+   /*!
+   You need to call load() after changing it.
+   
+    */
+   Vector3 Size;
+   /*!
+   Render position of the heightmap
+   
+    */
+   Vector3 Position;
+   /*! @name Ungrouped
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Object
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Editing
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Persistence
+   @{ */
+   /*! */
+   /// @}
+};
+class  ModelObject : public SceneObject {
+  public:
+   /*! Draws this object instance and all its children polymorphically. */
+   void draw() {}
+   /*!
+   The script ID of the raylib model.
+   
+    */
+   int ModelId;
    /*! @name Ungrouped
    @{ */
    /*! */
@@ -2398,6 +2526,12 @@ namespace Global {
    void ImageColorBrightness( int imageId, int brightness ) {}
    /*! Modify image color: replace color */
    void ImageColorReplace( int imageId, Color color, Color replace ) {}
+   /*! Load color data from image by id as a Color array (RGBA - 32bit) and return the colorsId */
+   S32 LoadImageColors( int imageId ) {}
+   /*! Get a color from Colors* loaded with LoadImageColors */
+   Color GetImageColorsColor( int colorsId, int index ) {}
+   /*! Unload color data loaded with LoadImageColors() */
+   void UnloadImageColors( int colorsId ) {}
    /*! Get image alpha border rectangle */
    Rectangle GetImageAlphaBorder( int imageId, float threshold ) {}
    /*! Get image pixel color at (x, y) position */
@@ -2870,6 +3004,12 @@ SetModelShader(modelId, shaderId [, matIndex=0]) */
    void UnloadModelAnimations( int animBlockId ) {}
    /*! Get total number of animations inside an AnimationBlock */
    int GetModelAnimationCount( int animBlockId ) {}
+   /*! Generates a 3D cube model from dimensions and returns its modelId. */
+   S32 GenModelCube( float width, float height, float length ) {}
+   /*! Generates a 3D sphere model and returns its modelId. */
+   S32 GenModelSphere( float radius, int rings, int slices ) {}
+   /*! Generates a 3D cylinder model and returns its modelId. */
+   S32 GenModelCylinder( float radius, float height, int slices ) {}
    /*! Initialize audio device and context */
    void InitAudioDevice() {}
    /*! Close the audio device and context */
@@ -3020,6 +3160,18 @@ SetModelShader(modelId, shaderId [, matIndex=0]) */
    int GetDirectoryFileCount( String dirPath ) {}
    /*! Get file count with extension filtering and recursive directory scan. Use 'DIR' in filter to include directories. */
    int GetDirectoryFileCountEx( String basePath, String filter, bool scanSubdirs ) {}
+   /*! Adds two Vector3 values together. */
+   Vector3 Vector3Add( Vector3 v1, Vector3 v2 ) {}
+   /*! Subtracts v2 from v1. */
+   Vector3 Vector3Subtract( Vector3 v1, Vector3 v2 ) {}
+   /*! Scales a Vector3 by a float multiplier. */
+   Vector3 Vector3Scale( Vector3 v, float scale ) {}
+   /*! Normalizes a Vector3 to a length of 1.0. */
+   Vector3 Vector3Normalize( Vector3 v ) {}
+   /*! Returns the length of a Vector3. */
+   F32 Vector3Length( Vector3 v ) {}
+   /*! Returns the distance between two Vector3 points. */
+   F32 Vector3Distance( Vector3 v1, Vector3 v2 ) {}
    /*! Create or reinit global BatchRender */
    void BatchCreate( int count ) {}
    /*! push variables $b[stack]x, y, z, w */
@@ -3040,6 +3192,15 @@ SetModelShader(modelId, shaderId [, matIndex=0]) */
    bool BatchDrawLines( Color color=DARKPURPLE ) {}
    /*! Draw lines from the global BatchRender 3th stack is used for colors */
    bool BatchDrawColoredLines( Color color=DARKPURPLE ) {}
+   /*! Casts a ray into the container and returns the closest hit SceneObject and collision info. */
+   const char* ContainerRayCast( Ray ray ) {}
+   /*! Returns true if no SceneObject intersects the given bounding box. */
+   bool ContainerBoxEmpty( Vector3 minBounds, Vector3 maxBounds ) {}
+   /*! Returns a SimSet ID containing all SceneObjects within the specified bounding box.
+NOTE: You should delete the returned SimSet when done to avoid leaks! */
+   S32 ContainerGetBoxObjects( Vector3 minBounds, Vector3 maxBounds ) {}
+   /*! For Debug ... use ContainerGetBoxObjects with a big box to get all objects in as a SimSet  */
+   void ContainerListObjects() {}
    /*! @name Clipboard
    
    Miscellaneous functions to control the clipboard and clear the console.

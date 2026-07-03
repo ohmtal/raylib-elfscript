@@ -21,6 +21,7 @@ set(PROJECT_SRC
     src/interface/elfShader.cpp
     src/interface/elfFile.cpp
     src/interface/elfLights.cpp
+    src/interface/elfRayMath.cpp
 
     # --- Extras
     src/gui/Gui.cpp
