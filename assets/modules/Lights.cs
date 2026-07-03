@@ -8,7 +8,7 @@ function createLights() {
 
     // ---- camera
     %obj.camera = new Camera3DObject() {
-        position = "2.0 4.0 6.0 ";    // Camera position
+        position = "2.0 4.0 6.0";    // Camera position
         target = "0.0 0.5 0.0";      // Camera looking at point
         up = "0.0 1.0 0.0";          // Camera up vector (rotation towards target)
         fovy = 45.0;                  // Camera field-of-view Y

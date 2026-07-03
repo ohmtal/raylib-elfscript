@@ -9,8 +9,10 @@
 #include "ConsoleTypes.h"
 #include "elfCamera.h"
 #include "raymath.h"
+#include "interface/elfTools.h"
 
 using namespace ElfResource;
+using namespace ElfTools;
 //------------------------------------------------------------------------------------
 // Basic 3d Shapes Drawing Functions (Module: models)
 //------------------------------------------------------------------------------------
@@ -38,7 +40,7 @@ DefineEngineFunction( DrawTriangle3D, void, (Vector3 v1, Vector3 v2, Vector3 v3,
 
 // RLAPI void DrawTriangleStrip3D(const Vector3 *points, int pointCount, Color color); // Draw a triangle strip defined by points
 DefineEngineFunction( DrawTriangleStrip3D, void, (Vector<F32> pointValues, int pointCount, Color color), , "Draw a triangle strip defined by points") {
-    auto points = ElfResource::getVector3List(pointValues, pointCount);
+    auto points = getVector3List(pointValues, pointCount);
     if (points.size() != (size_t) pointCount ) return;
     DrawTriangleStrip3D(points.data(), pointCount, color);
 }
@@ -678,19 +680,6 @@ DefineEngineFunction( CheckCollisionBoxSphere, bool, (BoundingBox box, Vector3 c
     return CheckCollisionBoxSphere(box, center, radius);
 }
 
-// Helper-Funktion um RayCollision sauber für TorqueScript als String aufzubereiten
-// Format: "hitPoint.x hitPoint.y hitPoint.z hitNormal.x hitNormal.y hitNormal.z distance"
-inline const char* FormatRayCollision(RayCollision collision) {
-    if (!collision.hit) {
-        return "";
-    }
-    char* ret = Con::getReturnBuffer(128);
-    dSprintf(ret, 128, "%g %g %g %g %g %g %g",
-             collision.point.x,  collision.point.y,  collision.point.z,
-             collision.normal.x, collision.normal.y, collision.normal.z,
-             collision.distance);
-    return ret;
-}
 
 // RLAPI RayCollision GetRayCollisionSphere(Ray ray, Vector3 center, float radius);            // Get collision info between ray and sphere
 DefineEngineFunction( GetRayCollisionSphere, const char*, (Ray ray, Vector3 center, float radius), , "Returns hit info string 'px py pz nx ny nz dist' or empty string") {
@@ -767,4 +756,34 @@ DefineEngineFunction( GetModelAnimationCount, int, (S32 animBlockId), , "Get tot
     ElfAnimationBlock* block = ModelAnimationMap.get(animBlockId);
     if (!block) return 0;
     return (int)block->count;
+}
+// ----------------------
+// WRAPPER FIXME MORE ;)
+// ElfScript ==> %cubeModelId = GenModelCube(2.0, 2.0, 2.0);
+DefineEngineFunction( GenModelCube, S32, (F32 width, F32 height, F32 length), ,
+                      "Generates a 3D cube model from dimensions and returns its modelId."
+) {
+    if (width <= 0.0f || height <= 0.0f || length <= 0.0f) return 0;
+    Mesh mesh = ::GenMeshCube(width, height, length);
+    Model model = ::LoadModelFromMesh(mesh);
+    return ModelMap.add(model);
+}
+// ElfScript ==> %sphereModelId = GenModelSphere(1.0, 16, 16);
+DefineEngineFunction( GenModelSphere, S32, (F32 radius, int rings, int slices), ,
+                      "Generates a 3D sphere model and returns its modelId."
+) {
+    if (radius <= 0.0f || rings < 3 || slices < 3) return 0;
+    Mesh mesh = ::GenMeshSphere(radius, rings, slices);
+    Model model = ::LoadModelFromMesh(mesh);
+    return ModelMap.add(model);
+}
+
+// ElfScript ==> %cylinderModelId = GenModelCylinder(0.5, 2.0, 16);
+DefineEngineFunction( GenModelCylinder, S32, (F32 radius, F32 height, int slices), ,
+                      "Generates a 3D cylinder model and returns its modelId."
+) {
+    if (radius <= 0.0f || height <= 0.0f || slices < 3) return 0;
+    Mesh mesh = ::GenMeshCylinder(radius, height, slices);
+    Model model = ::LoadModelFromMesh(mesh);
+    return ModelMap.add(model);
 }

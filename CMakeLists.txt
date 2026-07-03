@@ -14,23 +14,26 @@ set(PROJECT_SRC
     src/interface/elfResource.cpp
     src/interface/elfTextures.cpp
     src/interface/elfText.cpp
-    src/interface/elfImageResource.cpp
     src/interface/elfCamera.cpp
     src/interface/elfShapes.cpp
     src/interface/elfModels.cpp
     src/interface/elfAudio.cpp
     src/interface/elfShader.cpp
     src/interface/elfFile.cpp
-    src/interface/elfBatchRender.cpp
     src/interface/elfLights.cpp
 
+    # --- Extras
     src/gui/Gui.cpp
     src/gui/ConsoleGuiObject.cpp
 
-    src/objects/starfield.cpp
-
     lib/ohmflux/grid/basicgrid.cpp
+
+    src/objects/starfield.cpp
+    src/objects/BatchRender.cpp
     src/objects/Grid.cpp
+    src/objects/Terrain.cpp
+    src/objects/Model.cpp
+
 
 )
 

@@ -1,8 +1,8 @@
 // Main Script
-$MODULES = "Lights textures_sprite_animation textures_background_scrolling Eyes";
+$MODULES = "Lights models_first_person_maze textures_sprite_animation textures_background_scrolling Eyes";
 $MODULES = $MODULES SPC "textures_mouse_painting gridtest";
 $MODULES = $MODULES SPC "RenderMap BatchTest";
-$MODULES = $MODULES SPC "DeltaTime shapes_starfield_batch";
+$MODULES = $MODULES SPC "DeltaTime shapes_starfield_batch TerrainDemo";
 // $MODULES = $MODULES SPC "looptest blank shapes_starfield_effect shapes_starfield_nativ";
 
 // LOADFAILTEST shapes_starfield_effect_v1

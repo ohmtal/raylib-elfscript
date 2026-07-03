@@ -9,9 +9,11 @@
 #include <console/console.h>
 #include "console/engineAPI.h"
 #include "ConsoleTypes.h"
+#include "interface/elfTools.h"
 
 namespace ElfTextures {
     using namespace ElfResource;
+    using namespace ElfTools;
 
     // ------------------------------------------------------------------------
     // Image loading functions
@@ -389,9 +391,87 @@ namespace ElfTextures {
         if (img) ImageColorReplace(img, color, replace);
     }
 
-//     RLAPI Color *LoadImageColors(Image image);                                                               // Load color data from image as a Color array (RGBA - 32bit)
+    // DefineEngineFunction(LoadImageColors, S32, (S32 imageId), ,
+    //                      " Load color data from image by id as a Color array (RGBA - 32bit) and return the colorsId ") {
+    //
+    //     if (imageId <= 0 ) return 0;
+    //     Image* img = ImageMap.get(imageId);
+    //     if (!img) {
+    //         Con::errorf("LoadImageColors failed to get image by id %s", imageId);
+    //     }
+    //     Color* colors = LoadImageColors(*img);
+    //
+    //     return ColorsMap.add(colors);
+    // }
+    //
+    // DefineEngineFunction(GetImageColorsColor, Color, (S32 colorsId, S32 index),
+    //                      ,"Get a color from Colors* loaded with LoadImageColors") {
+    //
+    //     if (colorsId <=0 || index < 0 ) return {0};
+    //     Color** colors = ColorsMap.get(colorsId);
+    //     if (!colors) {
+    //          Con::errorf("GetImageColorsColor failed to get Colors* by id %s", colorsId);
+    //     }
+    //     return *colors[index]; //FIXME dangerous!!
+    // }
+
+    // RLAPI Color *LoadImageColors(Image image);   // Load color data from image as a Color array (RGBA - 32bit)
+    // ElfScript ==> %colorsId = LoadImageColors(%imageId);
+    DefineEngineFunction(LoadImageColors, S32, (S32 imageId), ,
+                     "Load color data from image by id as a Color array (RGBA - 32bit) and return the colorsId") {
+        if (imageId <= 0) return 0;
+
+        Image* img = ImageMap.get(imageId);
+        if (!img) {
+            Con::errorf("LoadImageColors: Failed to get image by id %d", imageId);
+            return 0;
+        }
+
+        Color* rawColors = ::LoadImageColors(*img);
+        if (!rawColors) {
+            Con::errorf("LoadImageColors: raylib failed to extract colors from image %d", imageId);
+            return 0;
+        }
+
+        ElfImageColors wrappedColors;
+        wrappedColors.pixels = rawColors;
+        wrappedColors.count = img->width * img->height;
+
+        return ColorsMap.add(wrappedColors);
+    }
+
+    // ElfScript ==> %pixelColor = GetImageColorsColor(%colorsId, %index);
+    DefineEngineFunction(GetImageColorsColor, Color, (S32 colorsId, S32 index), ,
+                        "Get a color from Colors* loaded with LoadImageColors") {
+        // Weiß (WHITE) oder Blank als sicherer Fallback bei Fehlern
+        Color errorColor = { 0, 0, 0, 0 };
+
+        if (colorsId <= 0 || index < 0) return errorColor;
+
+        ElfImageColors* wrapped = ColorsMap.get(colorsId);
+        if (!wrapped || !wrapped->pixels) {
+            Con::errorf("GetImageColorsColor: Failed to get Colors by id %d", colorsId);
+            return errorColor;
+        }
+
+        if (index >= wrapped->count) {
+            Con::errorf("GetImageColorsColor: Index %d out of bounds! (Image has only %d pixels)", index, wrapped->count);
+            return errorColor;
+        }
+
+        return wrapped->pixels[index];
+    }
+
+    // RLAPI void UnloadImageColors(Color *colors); // Unload color data loaded with LoadImageColors()
+    DefineEngineFunction(UnloadImageColors, void, (S32 colorsId), ,
+                         "Unload color data loaded with LoadImageColors()") {
+
+        ColorsMap.remove( colorsId);
+    }
+
+
+
 //     RLAPI Color *LoadImagePalette(Image image, int maxPaletteSize, int *colorCount);                         // Load colors palette from image as a Color array (RGBA - 32bit)
-//     RLAPI void UnloadImageColors(Color *colors);                                                             // Unload color data loaded with LoadImageColors()
 //     RLAPI void UnloadImagePalette(Color *colors);                                                            // Unload colors palette loaded with LoadImagePalette()
 
     // RLAPI Rectangle GetImageAlphaBorder(Image image, float threshold);

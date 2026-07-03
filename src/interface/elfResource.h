@@ -16,6 +16,18 @@
 
 namespace ElfResource {
 
+    // for LoadImageColors ---------------------------- >
+    struct ElfImageColors {
+        Color* pixels;
+        int count; // width * height
+    };
+    inline void UnloadElfColorsData(ElfImageColors data) {
+        if (data.pixels != nullptr) {
+            ::UnloadImageColors(data.pixels); // raylib Speicherfreigabe
+        }
+    }
+    // < ------------------------------------------------
+
 // -------------------------------------------------------------------------
 // Template for Resource Handling
 // - add() add a item (copy)
@@ -150,63 +162,6 @@ inline Material* ElfStorage<Material, UnloadMaterial>::get(S32 id) {
     return nullptr;
 }
 
-// -----------------------------------------------------------------------------------
-// -----------------------------------------------------------------------------------
-// Helper func to get Vector2  from: Vector<F32> pointValues, S32 pointCount
-inline std::vector<Vector2> getVector2List(Vector<F32> pointValues, S32 pointCount) {
-    std::vector<Vector2> points;
-    if ( pointCount <= 0) return points;
-
-    if (pointValues.size() != (pointCount * 2)) {
-        Con::errorf("PointValues size (%d) does not match pointCount * 2 (%d)!", (int)pointValues.size(), pointCount * 2);
-        return points;
-    }
-
-    points.reserve(pointCount);
-
-    for (S32 i = 0; i < pointCount; ++i) {
-        points.push_back( { pointValues[i*2], pointValues[i*2+1] });
-    }
-    return points;
-}
-// -----------------------------------------------------------------------------------
-
-inline std::vector<Vector3> getVector3List(Vector<F32> pointValues, S32 pointCount) {
-    std::vector<Vector3> points;
-    if (pointCount <= 0) return points;
-
-    if (pointValues.size() != (size_t)(pointCount * 3)) {
-        Con::errorf("getVector3List: pointValues size (%d) does not match pointCount * 3 (%d)!", (int)pointValues.size(), pointCount * 3);
-        return points;
-    }
-
-    points.reserve(pointCount);
-
-    for (S32 i = 0; i < pointCount; ++i) {
-        S32 idx = i * 3;
-        points.push_back({ pointValues[idx], pointValues[idx + 1], pointValues[idx + 2] });
-    }
-    return points;
-}
-// -----------------------------------------------------------------------------------
-
-inline std::vector<Vector4> getVector4List(Vector<F32> pointValues, S32 pointCount) {
-    std::vector<Vector4> points;
-    if (pointCount <= 0) return points;
-
-    if (pointValues.size() != (size_t)(pointCount * 4)) {
-        Con::errorf("getVector4List: pointValues size (%d) does not match pointCount * 4 (%d)!", (int)pointValues.size(), pointCount * 4);
-        return points;
-    }
-
-    points.reserve(pointCount);
-
-    for (S32 i = 0; i < pointCount; ++i) {
-        S32 idx = i * 4;
-        points.push_back({ pointValues[idx], pointValues[idx + 1], pointValues[idx + 2], pointValues[idx + 3] });
-    }
-    return points;
-}
 
 // -----------------------------------------------------------------------------------
 // Special for animations
@@ -234,6 +189,7 @@ inline ElfStorage<Shader, UnloadShader> ShadersMap;
 inline ElfStorage<Wave, UnloadWave> WaveMap;
 inline ElfStorage<Sound, UnloadSound> SoundMap;
 inline ElfStorage<Music, UnloadMusicStream> MusicMap;
+inline ElfStorage<ElfImageColors, UnloadElfColorsData> ColorsMap;
 
 
 

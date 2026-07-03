@@ -2,10 +2,6 @@
  
 Raylib binding of Elf(Torque)Script.
 
-2026-09-29: Added Gui Object from RayTal and Lights Demo
-2026-06-20: A lot (80-90% excluding VR stuff) of bindings are implemented but not tested.  
-
-
 ## Setup: 
 
 I usually have the TorqueScript Source in "/opt/TorqueScript" which is set as default in CMake. 
@@ -19,6 +15,11 @@ and then
     cmake --build build
     ./raylib-elfscript
 
+## Terrain Object Demo
+
+![Terrain and Model Objects](./docu/Screenshot_2026-07-03_04-21-35.png)
+
+    
 ## Lights Demo
 
 ![Lights](./docu/Screenshot_2026-06-29_16-07-31.png)

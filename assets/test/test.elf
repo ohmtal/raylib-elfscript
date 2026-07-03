@@ -29,18 +29,28 @@ function MainInit() {
     $ConsoleGui.heightDiv = 2; //must be set here !!
     $ConsoleGui.fontsize = 16.0; //must be set here !!
 
+    // S32 GenImageChecked( int width, int height, int checksX, int checksY, Color col1, Color col2 ) {}
+    %checkImg = GenImageChecked(256,256,8,8, WHITE,BLACK);
+    %checkTex = LoadTextureFromImage( %checkImg); //$iconImg);
+    UnloadImage(%checkImg);
+
+    $backTex =  LoadTexture("assets/texture/nebulapurple_sky_back.png");
+    $backTexRect =  "0 0" SPC getTextureSize($backTex);
+    $ScreenRect = "0 0" SPC $screenWidth SPC $screenHeight;
 
     // icon
-    $iconImg = LoadImage("assets/texture/raylib_32x32.png");
-    SetWindowIcon($iconImg);
-    $iconTex = LoadTextureFromImage($iconImg);
-    UnloadImage($iconImg);
+    %iconImg = LoadImage("assets/texture/raylib_32x32.png");
+    SetWindowIcon(%iconImg);
+    // $iconTex = LoadTextureFromImage( %iconImg);
+    UnloadImage(%iconImg);
+
 
     $mesh = GenMeshPlane(1.0, 1.0, 20, 20); // width, length, subdivisions
+    // $mesh = GenMeshPoly(100.0, 1.0);
     $model = LoadModelFromMesh($mesh);
     // $model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = tex; =>
-    SetModelMapTexture($model, $iconTex);
-    SetModelMapColor($model, VIOLET);
+    SetModelMapTexture($model, %checkTex);
+    // SetModelMapColor($model, "255 255 255 196");
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
 
@@ -98,31 +108,34 @@ function MainLoop()
     // ----- Update
     if (IsWindowResized()) {
         $position = CenterText($text, $fontSize);
+        $ScreenRect = "0 0" SPC GetScreenWidth() SPC GetScreenHeight();
     }
     UpdateMusicStream($music);
     $camera.update(CAMERA_ORBITAL);
 
-    $hue += 0.3;
+    $hue += 30 * GetFrameTime();
     if ($hue >= 360.0) $hue = 0.0;
-
+    %rainbowColor = ColorFromHSV($hue, 1.0, 1.0);
     // ----- Draw
     BeginDrawing();
-    // ClearBackground("30 20 60");
-    ClearBackground(ColorFromHSV($hue, 1.0, 1.0));
+    ClearBackground("30 20 60");
 
+    // void DrawTexturePro( int textureId, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint=WHITE ) {}
+    DrawTexturePro( $backTex,$backTexRect,$ScreenRect,"0 0",0);
 
     BeginMode3D($camera);
-    DrawSphere("0 1.0 0", 1.0, BLUE);
     // DrawPlane("0 0 0", "10.0 10.0", GRAY);
-    DrawModel($model, "0 0 0", "10 10", WHITE);
+    DrawModel($model, "0 0 0", "10 10", WHITE); //generated plane
     DrawCubeV("4 1 0", "1 2 1", GREEN);
-    DrawCubeV("-4 1 0", "1 2 1", BLACK);
+    DrawCubeV("-4 1 0", "1 2 1", "0 0 0 64");
     DrawCubeV("0 1 4", "1 2 1", YELLOW);
-    DrawCubeV("0 1 -4", "1 2 1", PURPLE);
+    DrawCubeV("0 1 -4", "1 2 1", %rainbowColor);
+    DrawSphere("0 1.0 0", 1.0, "20 20 200 200");
     EndMode3D();
 
     DrawFPS(10, 10);
-    DrawText($text, $position.x, $position.y, $fontsize, LIGHTGRAY, true, BLACK);
+    // DrawText($text, $position.x, $position.y, $fontsize, LIGHTGRAY, true, BLACK);
+    DrawText($text, $position.x, GetScreenHeight() - $fontSize - 10, $fontsize, LIGHTGRAY, true, BLACK);
 
     for (%i = 0; %i < $Labels.getCount(); %i++) {
         $Labels.getObject(%i).Draw();

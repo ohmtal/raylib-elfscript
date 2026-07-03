@@ -1,0 +1,407 @@
+//-----------------------------------------------------------------------------
+// Copyright (c) 2026 Thomas Hühn (XXTH)
+// SPDX-License-Identifier: MIT
+//-----------------------------------------------------------------------------
+// Terrain ! :D
+//-----------------------------------------------------------------------------
+
+#include "console/engineAPI.h"
+#include "interface/ConsoleTypes.h"
+#include "raylib.h"
+#include "raymath.h"
+#include "math/mMathRand.h"
+#include "interface/elfTools.h"
+#include "console/simSet.h"
+
+namespace ElfObjects {
+
+using namespace ElfMath;
+
+class TerrainObject: public SimSet
+{
+    typedef SimSet Parent;
+public:
+    DECLARE_CONOBJECT(TerrainObject);
+    StringTableEntry mHeightMapFilename;
+    Vector3 mSize = { 256.f, 64.f, 256.f};
+    Model mModel = { 0 };
+    Vector3 mPosition = { 0.f, 0.f, 0.f };
+
+    Vector<F32> mHeightGrid;
+    S32 mGridWidth = 0;
+    S32 mGridHeight = 0;
+
+
+    TerrainObject() {
+        mHeightMapFilename = StringTable->EmptyString();
+    }
+
+    bool onAdd() override;
+    void onRemove() override;
+
+    static void initPersistFields()
+    {
+        addField("HeightMapFilename", TypeString, Offset(mHeightMapFilename, TerrainObject), "You need to call load() after changing it.");
+        addField("Size", TypeVector3, Offset(mSize, TerrainObject), "You need to call load() after changing it.");
+
+        addField("Position", TypeVector3, Offset(mPosition, TerrainObject), "Render position of the heightmap");
+        Parent::initPersistFields();
+    }
+    // -----
+    F32 getHeight(Vector3 worldPos);
+    Vector3 getNormal(Vector3 worldPos);
+    const char* getRayCollision(Ray ray);
+    // -----
+    bool load() { return loadAutoTexture();}
+    bool loadAutoTexture();
+    bool loadBasic();
+    void drawBasic();
+
+private:
+    void unloadInternal();
+    void genHeightGrid(Image* image, Color* heightPixels );
+};
+
+IMPLEMENT_CONOBJECT(TerrainObject);
+// -----------------------------------------------------------------------------
+// generate the heighgrid from the heighmap image and pixels
+// called before the image is unloaded.
+void TerrainObject::genHeightGrid(Image* image, Color* heightPixels ){
+    if (!image || !heightPixels) return ;
+
+    mGridWidth = image->width;
+    mGridHeight = image->height;
+    mHeightGrid.setSize(mGridWidth * mGridHeight);
+    for (int i = 0; i < mGridWidth * mGridHeight; i++) {
+        mHeightGrid[i] = (float)heightPixels[i].r / 255.0f;
+    }
+}
+// -----------------------------------------------------------------------------
+F32 TerrainObject::getHeight(Vector3 worldPos) {
+    if (mHeightGrid.empty() || mGridWidth <= 1 || mGridHeight <= 1) return mPosition.y;
+
+    // worldpos to localpos
+    F32 localX = worldPos.x - mPosition.x + (mSize.x / 2.0f);
+    F32 localZ = worldPos.z - mPosition.z + (mSize.z / 2.0f);
+
+    // to grid
+    F32 gridX = (localX / mSize.x) * (mGridWidth - 1);
+    F32 gridZ = (localZ / mSize.z) * (mGridHeight - 1);
+
+    // Failsafe: out of terrain FIXME could be used for getTerrainAt...
+    if (gridX < 0.0f || gridX >= (mGridWidth - 1) || gridZ < 0.0f || gridZ >= (mGridHeight - 1)) {
+        return mPosition.y;
+    }
+
+    // get corner points
+    int x0 = (int)gridX;
+    int z0 = (int)gridZ;
+    int x1 = x0 + 1;
+    int z1 = z0 + 1;
+
+     // normalized local position inside the quad
+    F32 dx = gridX - x0;
+    F32 dz = gridZ - z0;
+
+    // heightvalues
+    F32 h00 = mHeightGrid[z0 * mGridWidth + x0]; // top left
+    F32 h10 = mHeightGrid[z0 * mGridWidth + x1]; // top right
+    F32 h01 = mHeightGrid[z1 * mGridWidth + x0]; // bottom left
+    F32 h11 = mHeightGrid[z1 * mGridWidth + x1]; // bottom right
+
+    F32 interpolatedHeightFactor = 0.0f;
+
+    // linear Interpolation
+    if (dx + dz <= 1.0f) {
+        // top left  triangle
+        interpolatedHeightFactor = h00 + dx * (h10 - h00) + dz * (h01 - h00);
+    } else {
+        // bottom right triangle
+        interpolatedHeightFactor = h11 + (1.0f - dx) * (h01 - h11) + (1.0f - dz) * (h10 - h11);
+    }
+
+    // multiply with terrain height
+    return mPosition.y + (interpolatedHeightFactor * mSize.y);
+}
+
+// -----------------------------------------------------------------------------
+void TerrainObject::drawBasic()
+{
+     if (mModel.meshCount > 0) DrawModel(mModel, mPosition, 1.0f, WHITE);
+}
+
+// -----------------------------------------------------------------------------
+void TerrainObject::unloadInternal() {
+    if (mModel.meshCount > 0) {
+        Texture2D terrainTexture = mModel.materials[0].maps[MATERIAL_MAP_ALBEDO].texture;
+        if (terrainTexture.id > 0) {
+            ::UnloadTexture(terrainTexture);
+        }
+
+        ::UnloadModel(mModel);
+        mModel = { 0 };
+    }
+}
+// -----------------------------------------------------------------------------
+bool TerrainObject::loadAutoTexture() {
+    if (!mHeightMapFilename || mHeightMapFilename == StringTable->EmptyString()) {
+        Con::errorf("TerrainObject::load: No HeightMapFilename specified.");
+        return false;
+    }
+
+    Image image = ::LoadImage(mHeightMapFilename);
+    if (!::IsImageValid(image)) {
+        Con::errorf("TerrainObject::load: Could not load heightmap file: %s", mHeightMapFilename);
+        return false;
+    }
+
+    Image diffuseImage = ::GenImageColor(image.width, image.height, BLANK);
+
+    Color* heightPixels = ::LoadImageColors(image);
+    Color* diffusePixels = ::LoadImageColors(diffuseImage);
+
+    int pixelCount = image.width * image.height;
+
+
+    for (int i = 0; i < pixelCount; i++) {
+        U8 height = heightPixels[i].r; // 0 bis 255
+
+        // Ein leichter Zufallswert zwischen -8 und +8 für die Farbhelligkeit (Noise-Effekt)
+        S32 noise = ElfMath::mRandI(-8,8);
+
+        Color baseColor;
+
+        // Zone 1: Strand / Sand
+        if (height < 45) {
+            baseColor.r = (U8)mClamp(230 + noise, 0, 255);
+            baseColor.g = (U8)mClamp(215 + noise, 0, 255);
+            baseColor.b = (U8)mClamp(160 + noise, 0, 255);
+            baseColor.a = 255;
+        }
+        // Zone 2: Übergang Sand zu Gras (Misch-Zone)
+        else if (height < 60) {
+            F32 factor = (height - 45) / 15.0f;
+
+            baseColor.r = (U8)((1.0f - factor) * 230 + factor * 70);
+            baseColor.g = (U8)((1.0f - factor) * 215 + factor * 140);
+            baseColor.b = (U8)((1.0f - factor) * 160 + factor * 60);
+            baseColor.a = 255;
+
+            baseColor.r = (U8)mClamp(baseColor.r + noise, 0, 255);
+            baseColor.g = (U8)mClamp(baseColor.g + noise, 0, 255);
+            baseColor.b = (U8)mClamp(baseColor.b + noise, 0, 255);
+        }
+        // Zone 3: Wiese / Gras
+        else if (height < 135) {
+            int grassNoise = (rand() % 25) - 12;
+            baseColor.r = (U8)mClamp(70 + grassNoise, 0, 255);
+            baseColor.g = (U8)mClamp(140 + grassNoise / 2, 0, 255); // g weniger abdunkeln
+            baseColor.b = (U8)mClamp(60 + grassNoise, 0, 255);
+            baseColor.a = 255;
+        }
+        // Zone 4: Übergang Gras zu Fels
+        else if (height < 155) {
+            F32 factor = (height - 135) / 20.0f;
+            baseColor.r = (U8)((1.0f - factor) * 70 + factor * 110);
+            baseColor.g = (U8)((1.0f - factor) * 140 + factor * 105);
+            baseColor.b = (U8)((1.0f - factor) * 60 + factor * 100);
+            baseColor.a = 255;
+
+            baseColor.r = (U8)mClamp(baseColor.r + noise, 0, 255);
+            baseColor.g = (U8)mClamp(baseColor.g + noise, 0, 255);
+            baseColor.b = (U8)mClamp(baseColor.b + noise, 0, 255);
+        }
+        // Zone 5: Fels / Berge
+        else if (height < 210) {
+            baseColor.r = (U8)mClamp(110 + noise, 0, 255);
+            baseColor.g = (U8)mClamp(105 + noise, 0, 255);
+            baseColor.b = (U8)mClamp(100 + noise, 0, 255);
+            baseColor.a = 255;
+        }
+        // Zone 6: Schnee-Gipfel
+        else {
+            int snowNoise = (rand() % 10) - 5;
+            baseColor.r = (U8)mClamp(245 + snowNoise, 0, 255);
+            baseColor.g = (U8)mClamp(245 + snowNoise, 0, 255);
+            baseColor.b = (U8)mClamp(250 + snowNoise, 0, 255);
+            baseColor.a = 255;
+        }
+
+        diffusePixels[i] = baseColor;
+    }
+
+
+    dMemcpy(diffuseImage.data, diffusePixels, pixelCount * sizeof(Color));
+
+    ::UnloadImageColors(heightPixels);
+    ::UnloadImageColors(diffusePixels);
+
+    unloadInternal();
+
+    Mesh mesh = ::GenMeshHeightmap(image, mSize);
+    this->genHeightGrid(&image, heightPixels);
+
+    ::UnloadImage(image);
+
+    mModel = ::LoadModelFromMesh(mesh);
+
+    Texture2D terrainTexture = ::LoadTextureFromImage(diffuseImage);
+    ::UnloadImage(diffuseImage);
+
+    if (mModel.meshCount > 0) {
+        mModel.materials[0].maps[MATERIAL_MAP_ALBEDO].texture = terrainTexture;
+        mModel.materials[0].maps[MATERIAL_MAP_ALBEDO].color = WHITE;
+    }
+
+    return (mModel.meshCount > 0);
+}
+
+// -----------------------------------------------------------------------------
+bool TerrainObject::loadBasic() {
+    if (!mHeightMapFilename || mHeightMapFilename == StringTable->EmptyString()) {
+        Con::errorf("Terrain::load: No HeightMapFilename specified.");
+        return false;
+    }
+
+    Image image = ::LoadImage(mHeightMapFilename);
+    if (!::IsImageValid(image)) {
+        Con::errorf("Terrain::load: Could not load heightmap file: %s", mHeightMapFilename);
+        return false;
+    }
+
+    unloadInternal();
+
+    Vector3 scale = { mSize.x, mSize.y, mSize.z };
+    Mesh mesh = ::GenMeshHeightmap(image, scale);
+    ::UnloadImage(image);
+
+    mModel = ::LoadModelFromMesh(mesh);
+
+    return (mModel.meshCount > 0);
+}
+
+// -----------------------------------------------------------------------------
+bool TerrainObject::onAdd() {
+    if (!Parent::onAdd()) return false;
+
+    if (mHeightMapFilename && mHeightMapFilename != StringTable->EmptyString()) {
+        if (!load()) {
+            Con::warnf("Terrain::onAdd: Initial load failed for %s", mHeightMapFilename);
+            return false;
+        }
+    }
+    return true;
+}
+
+// -----------------------------------------------------------------------------
+void TerrainObject::onRemove() {
+    unloadInternal();
+    Parent::onRemove();
+}
+
+// -----------------------------------------------------------------------------
+Vector3 TerrainObject::getNormal(Vector3 worldPos) {
+    // Standard-Up-Vektor als Fallback, falls das Grid leer oder außerhalb ist
+    Vector3 defaultNormal = { 0.0f, 1.0f, 0.0f };
+    if (mHeightGrid.empty() || mGridWidth <= 1 || mGridHeight <= 1) return defaultNormal;
+
+    F32 localX = worldPos.x - mPosition.x + (mSize.x / 2.0f);
+    F32 localZ = worldPos.z - mPosition.z + (mSize.z / 2.0f);
+
+    F32 gridX = (localX / mSize.x) * (mGridWidth - 1);
+    F32 gridZ = (localZ / mSize.z) * (mGridHeight - 1);
+
+    if (gridX < 0.0f || gridX >= (mGridWidth - 1) || gridZ < 0.0f || gridZ >= (mGridHeight - 1)) {
+        return defaultNormal;
+    }
+
+    int x0 = (int)gridX;
+    int z0 = (int)gridZ;
+    int x1 = x0 + 1;
+    int z1 = z0 + 1;
+
+    F32 dx = gridX - x0;
+    F32 dz = gridZ - z0;
+
+    // Die echten 3D-Punkte der Eckpunkte auf dem Terrain berechnen
+    // Dazu rechnen wir die Grid-Indices zurück in Welt-Koordinaten
+    F32 worldX0 = mPosition.x - (mSize.x / 2.0f) + ((float)x0 / (mGridWidth - 1)) * mSize.x;
+    F32 worldX1 = mPosition.x - (mSize.x / 2.0f) + ((float)x1 / (mGridWidth - 1)) * mSize.x;
+    F32 worldZ0 = mPosition.z - (mSize.z / 2.0f) + ((float)z0 / (mGridHeight - 1)) * mSize.z;
+    F32 worldZ1 = mPosition.z - (mSize.z / 2.0f) + ((float)z1 / (mGridHeight - 1)) * mSize.z;
+
+    // Die 4 Höhenwerte holen und skalieren
+    F32 y00 = mPosition.y + (mHeightGrid[z0 * mGridWidth + x0] * mSize.y); // Oben Links
+    F32 y10 = mPosition.y + (mHeightGrid[z0 * mGridWidth + x1] * mSize.y); // Oben Rechts
+    F32 y01 = mPosition.y + (mHeightGrid[z1 * mGridWidth + x0] * mSize.y); // Unten Links
+    F32 y11 = mPosition.y + (mHeightGrid[z1 * mGridWidth + x1] * mSize.y); // Unten Rechts
+
+    Vector3 p00 = { worldX0, y00, worldZ0 };
+    Vector3 p10 = { worldX1, y10, worldZ0 };
+    Vector3 p01 = { worldX0, y01, worldZ1 };
+    Vector3 p11 = { worldX1, y11, worldZ1 };
+
+    Vector3 normal = defaultNormal;
+
+    // Je nachdem auf welchem der beiden Dreiecke wir uns befinden
+    if (dx + dz <= 1.0f) {
+        // Oberes/Linkes Dreieck (p00 -> p10 -> p01)
+        Vector3 v1 = { p10.x - p00.x, p10.y - p00.y, p10.z - p00.z };
+        Vector3 v2 = { p01.x - p00.x, p01.y - p00.y, p01.z - p00.z };
+        // Kreuzprodukt v2 x v1 für raylib CCW-Anordnung
+        normal = Vector3CrossProduct(v2, v1);
+    } else {
+        // Unteres/Rechtes Dreieck (p11 -> p01 -> p10)
+        Vector3 v1 = { p01.x - p11.x, p01.y - p11.y, p01.z - p11.z };
+        Vector3 v2 = { p10.x - p11.x, p10.y - p11.y, p10.z - p11.z };
+        // Kreuzprodukt v1 x v2
+        normal = Vector3CrossProduct(v1, v2);
+    }
+
+    // Wichtig: Vektor auf die Länge 1 normalisieren
+    return Vector3Normalize(normal);
+}
+// -----------------------------------------------------------------------------
+const char* TerrainObject::getRayCollision(Ray ray) {
+    if (mModel.meshCount <= 0) return "";
+
+    // Da raylib Modelle über model.transform verschoben werden können,
+    // bauen wir hier die passende Matrix für das Terrain zusammen.
+    // Falls mPosition bereits die Transformation bestimmt, nutzen wir MatrixTranslate:
+    Matrix terrainTransform = MatrixTranslate(mPosition.x, mPosition.y, mPosition.z);
+
+    // Wir prüfen das erste Mesh des Terrains (GenMeshHeightmap erzeugt 1 Mesh)
+    RayCollision collision = ::GetRayCollisionMesh(ray, mModel.meshes[0], terrainTransform);
+
+    // Nutzt deinen bereits geschriebenen Format-Helper!
+    return ElfTools::FormatRayCollision(collision);
+}
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+DefineEngineMethod(TerrainObject, load, bool, (), , "Load or reload the terrain from the specified HeightMapFilename.") {
+    return object->load();
+}
+
+DefineEngineMethod(TerrainObject, drawBasic, void, (), , "Draw basic heightmap") {
+    object->drawBasic();
+}
+
+// ElfScript ==> %height = %terrain.getHeight(%playerPos);
+DefineEngineMethod(TerrainObject, getHeight, F32, (Vector3 position), ,
+                   "Returns the exact terrain height (Y-coordinate) at the given world position.") {
+    return object->getHeight(position);
+}
+
+DefineEngineMethod(TerrainObject, getNormal, Vector3, (Vector3 position), ,
+                   "Returns the surface normal vector at the given world position.") {
+    return object->getNormal(position);
+}
+
+DefineEngineMethod(TerrainObject, getRayCollision, const char*, (Ray ray), ,
+                   "Performs a raycast collision check against the terrain and returns 'X Y Z Nx Ny Nz Dist' or empty string.") {
+    return object->getRayCollision(ray);
+
+}
+
+} //namespace ElfTerrain

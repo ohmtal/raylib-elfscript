@@ -11,6 +11,7 @@
 #include "console/engineAPI.h"
 #include "ConsoleTypes.h"
 #include "elfResource.h"
+#include "elfTools.h"
 
 // -----------------------------------------------------------------------------
 // Basic shapes drawing functions
@@ -73,7 +74,7 @@ DefineEngineFunction( DrawLineEx, void, (Vector2 startPos, Vector2 endPos, float
 
 // RLAPI void DrawLineStrip(const Vector2 *points, int pointCount, Color color);                            // Draw lines sequence (using gl lines)
 DefineEngineFunction( DrawLineStrip, void, (Vector<F32> pointValues, int pointCount, Color color), (RAYWHITE), "Draw lines sequence (using gl lines)") {
-    auto points = ElfResource::getVector2List(pointValues, pointCount);
+    auto points = ElfTools::getVector2List(pointValues, pointCount);
     if (points.size() != (size_t) pointCount ) return;
     DrawLineStrip(points.data(), pointCount, color);
 }
@@ -239,7 +240,7 @@ DefineEngineFunction( DrawTriangleLines, void, (Vector2 v1, Vector2 v2, Vector2 
 
 // RLAPI void DrawTriangleFan(const Vector2 *points, int pointCount, Color color);                          // Draw a triangle fan defined by points (first vertex is the center)
 DefineEngineFunction( DrawTriangleFan, void, (Vector<F32> pointValues, int pointCount, Color color), (RAYWHITE), "Draw a triangle fan defined by points (first vertex is the center)") {
-    auto points = ElfResource::getVector2List(pointValues, pointCount);
+    auto points = ElfTools::getVector2List(pointValues, pointCount);
     if (points.size() != (size_t) pointCount ) return;
 
     DrawTriangleFan(points.data(), pointCount, color);
@@ -248,7 +249,7 @@ DefineEngineFunction( DrawTriangleFan, void, (Vector<F32> pointValues, int point
 
 // RLAPI void DrawTriangleStrip(Vector<F32> pointValues, int pointCount, Color color);                        // Draw a triangle strip defined by points
 DefineEngineFunction( DrawTriangleStrip, void, (Vector<F32> pointValues, int pointCount, Color color), (RAYWHITE), "Draw a triangle strip defined by points") {
-    auto points = ElfResource::getVector2List(pointValues, pointCount);
+    auto points = ElfTools::getVector2List(pointValues, pointCount);
     if (points.size() != (size_t) pointCount ) return;
     DrawTriangleStrip(points.data(), pointCount, color);
 }
@@ -272,35 +273,35 @@ DefineEngineFunction( DrawPolyLinesEx, void, (Vector2 center, int sides, float r
 // -----------------------------------------------------------------------------
 // RLAPI void DrawSplineLinear(const Vector2 *points, int pointCount, float thick, Color color);            // Draw spline: Linear, minimum 2 points
 DefineEngineFunction( DrawSplineLinear, void, (Vector<F32> pointValues, int pointCount, float thick, Color color), (RAYWHITE), "Draw spline: Linear, minimum 2 points") {
-    auto points = ElfResource::getVector2List(pointValues, pointCount);
+    auto points = ElfTools::getVector2List(pointValues, pointCount);
     if (points.size() != (size_t) pointCount ) return;
     DrawSplineLinear(points.data(), pointCount, thick, color);
 }
 
 // RLAPI void DrawSplineBasis(const Vector2 *points, int pointCount, float thick, Color color);             // Draw spline: B-Spline, minimum 4 points
 DefineEngineFunction( DrawSplineBasis, void, (Vector<F32> pointValues, int pointCount, float thick, Color color), (RAYWHITE), "Draw spline: B-Spline, minimum 4 points") {
-    auto points = ElfResource::getVector2List(pointValues, pointCount);
+    auto points = ElfTools::getVector2List(pointValues, pointCount);
     if (points.size() != (size_t) pointCount ) return;
     DrawSplineBasis(points.data(), pointCount, thick, color);
 }
 
 // RLAPI void DrawSplineCatmullRom(const Vector2 *points, int pointCount, float thick, Color color);        // Draw spline: Catmull-Rom, minimum 4 points
 DefineEngineFunction( DrawSplineCatmullRom, void, (Vector<F32> pointValues, int pointCount, float thick, Color color), (RAYWHITE), "Draw spline: Catmull-Rom, minimum 4 points") {
-    auto points = ElfResource::getVector2List(pointValues, pointCount);
+    auto points = ElfTools::getVector2List(pointValues, pointCount);
     if (points.size() != (size_t) pointCount ) return;
     DrawSplineCatmullRom(points.data(), pointCount, thick, color);
 }
 
 // RLAPI void DrawSplineBezierQuadratic(const Vector2 *points, int pointCount, float thick, Color color);   // Draw spline: Quadratic Bezier, minimum 3 points (1 control point): [p1, c2, p3, c4...]
 DefineEngineFunction( DrawSplineBezierQuadratic, void, (Vector<F32> pointValues, int pointCount, float thick, Color color), (RAYWHITE), "Draw spline: Quadratic Bezier, minimum 3 points (1 control point): [p1, c2, p3, c4...]") {
-    auto points = ElfResource::getVector2List(pointValues, pointCount);
+    auto points = ElfTools::getVector2List(pointValues, pointCount);
     if (points.size() != (size_t) pointCount ) return;
     DrawSplineBezierQuadratic(points.data(), pointCount, thick, color);
 }
 
 // RLAPI void DrawSplineBezierCubic(const Vector2 *points, int pointCount, float thick, Color color);       // Draw spline: Cubic Bezier, minimum 4 points (2 control points): [p1, c2, c3, p4, c5, c6...]
 DefineEngineFunction( DrawSplineBezierCubic, void, (Vector<F32> pointValues, int pointCount, float thick, Color color), (RAYWHITE), "Draw spline: Cubic Bezier, minimum 4 points (2 control points): [p1, c2, c3, p4, c5, c6...]") {
-    auto points = ElfResource::getVector2List(pointValues, pointCount);
+    auto points = ElfTools::getVector2List(pointValues, pointCount);
     if (points.size() != (size_t) pointCount ) return;
     DrawSplineBezierCubic(points.data(), pointCount, thick, color);
 }
@@ -402,7 +403,7 @@ DefineEngineFunction( CheckCollisionPointLine, bool, (Vector2 point, Vector2 p1,
 
 // RLAPI bool CheckCollisionPointPoly(Vector2 point, const Vector2 *points, int pointCount);                // Check if point is within a polygon described by array of vertices
 DefineEngineFunction( CheckCollisionPointPoly, bool, (Vector2 point, Vector<F32> pointValues, int pointCount), , "Check if point is within a polygon described by array of vertices") {
-    auto points = ElfResource::getVector2List(pointValues, pointCount);
+    auto points = ElfTools::getVector2List(pointValues, pointCount);
     if (points.size() != (size_t) pointCount ) return false;
 
     return CheckCollisionPointPoly(point, points.data(), pointCount);
