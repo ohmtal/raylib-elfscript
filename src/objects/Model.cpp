@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
 // Model
+// [ ] TODO add SceneObjectStub  Class
+// [ ] TODO add getRayCollision , maybe rename to rayCast
 //-----------------------------------------------------------------------------
 
 #include "console/engineAPI.h"
@@ -15,9 +17,9 @@
 
 namespace ElfObjects {
 
-class ModelObject : public SimSet
+class ModelObject : public SimGroup
 {
-    typedef SimSet Parent;
+    typedef SimGroup Parent;
 public:
     DECLARE_CONOBJECT(ModelObject);
 
@@ -34,12 +36,12 @@ public:
         Parent::initPersistFields();
     }
 
-    void draw();
+    void draw(bool recursive = false);
 };
 
 IMPLEMENT_CONOBJECT(ModelObject);
 //-----------------------------------------------------------------------------
-void ModelObject::draw() {
+void ModelObject::draw(bool recursive) {
     if (mModelId <= 0) return;
 
     Model* baseModel = ElfResource::ModelMap.get(mModelId);
@@ -59,12 +61,32 @@ void ModelObject::draw() {
     ::DrawModel(*baseModel, Vector3{0.0f, 0.0f, 0.0f}, 1.0f, WHITE);
 
     baseModel->transform = oldTransform;
+
+    // WARNING may end in endless loop.
+    if (recursive) {
+        lock();
+        SimSet::iterator itr;
+        for(itr = begin(); itr != end(); itr++)
+        {
+            SimObject *obj = *itr;
+            if (obj == NULL) continue;
+            ModelObject* child = dynamic_cast<ModelObject *>(obj);
+            if (child != nullptr) {
+                child->draw(true);
+            }
+        }
+        unlock();
+    }
+
 }
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod(ModelObject, draw, void, (), , "Draws this object instance using its assigned model.") {
-    object->draw();
+DefineEngineMethod(ModelObject, draw, void, (bool recursive),(false) ,
+    "Draws this object instance using its assigned model."
+    "@param recursive draw it's childs and their childs if any "
+) {
+    object->draw(recursive);
 }
 
 } //namespace

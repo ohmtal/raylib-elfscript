@@ -82,7 +82,7 @@ function TerrainDemo::Render(%this) {
       // level models render:
       %l = %this.levelObjects;
       %cnt = %l.getCount();
-      for (%i = 0; %i < %cnt; %i++) %l.getObject(%i).draw();
+      for (%i = 0; %i < %cnt; %i++) %l.getObject(%i).draw( true );
 
 
       // DrawGrid(20, 1.0);
@@ -110,9 +110,9 @@ function TerrainDemo::spawnScriptTree(%this, %worldPos)
     };
     %trunk.add( %crown ); //link them together
 
-    // add to levelObjects
+    // add to levelObjects only trunk since crown is a child!
     %this.levelObjects.add(%trunk);
-    %this.levelObjects.add(%crown);
+    // now using recursive %this.levelObjects.add(%crown);
 
     return %trunk;
 }

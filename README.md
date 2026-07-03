@@ -1,6 +1,6 @@
 # raylib-elfscript 
  
-Raylib binding of Elf(Torque)Script.
+This is an MIT-licensed ElfScript (aka TorqueScript) binding for Raylib 6.0.
 
 ## Setup: 
 

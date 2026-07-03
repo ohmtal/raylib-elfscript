@@ -2,7 +2,8 @@
 // Copyright (c) 2026 Thomas Hühn (XXTH)
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
-// Terrain ! :D
+// Terrain ! :D,
+// [ ] TODO add SceneObjectStub  Class
 //-----------------------------------------------------------------------------
 
 #include "console/engineAPI.h"
@@ -50,7 +51,7 @@ public:
     // -----
     F32 getHeight(Vector3 worldPos);
     Vector3 getNormal(Vector3 worldPos);
-    const char* getRayCollision(Ray ray);
+    RayCollision getRayCollision(Ray ray);
     // -----
     bool load() { return loadAutoTexture();}
     bool loadAutoTexture();
@@ -166,19 +167,19 @@ bool TerrainObject::loadAutoTexture() {
     for (int i = 0; i < pixelCount; i++) {
         U8 height = heightPixels[i].r; // 0 bis 255
 
-        // Ein leichter Zufallswert zwischen -8 und +8 für die Farbhelligkeit (Noise-Effekt)
+        // Noise-Effekt
         S32 noise = ElfMath::mRandI(-8,8);
 
         Color baseColor;
 
-        // Zone 1: Strand / Sand
+        // Zone 1: Beach / Sand
         if (height < 45) {
             baseColor.r = (U8)mClamp(230 + noise, 0, 255);
             baseColor.g = (U8)mClamp(215 + noise, 0, 255);
             baseColor.b = (U8)mClamp(160 + noise, 0, 255);
             baseColor.a = 255;
         }
-        // Zone 2: Übergang Sand zu Gras (Misch-Zone)
+        // Zone 2: Transition from sand to grass (mixed zone)
         else if (height < 60) {
             F32 factor = (height - 45) / 15.0f;
 
@@ -191,7 +192,7 @@ bool TerrainObject::loadAutoTexture() {
             baseColor.g = (U8)mClamp(baseColor.g + noise, 0, 255);
             baseColor.b = (U8)mClamp(baseColor.b + noise, 0, 255);
         }
-        // Zone 3: Wiese / Gras
+        // Zone 3: Meadow / Grass
         else if (height < 135) {
             int grassNoise = (rand() % 25) - 12;
             baseColor.r = (U8)mClamp(70 + grassNoise, 0, 255);
@@ -199,7 +200,7 @@ bool TerrainObject::loadAutoTexture() {
             baseColor.b = (U8)mClamp(60 + grassNoise, 0, 255);
             baseColor.a = 255;
         }
-        // Zone 4: Übergang Gras zu Fels
+        // Zone 4: Transition from grass to rock
         else if (height < 155) {
             F32 factor = (height - 135) / 20.0f;
             baseColor.r = (U8)((1.0f - factor) * 70 + factor * 110);
@@ -211,14 +212,14 @@ bool TerrainObject::loadAutoTexture() {
             baseColor.g = (U8)mClamp(baseColor.g + noise, 0, 255);
             baseColor.b = (U8)mClamp(baseColor.b + noise, 0, 255);
         }
-        // Zone 5: Fels / Berge
+        // Zone 5: Rock / Mountains
         else if (height < 210) {
             baseColor.r = (U8)mClamp(110 + noise, 0, 255);
             baseColor.g = (U8)mClamp(105 + noise, 0, 255);
             baseColor.b = (U8)mClamp(100 + noise, 0, 255);
             baseColor.a = 255;
         }
-        // Zone 6: Schnee-Gipfel
+        // Zone 6: Snow Peaks
         else {
             int snowNoise = (rand() % 10) - 5;
             baseColor.r = (U8)mClamp(245 + snowNoise, 0, 255);
@@ -301,7 +302,7 @@ void TerrainObject::onRemove() {
 
 // -----------------------------------------------------------------------------
 Vector3 TerrainObject::getNormal(Vector3 worldPos) {
-    // Standard-Up-Vektor als Fallback, falls das Grid leer oder außerhalb ist
+
     Vector3 defaultNormal = { 0.0f, 1.0f, 0.0f };
     if (mHeightGrid.empty() || mGridWidth <= 1 || mGridHeight <= 1) return defaultNormal;
 
@@ -323,14 +324,14 @@ Vector3 TerrainObject::getNormal(Vector3 worldPos) {
     F32 dx = gridX - x0;
     F32 dz = gridZ - z0;
 
-    // Die echten 3D-Punkte der Eckpunkte auf dem Terrain berechnen
-    // Dazu rechnen wir die Grid-Indices zurück in Welt-Koordinaten
+    // Calculate the real 3D points of the vertices on the terrain To do this,
+    // we calculate the grid indices back into world coordinates
     F32 worldX0 = mPosition.x - (mSize.x / 2.0f) + ((float)x0 / (mGridWidth - 1)) * mSize.x;
     F32 worldX1 = mPosition.x - (mSize.x / 2.0f) + ((float)x1 / (mGridWidth - 1)) * mSize.x;
     F32 worldZ0 = mPosition.z - (mSize.z / 2.0f) + ((float)z0 / (mGridHeight - 1)) * mSize.z;
     F32 worldZ1 = mPosition.z - (mSize.z / 2.0f) + ((float)z1 / (mGridHeight - 1)) * mSize.z;
 
-    // Die 4 Höhenwerte holen und skalieren
+    // Fetching and scaling the 4 height values
     F32 y00 = mPosition.y + (mHeightGrid[z0 * mGridWidth + x0] * mSize.y); // Oben Links
     F32 y10 = mPosition.y + (mHeightGrid[z0 * mGridWidth + x1] * mSize.y); // Oben Rechts
     F32 y01 = mPosition.y + (mHeightGrid[z1 * mGridWidth + x0] * mSize.y); // Unten Links
@@ -343,38 +344,30 @@ Vector3 TerrainObject::getNormal(Vector3 worldPos) {
 
     Vector3 normal = defaultNormal;
 
-    // Je nachdem auf welchem der beiden Dreiecke wir uns befinden
+    // Depending on which of the two triangles we are on
     if (dx + dz <= 1.0f) {
         // Oberes/Linkes Dreieck (p00 -> p10 -> p01)
         Vector3 v1 = { p10.x - p00.x, p10.y - p00.y, p10.z - p00.z };
         Vector3 v2 = { p01.x - p00.x, p01.y - p00.y, p01.z - p00.z };
-        // Kreuzprodukt v2 x v1 für raylib CCW-Anordnung
+        // Cross product v2 x v1 for raylib CCW array
         normal = Vector3CrossProduct(v2, v1);
     } else {
-        // Unteres/Rechtes Dreieck (p11 -> p01 -> p10)
+        // Lower/Right Triangle (p11 -> p01 -> p10)
         Vector3 v1 = { p01.x - p11.x, p01.y - p11.y, p01.z - p11.z };
         Vector3 v2 = { p10.x - p11.x, p10.y - p11.y, p10.z - p11.z };
-        // Kreuzprodukt v1 x v2
+        // Cross product v1 x v2
         normal = Vector3CrossProduct(v1, v2);
     }
 
-    // Wichtig: Vektor auf die Länge 1 normalisieren
+    // normalize
     return Vector3Normalize(normal);
 }
 // -----------------------------------------------------------------------------
-const char* TerrainObject::getRayCollision(Ray ray) {
-    if (mModel.meshCount <= 0) return "";
+RayCollision TerrainObject::getRayCollision(Ray ray) {
+    if (mModel.meshCount <= 0) return RayCollision({0});
 
-    // Da raylib Modelle über model.transform verschoben werden können,
-    // bauen wir hier die passende Matrix für das Terrain zusammen.
-    // Falls mPosition bereits die Transformation bestimmt, nutzen wir MatrixTranslate:
     Matrix terrainTransform = MatrixTranslate(mPosition.x, mPosition.y, mPosition.z);
-
-    // Wir prüfen das erste Mesh des Terrains (GenMeshHeightmap erzeugt 1 Mesh)
-    RayCollision collision = ::GetRayCollisionMesh(ray, mModel.meshes[0], terrainTransform);
-
-    // Nutzt deinen bereits geschriebenen Format-Helper!
-    return ElfTools::FormatRayCollision(collision);
+    return ::GetRayCollisionMesh(ray, mModel.meshes[0], terrainTransform);
 }
 
 // -----------------------------------------------------------------------------
@@ -398,9 +391,10 @@ DefineEngineMethod(TerrainObject, getNormal, Vector3, (Vector3 position), ,
     return object->getNormal(position);
 }
 
-DefineEngineMethod(TerrainObject, getRayCollision, const char*, (Ray ray), ,
-                   "Performs a raycast collision check against the terrain and returns 'X Y Z Nx Ny Nz Dist' or empty string.") {
-    return object->getRayCollision(ray);
+DefineEngineMethod(TerrainObject, getRayCollision, String, (Ray ray), ,
+                   "Performs a raycast collision check against the terrain"
+                   "and returns 'X Y Z Nx Ny Nz Dist' or empty string.") {
+    return ElfTools::FormatRayCollision( object->getRayCollision(ray));
 
 }
 
