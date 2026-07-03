@@ -99,5 +99,10 @@ void SceneObject::updateWorldBox(const BoundingBox& localBox, const Matrix& worl
 }
 
 //-----------------------------------------------------------------------------
+RayCollision SceneObject::castRay(Ray ray) {
+    return ::GetRayCollisionBox(ray, mWorldBox);
+}
+
+//-----------------------------------------------------------------------------
 
 }//namespace

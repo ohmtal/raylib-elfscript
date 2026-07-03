@@ -3,9 +3,12 @@ function createTerrainDemo() {
         class = "TerrainDemo";
     };
 
-    %this = %obj; //map
-
-    // handling draw and delete
+    return %obj;
+}
+//----------------------------------------------------------------------
+function TerrainDemo::onAdd(%this) {
+    // keep objects here to cleanup, we also have all
+    // Terrain/Model objects in ClientContainer
     %this.levelObjects = new SimSet();
 
     // ---- camera
@@ -77,20 +80,20 @@ function createTerrainDemo() {
     %this.sunTime = 0.0; // 0.0 .. 360.0
 
 
-    return %obj;
-}
-//----------------------------------------------------------------------
-function TerrainDemo::onAdd(%this) {
+    %this.gui = new Gui() {
+        class ="LightGui";
+    };
 
-    SetTargetFPS(60); //FPS TEST only calling module
     return true;
 }
 //----------------------------------------------------------------------
 function TerrainDemo::OnRemove(%this) {
     EnableCursor();
+
     %this.camera.delete();
     %this.levelObjects.deleteObjects();
     %this.levelObjects.delete();
+    %this.gui.delete();
 
     UnloadShader(%this.sunShader);
 
@@ -204,20 +207,26 @@ function TerrainDemo::Render(%this) {
     %this.updateSun(%dt);
 
     %cam.Begin();
-      // level models render:
-      %l = %this.levelObjects;
-      %cnt = %l.getCount();
-      for (%i = 0; %i < %cnt; %i++) %l.getObject(%i).draw(  );
+      ClientContainerDrawObjects();
     %cam.End();
 
-    DrawText("CAM:" SPC %cam.position,10,10);
+
+    %gui = %this.gui;
+    %gui.Begin(10,10);
+    %gui.Write("Terrain Demo", 20, WHITE);
+    %gui.Separator(140);
+    %gui.spacing ="10 3";
+    %gui.Write("cam pos:" SPC %cam.position, 10, WHITE);
+    %gui.Write("cam tar:" SPC %cam.target, 10, WHITE);
+    %gui.Write("time   :" SPC %this.sunTime, 10, WHITE);
+
 }
 
 //----------------------------------------------------------------------
 function TerrainDemo::spawnScriptTree(%this, %worldPos)
 {
     %trunkHeight = getRandomF(1.5, 3.5);
-    %trunkThickness = getRandomF(0.4, 0.8);
+    %trunkThickness = getRandomF(0.4, 1.2);
 
     %trunk = new ModelObject() {
         Position = %worldPos.x SPC (%worldPos.y + (%trunkHeight / 2.0)) SPC %worldPos.z;
@@ -225,7 +234,6 @@ function TerrainDemo::spawnScriptTree(%this, %worldPos)
         Scale = %trunkThickness SPC %trunkHeight SPC %trunkThickness;
     };
 
-    // 2. Wunschgröße der Krone (Kugel) bestimmen
     %crownScaleX = getRandomF(1.0, 1.5);
     %crownScaleY = getRandomF(1.0, 1.5);
     %crownScaleZ = getRandomF(1.0, 1.5);

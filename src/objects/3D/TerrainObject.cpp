@@ -16,15 +16,16 @@
 #include "interface/elfTools.h"
 #include "interface/ConsoleTypes.h"
 #include "interface/elfResource.h"
+#include "SceneObject.h"
 
 
 namespace ElfObjects {
 
 using namespace ElfMath;
 
-class TerrainObject: public SimSet
+class TerrainObject: public SceneObject
 {
-    typedef SimSet Parent;
+    typedef SceneObject Parent;
 public:
     DECLARE_CONOBJECT(TerrainObject);
     StringTableEntry mHeightMapFilename;
@@ -55,14 +56,14 @@ public:
     // -----
     F32 getHeight(Vector3 worldPos);
     Vector3 getNormal(Vector3 worldPos);
-    RayCollision getRayCollision(Ray ray);
+    RayCollision castRay(Ray ray) override;
     // -----
     S32 getModelId() {return mModelId;}; //model id in resource manager
     // -----
     bool load() { return loadAutoTexture();}
     bool loadAutoTexture();
     bool loadBasic();
-    void draw();
+    void draw() override;
 
 private:
     S32 mModelId = 0; // model id in resource manager
@@ -380,7 +381,7 @@ Vector3 TerrainObject::getNormal(Vector3 worldPos) {
     return Vector3Normalize(normal);
 }
 // -----------------------------------------------------------------------------
-RayCollision TerrainObject::getRayCollision(Ray ray) {
+RayCollision TerrainObject::castRay(Ray ray) {
     if (mModel.meshCount <= 0) return RayCollision({0});
 
     Matrix terrainTransform = MatrixTranslate(mPosition.x, mPosition.y, mPosition.z);
@@ -411,7 +412,7 @@ DefineEngineMethod(TerrainObject, getNormal, Vector3, (Vector3 position), ,
 DefineEngineMethod(TerrainObject, getRayCollision, String, (Ray ray), ,
                    "Performs a raycast collision check against the terrain"
                    "and returns 'X Y Z Nx Ny Nz Dist' or empty string.") {
-    return ElfTools::FormatRayCollision( object->getRayCollision(ray));
+    return ElfTools::FormatRayCollision( object->castRay(ray));
 
 }
 

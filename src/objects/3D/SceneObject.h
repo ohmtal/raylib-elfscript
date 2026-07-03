@@ -36,6 +36,8 @@ public:
     // for childs which are mounted on parent object
     virtual void drawTransformed(const Matrix& parentTransform);
 
+    virtual RayCollision castRay(Ray ray);
+
     static void initPersistFields();
 
 protected:

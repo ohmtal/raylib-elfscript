@@ -1,3 +1,66 @@
+class  models_first_person_maze {
+  public:
+   Script render( string this )...) {}
+   Script onRemove( string this )...) {}
+   Script onAdd( string this )...) {}
+};
+class  textures_sprite_animation {
+  public:
+   Script render( string this )...) {}
+   Script onRemove( string this )...) {}
+   Script onAdd( string this )...) {}
+};
+class  textures_background_scrolling {
+  public:
+   Script render( string this )...) {}
+   Script onRemove( string this )...) {}
+   Script onAdd( string this )...) {}
+};
+class  Eyes {
+  public:
+   Script render( string this )...) {}
+   Script onAdd( string this )...) {}
+};
+class  textures_mouse_painting {
+  public:
+   Script render( string this )...) {}
+   Script onRemove( string this )...) {}
+   Script onAdd( string this )...) {}
+   Script clear( string this )...) {}
+};
+class  GridTest {
+  public:
+   Script newTerrain( string this )...) {}
+   Script init( string this )...) {}
+   Script render( string this )...) {}
+   Script onRemove( string this )...) {}
+   Script onAdd( string this )...) {}
+};
+class  RenderMap {
+  public:
+   Script render( string this )...) {}
+   Script onRemove( string this )...) {}
+   Script onAdd( string this )...) {}
+};
+class  BatchTest {
+  public:
+   Script render( string this )...) {}
+   Script onRemove()...) {}
+   Script onAdd( string this )...) {}
+};
+class  DeltaTime {
+  public:
+   Script render( string this )...) {}
+   Script onAdd( string this )...) {}
+   Script onRemove( string this )...) {}
+};
+class  shapes_starfield_batch {
+  public:
+   Script render( string this )...) {}
+   Script onAdd( string this )...) {}
+   Script UpdateScreenSize( string this )...) {}
+   Script onRemove( string this )...) {}
+};
 /*!
 @brief Base class for almost all objects involved in the simulation.
 @ingroup Console
@@ -301,119 +364,6 @@ NOTE: this cant be used with arrays like setFieldValue@param fieldName The name 
    pid persistentId;
    /// @}
 };
-class  Gui : public SimObject {
-  public:
-   void Begin( float x, float y ) {}
-   void SameLine( float relativeX=0 ) {}
-   void enhanceCursor() {}
-   void resetStates() {}
-   void setStates( float width, float height ) {}
-   bool ButtonV( Vector2 size, String text ) {}
-   bool Button( float width, String text ) {}
-   bool checkBox( String text, bool value ) {}
-   /*! variable example: $MyValue or %this.object.getId() @ ".enabled" */
-   bool checkBoxVar( String text, String variable ) {}
-   bool Write( String text, int fontSize=-1, Color color=LIGHTGRAY ) {}
-   bool Label( String text ) {}
-   bool SeparatorV( Vector2 size, Color color ) {}
-   bool Separator( float width, Color color=LIGHTGRAY ) {}
-   /*! @name Ungrouped
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Object
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Editing
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Persistence
-   @{ */
-   /*! */
-   /// @}
-   /*!
-    */
-   float left;
-   /*!
-    */
-   Vector2 cursor;
-   /*!
-    */
-   Vector2 spacing;
-   /*!
-    */
-   Vector2 defaultSize;
-   /*!
-    */
-   bool SameLine;
-   /*!
-    */
-   bool isFocused;
-   /*!
-    */
-   bool isPressed;
-   /*!
-    */
-   bool isClicked;
-   /*!
-    */
-   Rectangle lastBounds;
-   /*!
-    */
-   int lastState;
-};
-class  LightGui : public Gui {
-  public:
-   Script LightBox( string this, string light )...) {}
-};
-/*!
-@brief A script-level OOP object which allows binding of a class, superClass and arguments along with declaration of methods.
-ScriptObjects are extrodinarily powerful objects that allow defining of any type of data required. They can optionally have
-a class and a superclass defined for added control of multiple ScriptObjects through a simple class definition.
-@tsexample
-new ScriptObject(Game)
-{
-   class = "DeathMatchGame";
-   superClass = GameCore;
-   genre = "Action FPS"; // Note the new, non-Torque variable
-};
-@endtsexample
-@see SimObject
-@ingroup Console
- */
-class  ScriptObject : public SimObject {
-  public:
-   /*! @name Ungrouped
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Object
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Editing
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Persistence
-   @{ */
-   /*! */
-   /// @}
-};
-class  Lights : public ScriptObject {
-  public:
-   Script render( string this )...) {}
-   Script onRemove( string this )...) {}
-   Script onAdd( string this )...) {}
-};
-class  Main : public ScriptObject {
-  public:
-   Script loop( string this )...) {}
-   Script loadModule( string this, string setNewModuleIndex )...) {}
-   Script init( string this )...) {}
-};
 /*!
 @brief A collection of SimObjects.
 It is often necessary to keep track of an arbitrary set of SimObjects. For instance, Torque's networking code needs to not only keep track of the set of objects which need to be ghosted, but also the set of objects which must <i>always</i> be ghosted. It does this by working with two sets. The first of these is the RootGroup (which is actually a SimGroup) and the second is the GhostAlwaysSet, which contains objects which must always be ghosted to the client.
@@ -524,6 +474,302 @@ class  SimSet : public SimObject {
    /*! */
    /// @}
 };
+class  SceneObject : public SimSet {
+  public:
+   /*!
+    */
+   Vector3 Position;
+   /*!
+    */
+   Vector3 Rotation;
+   /*!
+    */
+   Vector3 Scale;
+   /*! @name Ungrouped
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Object
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Editing
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Persistence
+   @{ */
+   /*! */
+   /// @}
+};
+class  TerrainObject : public SceneObject {
+  public:
+   /*! Load or reload the terrain from the specified HeightMapFilename. */
+   bool load() {}
+   /*! Draw  heightmap */
+   void draw() {}
+   /*! Returns the exact terrain height (Y-coordinate) at the given world position. */
+   F32 getHeight( Vector3 position ) {}
+   /*! Returns the surface normal vector at the given world position. */
+   Vector3 getNormal( Vector3 position ) {}
+   /*! Performs a raycast collision check against the terrainand returns 'X Y Z Nx Ny Nz Dist' or empty string. */
+   String getRayCollision( Ray ray ) {}
+   /*! Returns the resource-manager compatible model ID of the terrain's 3D mesh. */
+   S32 getModelId() {}
+   /*!
+   You need to call load() after changing it.
+   
+    */
+   string HeightMapFilename;
+   /*!
+   You need to call load() after changing it.
+   
+    */
+   Vector3 Size;
+   /*! @name Ungrouped
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Object
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Editing
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Persistence
+   @{ */
+   /*! */
+   /// @}
+};
+/// Stub class
+/// 
+/// @note This is a stub class to ensure a proper class hierarchy. No 
+///       information was available for this class.
+class  terrain : public TerrainObject {
+  public:
+};
+class  Camera3DObject : public SimObject {
+  public:
+   Script updateFly( string this, string dt )...) {}
+   /*! Update camera position for selected mode (e.g. $CAMERA_FIRST_PERSON, $CAMERA_FREE) */
+   void Update( int mode ) {}
+   /*! Update camera movement/rotation with pro parameters */
+   void updatePro( Vector3 movement, Vector3 rotation, float zoom ) {}
+   /*! Get a 3D ray trace from a screen position (e.g. mouse) */
+   Ray getScreenToWorldRay( Vector2 position ) {}
+   /*! Get a 3D ray trace from a screen position within a specific custom viewport size */
+   Ray getScreenToWorldRayEx( Vector2 position, int width, int height ) {}
+   /*! Get 2D screen space position for a 3D world space position */
+   Vector2 getWorldToScreen( Vector3 position ) {}
+   /*! Get 2D screen space position for a 3D world space position inside a specific custom viewport size */
+   Vector2 getWorldToScreenEx( Vector3 position, int width, int height ) {}
+   /*! Get the 3D camera transform matrix (view matrix) */
+   Matrix getCameraMatrix() {}
+   /*! BeginMode3D - Begins 3D mode with a Camera3DObject */
+   void Begin() {}
+   /*! EndMode3D - End 3D mode with custom camera */
+   void End() {}
+   /*! GetCameraForward */
+   Vector3 getForwardVector() {}
+   /*! GetCameraUp */
+   Vector3 getUpVector() {}
+   /*! GetCameraRight */
+   Vector3 getRightVector() {}
+   /*! Moves the camera forward/backward based on distance. If moveInWorldPlane is true, movement is locked to the XZ plane. */
+   void moveForward( float distance, bool moveInWorldPlane ) {}
+   /*! Moves the camera up/down along its local up vector. */
+   void moveUp( float distance ) {}
+   /*! Moves the camera right/left based on distance. If moveInWorldPlane is true, movement is locked to the XZ plane. */
+   void moveRight( float distance, bool moveInWorldPlane ) {}
+   /*! Moves the camera closer or further away from its target point. */
+   void moveToTarget( float delta ) {}
+   /*! Rotates the camera horizontally (yaw) around its own axis or around the target point (angle in radians). */
+   void yaw( float angle, bool rotateAroundTarget ) {}
+   /*! Rotates the camera vertically (pitch) with optional view locking (angle in radians). */
+   void pitch( float angle, bool lockView, bool rotateAroundTarget, bool rotateUp ) {}
+   /*! Tilts the camera (roll) along its view axis (angle in radians). */
+   void roll( float angle ) {}
+   /*! Returns the camera's view matrix. */
+   Matrix getViewMatrix() {}
+   /*! Returns the camera's projection matrix based on the given aspect ratio. */
+   Matrix getProjectionMatrix( float aspect ) {}
+   /*! @name Ungrouped
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Object
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Editing
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Persistence
+   @{ */
+   /*! */
+   /// @}
+   /*!
+   Camera position in world space
+   
+    */
+   Vector3 Position;
+   /*!
+   Camera target point in world space
+   
+    */
+   Vector3 target;
+   /*!
+   Camera up vector (defines the orientation)
+   
+    */
+   Vector3 up;
+   /*!
+   Camera field-of-view aperture in Y (degrees) in perspective, or width in orthographic
+   
+    */
+   float fovy;
+   /*!
+   Camera projection type (CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC)
+   
+    */
+   int projection;
+};
+/// Stub class
+/// 
+/// @note This is a stub class to ensure a proper class hierarchy. No 
+///       information was available for this class.
+class  camera : public Camera3DObject {
+  public:
+};
+class  Player {
+  public:
+   Script DropToGround()...) {}
+};
+/*!
+@brief A script-level OOP object which allows binding of a class, superClass and arguments along with declaration of methods.
+ScriptObjects are extrodinarily powerful objects that allow defining of any type of data required. They can optionally have
+a class and a superclass defined for added control of multiple ScriptObjects through a simple class definition.
+@tsexample
+new ScriptObject(Game)
+{
+   class = "DeathMatchGame";
+   superClass = GameCore;
+   genre = "Action FPS"; // Note the new, non-Torque variable
+};
+@endtsexample
+@see SimObject
+@ingroup Console
+ */
+class  ScriptObject : public SimObject {
+  public:
+   /*! @name Ungrouped
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Object
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Editing
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Persistence
+   @{ */
+   /*! */
+   /// @}
+};
+class  TerrainDemo : public ScriptObject {
+  public:
+   Script onMouseLeftClick( string this )...) {}
+   Script spawnScriptTree( string this, string worldPos )...) {}
+   Script render( string this )...) {}
+   Script updateSun( string this, string dt )...) {}
+   Script onRemove( string this )...) {}
+   Script onAdd( string this )...) {}
+};
+class  Gui : public SimObject {
+  public:
+   void Begin( float x, float y ) {}
+   void SameLine( float relativeX=0 ) {}
+   void enhanceCursor() {}
+   void resetStates() {}
+   void setStates( float width, float height ) {}
+   bool ButtonV( Vector2 size, String text ) {}
+   bool Button( float width, String text ) {}
+   bool checkBox( String text, bool value ) {}
+   /*! variable example: $MyValue or %this.object.getId() @ ".enabled" */
+   bool checkBoxVar( String text, String variable ) {}
+   bool Write( String text, int fontSize=-1, Color color=LIGHTGRAY ) {}
+   bool Label( String text ) {}
+   bool SeparatorV( Vector2 size, Color color ) {}
+   bool Separator( float width, Color color=LIGHTGRAY ) {}
+   /*! @name Ungrouped
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Object
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Editing
+   @{ */
+   /*! */
+   /// @}
+   /*! @name Persistence
+   @{ */
+   /*! */
+   /// @}
+   /*!
+    */
+   float left;
+   /*!
+    */
+   Vector2 cursor;
+   /*!
+    */
+   Vector2 spacing;
+   /*!
+    */
+   Vector2 defaultSize;
+   /*!
+    */
+   bool SameLine;
+   /*!
+    */
+   bool isFocused;
+   /*!
+    */
+   bool isPressed;
+   /*!
+    */
+   bool isClicked;
+   /*!
+    */
+   Rectangle lastBounds;
+   /*!
+    */
+   int lastState;
+};
+class  LightGui : public Gui {
+  public:
+   Script LightBox( string this, string light )...) {}
+};
+class  Lights {
+  public:
+   Script render( string this )...) {}
+   Script onRemove( string this )...) {}
+   Script onAdd( string this )...) {}
+};
+class  Main : public ScriptObject {
+  public:
+   Script loop( string this )...) {}
+   Script loadModule( string this, string setNewModuleIndex )...) {}
+   Script init( string this )...) {}
+};
 /// Stub class
 /// 
 /// @note This is a stub class to ensure a proper class hierarchy. No 
@@ -589,34 +835,6 @@ class  SimGroup : public SimSet {
 ///       information was available for this class.
 class  RootGroup : public SimGroup {
   public:
-};
-class  SceneObject : public SimSet {
-  public:
-   /*!
-    */
-   Vector3 Position;
-   /*!
-    */
-   Vector3 Rotation;
-   /*!
-    */
-   Vector3 Scale;
-   /*! @name Ungrouped
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Object
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Editing
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Persistence
-   @{ */
-   /*! */
-   /// @}
 };
 class  RenderTextureObject : public SimObject {
   public:
@@ -702,92 +920,6 @@ class  Camera2DObject : public SimObject {
    
     */
    float zoom;
-};
-class  Camera3DObject : public SimObject {
-  public:
-   /*! Update camera position for selected mode (e.g. $CAMERA_FIRST_PERSON, $CAMERA_FREE) */
-   void Update( int mode ) {}
-   /*! Update camera movement/rotation with pro parameters */
-   void updatePro( Vector3 movement, Vector3 rotation, float zoom ) {}
-   /*! Get a 3D ray trace from a screen position (e.g. mouse) */
-   Ray getScreenToWorldRay( Vector2 position ) {}
-   /*! Get a 3D ray trace from a screen position within a specific custom viewport size */
-   Ray getScreenToWorldRayEx( Vector2 position, int width, int height ) {}
-   /*! Get 2D screen space position for a 3D world space position */
-   Vector2 getWorldToScreen( Vector3 position ) {}
-   /*! Get 2D screen space position for a 3D world space position inside a specific custom viewport size */
-   Vector2 getWorldToScreenEx( Vector3 position, int width, int height ) {}
-   /*! Get the 3D camera transform matrix (view matrix) */
-   Matrix getCameraMatrix() {}
-   /*! BeginMode3D - Begins 3D mode with a Camera3DObject */
-   void Begin() {}
-   /*! EndMode3D - End 3D mode with custom camera */
-   void End() {}
-   /*! GetCameraForward */
-   Vector3 getForwardVector() {}
-   /*! GetCameraUp */
-   Vector3 getUpVector() {}
-   /*! GetCameraRight */
-   Vector3 getRightVector() {}
-   /*! Moves the camera forward/backward based on distance. If moveInWorldPlane is true, movement is locked to the XZ plane. */
-   void moveForward( float distance, bool moveInWorldPlane ) {}
-   /*! Moves the camera up/down along its local up vector. */
-   void moveUp( float distance ) {}
-   /*! Moves the camera right/left based on distance. If moveInWorldPlane is true, movement is locked to the XZ plane. */
-   void moveRight( float distance, bool moveInWorldPlane ) {}
-   /*! Moves the camera closer or further away from its target point. */
-   void moveToTarget( float delta ) {}
-   /*! Rotates the camera horizontally (yaw) around its own axis or around the target point (angle in radians). */
-   void yaw( float angle, bool rotateAroundTarget ) {}
-   /*! Rotates the camera vertically (pitch) with optional view locking (angle in radians). */
-   void pitch( float angle, bool lockView, bool rotateAroundTarget, bool rotateUp ) {}
-   /*! Tilts the camera (roll) along its view axis (angle in radians). */
-   void roll( float angle ) {}
-   /*! Returns the camera's view matrix. */
-   Matrix getViewMatrix() {}
-   /*! Returns the camera's projection matrix based on the given aspect ratio. */
-   Matrix getProjectionMatrix( float aspect ) {}
-   /*! @name Ungrouped
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Object
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Editing
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Persistence
-   @{ */
-   /*! */
-   /// @}
-   /*!
-   Camera position in world space
-   
-    */
-   Vector3 Position;
-   /*!
-   Camera target point in world space
-   
-    */
-   Vector3 target;
-   /*!
-   Camera up vector (defines the orientation)
-   
-    */
-   Vector3 up;
-   /*!
-   Camera field-of-view aperture in Y (degrees) in perspective, or width in orthographic
-   
-    */
-   float fovy;
-   /*!
-   Camera projection type (CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC)
-   
-    */
-   int projection;
 };
 class  LightObject : public SimObject {
   public:
@@ -1033,6 +1165,7 @@ class  BatchRender : public SimObject {
 };
 class  Grid : public SimObject {
   public:
+   Script addRandomMud( string this )...) {}
    /*! param: area: x y w h, F32 SquareSize */
    bool init( Rectangle area, float squareSize ) {}
    /*! get count of nodes */
@@ -1082,52 +1215,6 @@ class  Grid : public SimObject {
    void compilePathCosts() {}
    /*! return nodecount of to points to calculated closed path it -1 then it failed */
    S32 getNodeToNodeCosts( Vector2 start, Vector2 goal, bool smoothPath=true ) {}
-   /*! @name Ungrouped
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Object
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Editing
-   @{ */
-   /*! */
-   /// @}
-   /*! @name Persistence
-   @{ */
-   /*! */
-   /// @}
-};
-class  TerrainObject : public SimSet {
-  public:
-   /*! Load or reload the terrain from the specified HeightMapFilename. */
-   bool load() {}
-   /*! Draw  heightmap */
-   void draw() {}
-   /*! Returns the exact terrain height (Y-coordinate) at the given world position. */
-   F32 getHeight( Vector3 position ) {}
-   /*! Returns the surface normal vector at the given world position. */
-   Vector3 getNormal( Vector3 position ) {}
-   /*! Performs a raycast collision check against the terrainand returns 'X Y Z Nx Ny Nz Dist' or empty string. */
-   String getRayCollision( Ray ray ) {}
-   /*! Returns the resource-manager compatible model ID of the terrain's 3D mesh. */
-   S32 getModelId() {}
-   /*!
-   You need to call load() after changing it.
-   
-    */
-   string HeightMapFilename;
-   /*!
-   You need to call load() after changing it.
-   
-    */
-   Vector3 Size;
-   /*!
-   Render position of the heightmap
-   
-    */
-   Vector3 Position;
    /*! @name Ungrouped
    @{ */
    /*! */
@@ -2182,6 +2269,17 @@ function Message::onRemove(%this)
    /// @}
 };
 namespace Global {
+   Script createmodels_first_person_maze()...) {}
+   Script createtextures_sprite_animation()...) {}
+   Script createtextures_background_scrolling()...) {}
+   Script createEyes()...) {}
+   Script createtextures_mouse_painting()...) {}
+   Script creategridtest()...) {}
+   Script createRenderMap()...) {}
+   Script createBatchTest()...) {}
+   Script CreateDeltaTime()...) {}
+   Script createshapes_starfield_batch()...) {}
+   Script createTerrainDemo()...) {}
    Script createLights()...) {}
    Script updateDocu()...) {}
    Script rl()...) {}
@@ -3192,15 +3290,17 @@ SetModelShader(modelId, shaderId [, matIndex=0]) */
    bool BatchDrawLines( Color color=DARKPURPLE ) {}
    /*! Draw lines from the global BatchRender 3th stack is used for colors */
    bool BatchDrawColoredLines( Color color=DARKPURPLE ) {}
+   /*! Call draw on all objects */
+   void ClientContainerDrawObjects() {}
    /*! Casts a ray into the container and returns the closest hit SceneObject and collision info. */
-   const char* ContainerRayCast( Ray ray ) {}
+   const char* ClientContainerRayCast( Ray ray ) {}
    /*! Returns true if no SceneObject intersects the given bounding box. */
-   bool ContainerBoxEmpty( Vector3 minBounds, Vector3 maxBounds ) {}
+   bool ClientContainerBoxEmpty( Vector3 minBounds, Vector3 maxBounds ) {}
    /*! Returns a SimSet ID containing all SceneObjects within the specified bounding box.
 NOTE: You should delete the returned SimSet when done to avoid leaks! */
-   S32 ContainerGetBoxObjects( Vector3 minBounds, Vector3 maxBounds ) {}
+   S32 ClientContainerGetBoxObjects( Vector3 minBounds, Vector3 maxBounds ) {}
    /*! For Debug ... use ContainerGetBoxObjects with a big box to get all objects in as a SimSet  */
-   void ContainerListObjects() {}
+   void ClientContainerListObjects() {}
    /*! @name Clipboard
    
    Miscellaneous functions to control the clipboard and clear the console.

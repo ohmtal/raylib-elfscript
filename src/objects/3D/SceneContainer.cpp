@@ -34,7 +34,7 @@ SceneObject* SceneContainer::castRay(Ray ray, RayCollision& outCollision) {
     for (U32 i = 0; i < mObjects.size(); i++) {
         SceneObject* obj = mObjects[i];
 
-        RayCollision col = ::GetRayCollisionBox(ray, obj->mWorldBox);
+        RayCollision col = obj->castRay(ray); // ::GetRayCollisionBox(ray, obj->mWorldBox);
 
         if (col.hit && col.distance < outCollision.distance) {
             outCollision = col;
@@ -82,11 +82,19 @@ SimSet* SceneContainer::getBoxObjects(BoundingBox searchBox) {
 
     return resultSet;
 }
-
 // -----------------------------------------------------------------------------
+void SceneContainer::drawObjects() {
+    for (U32 i = 0; i < mObjects.size(); i++) {
+        mObjects[i]->draw();
+    }
+}
+// -----------------------------------------------------------------------------
+DefineEngineFunction(ClientContainerDrawObjects, void, (), , "Call draw on all objects") {
+    gClientSceneContainer.drawObjects();
+}
 // -----------------------------------------------------------------------------
 // ElfScript ==> %hitData = ContainerRayCast(%ray);
-DefineEngineFunction( ContainerRayCast, const char*, (Ray ray), ,
+DefineEngineFunction( ClientContainerRayCast, const char*, (Ray ray), ,
                       "Casts a ray into the container and returns the closest hit SceneObject and collision info."
 ) {
     RayCollision collision;
@@ -104,7 +112,7 @@ DefineEngineFunction( ContainerRayCast, const char*, (Ray ray), ,
 }
 // -----------------------------------------------------------------------------
 // ElfScript ==> %isEmpty = ContainerBoxEmpty("-1 -1 -1", "1 1 1");
-DefineEngineFunction( ContainerBoxEmpty, bool, (Vector3 minBounds, Vector3 maxBounds), ,
+DefineEngineFunction( ClientContainerBoxEmpty, bool, (Vector3 minBounds, Vector3 maxBounds), ,
                       "Returns true if no SceneObject intersects the given bounding box."
 ) {
     BoundingBox searchBox;
@@ -115,7 +123,7 @@ DefineEngineFunction( ContainerBoxEmpty, bool, (Vector3 minBounds, Vector3 maxBo
 }
 // -----------------------------------------------------------------------------
 // ElfScript ==> %simSetId = ContainerGetBoxObjects("-5 0 -5", "5 10 5");
-DefineEngineFunction( ContainerGetBoxObjects, S32, (Vector3 minBounds, Vector3 maxBounds), ,
+DefineEngineFunction( ClientContainerGetBoxObjects, S32, (Vector3 minBounds, Vector3 maxBounds), ,
                       "Returns a SimSet ID containing all SceneObjects within the specified bounding box.\n"
                       "NOTE: You should delete the returned SimSet when done to avoid leaks!"
 ) {
@@ -128,7 +136,7 @@ DefineEngineFunction( ContainerGetBoxObjects, S32, (Vector3 minBounds, Vector3 m
 }
 
 // -----------------------------------------------------------------------------
-DefineEngineFunction( ContainerListObjects, void, (), ,
+DefineEngineFunction( ClientContainerListObjects, void, (), ,
                       "For Debug ... use ContainerGetBoxObjects with a big box to get all objects in as a SimSet ")
 {
    S32 size = gClientSceneContainer.getObjects().size();

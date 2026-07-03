@@ -30,6 +30,8 @@ public:
     SimSet* getBoxObjects(BoundingBox searchBox);
 
     const Vector<SceneObject*> getObjects() { return  mObjects; }
+
+    void drawObjects(); //for future use to implement shadows
 };
 
 // global Container
