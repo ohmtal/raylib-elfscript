@@ -192,6 +192,21 @@ inline ElfStorage<Music, UnloadMusicStream> MusicMap;
 inline ElfStorage<ElfImageColors, UnloadElfColorsData> ColorsMap;
 
 
+void shutDown() {
+    Con::printf("ElfResource shutdown....");
+    ImageMap.clear();
+    TextureMap.clear();
+    FontMap.clear();
+    ModelMap.clear();
+    MeshMap.clear();
+    MaterialsMap.clear();
+    ModelAnimationMap.clear();
+    ShadersMap.clear();
+    WaveMap.clear();
+    SoundMap.clear();
+    MusicMap.clear();
+    ColorsMap.clear();
+}
 
 
 // -----------------------------------------------------------------------------------

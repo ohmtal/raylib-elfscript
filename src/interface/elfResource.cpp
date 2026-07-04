@@ -7,11 +7,5 @@
 
 namespace ElfResource {
 
-    void shutDown() {
-        Con::printf("Unloading resources...");
-        ImageMap.clear();
-        TextureMap.clear();
-        FontMap.clear();
-    }
 
 } // ElfResource
