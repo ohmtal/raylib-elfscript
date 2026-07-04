@@ -45,6 +45,9 @@ function TerrainDemo::onAdd(%this) {
         $SunBillboardModel = GenModelSphere(10.0, 16, 16); // big one
         SetModelMapColor($SunBillboardModel, "255 255 200 255", 0, 0); // yellow
 
+
+        $AppleTreeModel = LoadModel("assets/3d/appletree/appletree.obj");
+
     }
 
     // ---- Sun shader
@@ -75,6 +78,22 @@ function TerrainDemo::onAdd(%this) {
         Scale = "3 3 3";
     };
     %this.levelObjects.add(%this.sun);
+
+
+    // --- Apple Tree Test -----
+    //FIXME transparency / shader
+    %count = GetModelMatrialCount($AppleTreeModel, MATERIAL_MAP_DIFFUSE);
+    for (%i = 0; %i < %count; %i++) SetModelShader($AppleTreeModel, %this.sunShader, %i);
+
+    %this.appleTree = new ModelObject() {
+        Position = %this.camera.position; //for testing )
+        ModelId = $AppleTreeModel;
+        Scale = "3 3 3";
+    };
+    %this.levelObjects.add(%this.appleTree);
+    %this.DropToGround(%this.appleTree);
+
+
 
     // ---- Day night
     %this.sunTime = 0.0; // 0.0 .. 360.0
@@ -277,19 +296,23 @@ function TerrainDemo::onMouseLeftClick(%this)
     %hitNormal = getWords(%collisionStr, 3,5);
     warn("HITPOINT" SPC %hitPoint SPC "HITNORMAL" SPC %hitNormal);
     %distance = getWord(%collisionStr, 6);
-    %tree = %this.spawnScriptTree(%hitPoint);
+
+    // FIXME gui for selecting what to spawn
+    // %tree = %this.spawnScriptTree(%hitPoint);
+
+
+    %tree = %this.appleTree.clone();
+    %tree.position = %hitPoint;
+    %this.levelObjects.add(%tree);
+
     echo("new Tree:" SPC  %tree SPC "created. Position:" SPC %tree.position);
 }
 
 //----------------------------------------------------------------------
 // NOTE: stub code
-function Player::DropToGround(%this){
+function TerrainDemo::DropToGround(%this, %obj){
 
-    // %playerPos = %cam.position;
-    // %playerRadius = 0.1;
-    // example for push to terrain:
-    // %groundHeight = %this.terrain.getHeight(%playerPos);
-    // %playerPos.y = %groundHeight + %playerRadius;
-    // %player.position = %playerPos;
+    %groundHeight = %this.terrain.getHeight(%obj.position);
+    %obj.position.y = %groundHeight;
 
 }

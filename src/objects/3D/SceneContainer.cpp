@@ -85,7 +85,7 @@ SimSet* SceneContainer::getBoxObjects(BoundingBox searchBox) {
 // -----------------------------------------------------------------------------
 void SceneContainer::drawObjects() {
     for (U32 i = 0; i < mObjects.size(); i++) {
-        mObjects[i]->draw();
+        if (mObjects[i]->mVisible) mObjects[i]->draw();
     }
 }
 // -----------------------------------------------------------------------------

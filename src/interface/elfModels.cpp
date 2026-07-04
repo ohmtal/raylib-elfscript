@@ -153,6 +153,19 @@ DefineEngineFunction( LoadModelFromMesh, S32, (S32 meshId), , "Load model from g
 }
 //------------------------------------------------------------------------------------
 // ElfScript ==> textureId = ModelGetTexture($model [, matIndex=0, mapMap=MATERIAL_MAP_DIFFUSE]);
+DefineEngineFunction( GetModelMatrialCount, S32, (S32 modelId, S32 mapMap), ((S32)MATERIAL_MAP_DIFFUSE),
+                      "Gets the material count from a model by \n"
+                      "GetModelMapTexture(modelId, [mapMap=MATERIAL_MAP_DIFFUSE])")
+{
+    Model* model = ModelMap.get(modelId);
+    if (!model) {
+        Con::errorf("GetModelMapTexture: Invalid modelID: %d", modelId);
+        return 0;
+    }
+    return model->materialCount;
+}
+//------------------------------------------------------------------------------------
+// ElfScript ==> textureId = ModelGetTexture($model [, matIndex=0, mapMap=MATERIAL_MAP_DIFFUSE]);
 DefineEngineFunction( GetModelMapTexture, S32, (S32 modelId, S32 matIndex, S32 mapMap), (0, (S32)MATERIAL_MAP_DIFFUSE),
                       "Gets the texture ID from a model material map.\n"
                       "GetModelMapTexture(modelId, [matIndex=0], [mapMap=MATERIAL_MAP_DIFFUSE])"

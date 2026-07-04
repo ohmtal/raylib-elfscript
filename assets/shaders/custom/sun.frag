@@ -17,6 +17,12 @@ void main()
 {
     vec4 texelColor = texture(texture0, fragTexCoord) * colDiffuse * fragColor;
 
+    // fix for alpha transparency
+    if (texelColor.a < 0.1)
+    {
+        discard;
+    }
+
     vec3 lightDir = normalize(-sunDirection);
     vec3 normal = normalize(fragNormal);
 

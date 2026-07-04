@@ -24,6 +24,9 @@ public:
     Vector3 mScale = { 1.0f, 1.0f, 1.0f };
     BoundingBox mWorldBox = { 0 };             // raylib AABB
 
+    bool mVisible = true;
+
+
     SceneObject();
     ~SceneObject() = default;
 
