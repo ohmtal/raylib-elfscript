@@ -24,13 +24,14 @@ set(PROJECT_SRC
     src/interface/elfRayMath.cpp
 
     # --- Extras
-    src/gui/Gui.cpp
-    src/gui/ConsoleGuiObject.cpp
+    src/objects/gui/Gui.cpp
+    src/objects/gui/ConsoleGuiObject.cpp
 
-    lib/ohmflux/grid/basicgrid.cpp
 
     src/objects/starfield.cpp
     src/objects/BatchRender.cpp
+
+    lib/ohmflux/grid/basicgrid.cpp
     src/objects/Grid.cpp
 
     # ---- 3D Object -----

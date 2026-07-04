@@ -1,13 +1,10 @@
 //-----------------------------------------------------------------------------
 // Copyright (c) 2025-2026 korkscript contributors.
 // See AUTHORS file and git repository for contributor information.
+// Copyright (c) 2026 Thomas Hühn (XXTH)
 //
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
-// XXTH: Using SDL3 to start ....
-// ORIG: torqueSim/platform/basicPlatformProcess.cc
-//-----------------------------------------------------------------------------
-
 #include "raylib.h"
 #include "console/console.h"
 
@@ -31,7 +28,6 @@ namespace Platform
    U64 getTime( void )
    {
       return GetTime();  // Get elapsed time in seconds since InitWindow()
-      return 0;
    }
    //---------------------------------------------------------------------------
    U64 getRealMilliseconds( void )
@@ -136,28 +132,6 @@ void outputDebugString(const char *string, ...) {
    Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);
 
 }
-/// File IO.
-// StringTableEntry getWorkingDirectory()
-// {
-//
-//    return StringTable->insert( GetWorkingDirectory()) ;
-// }
-//
-// bool setWorkingDirectory(StringTableEntry newDir)
-// {
-//    return ChangeDirectory(newDir);
-//
-// }
-
-// StringTableEntry getCurrentDirectory()
-// {
-//    return getWorkingDirectory();
-// }
-//
-// bool setCurrentDirectory(StringTableEntry newDir)
-// {
-//    return setWorkingDirectory(newDir);
-// }
 
 StringTableEntry getExecutableName()
 {

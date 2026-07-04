@@ -23,12 +23,20 @@ function TerrainDemo::onAdd(%this) {
         panSpeed  = 30.0;
     };
 
+    %terSize = 1024 * 4;
+    %yVal = %terSize / 256 * 16;
+
     %this.terrain = new TerrainObject(TERRAIN) {
         HeightMapFilename = "assets/terrain/ohmtal_HM.png";
-        Size = "2048.0 128.0 2048.0";
-        // Size = "256.0 64.0 256.0";
-        Position = "-1024 -0 -1024";
+        // HeightMapFilename = "assets/terrain/ohmtal_HM_1024.png";
+        // HeightMapFilename = "assets/terrain/Tenerife_HM_1024.png";
+
+        Size =  %terSize SPC %yVal SPC %terSize;
     };
+
+    warn("Terrain size is: " SPC %this.terrain.Size);
+    %this.terrain.Position = %this.terrain.Size / -2.0  SPC 0 SPC %this.terrain.Size / -2.0;
+
 
     %this.levelObjects.add(%this.terrain);
 

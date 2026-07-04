@@ -206,7 +206,7 @@ bool TerrainObject::loadAutoTexture() {
         else if (height < 135) {
             int grassNoise = (rand() % 25) - 12;
             baseColor.r = (U8)mClamp(70 + grassNoise, 0, 255);
-            baseColor.g = (U8)mClamp(140 + grassNoise / 2, 0, 255); // g weniger abdunkeln
+            baseColor.g = (U8)mClamp(140 + grassNoise / 2, 0, 255);
             baseColor.b = (U8)mClamp(60 + grassNoise, 0, 255);
             baseColor.a = 255;
         }

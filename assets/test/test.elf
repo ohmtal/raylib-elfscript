@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 //  A Script with .elf extension 
-// ./raylib-elfscript --console --script assets/test/test.elf
+// ./raylib-elfscript --script assets/test/test.elf
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 function CenterText(%text, %fontsize) {
