@@ -10,16 +10,11 @@ But you can also put it somewhere else and need to add the path to cmake like:
     git pull https://github.com/ohmtal/TorqueScript.git
 
 and then
-
+    cd demo
     cmake -S . -B build -DELFSCRIPT_PATH="/whereIHaveMySource/TorqueScript"
     cmake --build build
     ./raylib-elfscript
 
-## Terrain Object Demo
-
-[Module Script](https://github.com/ohmtal/raylib-elfscript/blob/main/assets/modules/TerrainDemo.cs)
-
-![Terrain and Model Objects](./docu/Screenshot_2026-07-03_04-21-35.png)
 
     
 ## Lights Demo
@@ -65,21 +60,15 @@ function MainLoop()
 {
     // Update
     //----------------------------------------------------------------------------------
-    // TODO: Update your variables here
-    //----------------------------------------------------------------------------------
-
+    // nothing todo here ;)
+    
     // Draw
     //----------------------------------------------------------------------------------
     BeginDrawing();
-
-    ClearBackground("20 60 20");
-
-    DrawText("Congrats! You created your first window!", 190, 200, 20, "200 200 200 255");
-
+      ClearBackground("20 60 20");
+      DrawText("Congrats! You created your first window!", 190, 200, 20, "200 200 200 255");
     EndDrawing();
-    //----------------------------------------------------------------------------------
 
-    return 0;
 }
 
 ```
