@@ -5,7 +5,8 @@
 # -----------------------------------------------------------------------------
 
 set(RAYLIB_ELFSCRIPT_SRC
-    ${CMAKE_CURRENT_LIST_DIR}/defaultMain.cpp
+    # add this to you projects CMake look at demo >>
+    #   ${CMAKE_CURRENT_LIST_DIR}/defaultMain.cpp
     ${CMAKE_CURRENT_LIST_DIR}/platformProcess.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ConsoleTypes.cpp
     ${CMAKE_CURRENT_LIST_DIR}/elfBase.cpp

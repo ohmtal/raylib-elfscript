@@ -37,10 +37,18 @@ else()
 endif()
 
 # ----------- Elf/TorqueScript
+# first try to get the current source
 set(ELFSCRIPT_PATH "/opt/ElfScript" CACHE PATH "Path to ElfScript")
 set(ELF_MODULE ${ELFSCRIPT_PATH}/ElfScript)
 set(ELF_CMAKE ${ELF_MODULE}/ElfScript.cmake)
 
+# fallback to Version 0.1 if not found/configured
+if(NOT EXISTS ${ELF_CMAKE})
+  set(ELF_MODULE "${CMAKE_CURRENT_LIST_DIR}/../lib/ElfScript_v0dot1")
+  set(ELF_CMAKE ${ELF_MODULE}/ElfScript.cmake)
+endif()
+
+# this should not happen ....
 if(NOT EXISTS ${ELF_CMAKE})
     message(FATAL_ERROR
         "\n ElfScript path is not set! "
@@ -48,6 +56,8 @@ if(NOT EXISTS ${ELF_CMAKE})
         "\n cmake -B build -DELFSCRIPT_PATH=/path/to/ElfScript"
     )
 else()
+
+  message( STATUS "\n Using ElfScript: " ${ELF_CMAKE} )
   include(${ELF_CMAKE})
 
   set (ELFSCRIPT_INCLUDES
@@ -78,6 +88,7 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SRC}
     ${ELFSCRIPT_SRC}
     ${RAYLIB_ELFSCRIPT_SRC}
+    ${RAYELF_DIR}/defaultMain.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

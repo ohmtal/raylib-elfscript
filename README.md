@@ -10,18 +10,11 @@ This is the base which will be used in:
 - [ElfFlux](https://github.com/ohmtal/ElfFlux)
 
 
-## Setup: 
-
-I usually have the TorqueScript Source in "/opt/TorqueScript" which is set as default in CMake. 
-But you can also put it somewhere else and need to add the path to cmake like:
-
-    git pull https://github.com/ohmtal/TorqueScript.git
-
-and then
+## Build and Run: 
 
     cd demo
-    cmake -S . -B build -DELFSCRIPT_PATH="/whereIHaveMySource/TorqueScript"
-    cmake --build build
+    cmake -S . -B build 
+    cmake --build build 
     ./raylib-elfscript
 
 

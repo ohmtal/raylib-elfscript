@@ -13,7 +13,7 @@ namespace ElfResource {
         TextureMap.clear();
         FontMap.clear();
         ModelMap.clear();
-        MeshMap.clear();
+        //double free MeshMap.clear();
         MaterialsMap.clear();
         ModelAnimationMap.clear();
         ShadersMap.clear();
