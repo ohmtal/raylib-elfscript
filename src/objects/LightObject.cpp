@@ -5,8 +5,9 @@
 
 #include "console/engineAPI.h"
 #include "raylib.h"
-#include "ConsoleTypes.h"
-#include "elfResource.h"
+
+#include "interface/ConsoleTypes.h"
+#include "interface/elfResource.h"
 
 #define RLIGHTS_IMPLEMENTATION
 #include "rayspice/rlights.h"

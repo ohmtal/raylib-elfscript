@@ -20,13 +20,13 @@ set(PROJECT_SRC
     src/interface/elfAudio.cpp
     src/interface/elfShader.cpp
     src/interface/elfFile.cpp
-    src/interface/elfLights.cpp
     src/interface/elfRayMath.cpp
 
     # --- Extras
     src/objects/gui/Gui.cpp
     src/objects/gui/ConsoleGuiObject.cpp
 
+    src/objects/LightObject.cpp
 
     src/objects/starfield.cpp
     src/objects/BatchRender.cpp

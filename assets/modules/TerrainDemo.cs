@@ -23,6 +23,7 @@ function TerrainDemo::onAdd(%this) {
         panSpeed  = 30.0;
     };
 
+    // ---- Terrain
     %terSize = 1024 * 4;
     %yVal = %terSize / 256 * 16;
 
@@ -35,11 +36,13 @@ function TerrainDemo::onAdd(%this) {
     };
 
     warn("Terrain size is: " SPC %this.terrain.Size);
-    %this.terrain.Position = %this.terrain.Size / -2.0  SPC 0 SPC %this.terrain.Size / -2.0;
+    %this.terrainRadiusNeg =  %this.terrain.Size / -2.0;
+    %this.terrain.Position = %this.terrainRadiusNeg SPC 0 SPC %this.terrainRadiusNeg;
 
 
     %this.levelObjects.add(%this.terrain);
 
+    // ---- Modeldefs
     // TreeBuilder as global reusable model:
     if ( $TreeTrunkModel * 1 == 0)
     {
@@ -80,10 +83,12 @@ function TerrainDemo::onAdd(%this) {
     SetModelShader($TreeCrownModel, %this.sunShader, 0);
 
     // ---- Visual Sun
+    // scale against terrain radius
+    %scale = mAbs(%this.terrainRadiusNeg) / 1024 * 3;
     %this.sun = new ModelObject() {
         Position = "0 0 0";
         ModelId =$SunBillboardModel;
-        Scale = "3 3 3";
+        Scale = %scale SPC %scale SPC %scale;
     };
     %this.levelObjects.add(%this.sun);
 
@@ -184,7 +189,7 @@ function TerrainDemo::updateSun(%this, %dt)
     SetShaderValue(%this.sunShader, %sunDirLoc, %this.sunDirection, 2);
 
     %camPos = %this.camera.position;
-    %sunOffset = Vector3Scale(%this.sunDirection, -1100.0);
+    %sunOffset = Vector3Scale(%this.sunDirection, %this.terrainRadiusNeg);
     %this.sun.position = Vector3Add(%camPos, %sunOffset);
 
     if (%sunY > 0.0)
@@ -317,7 +322,6 @@ function TerrainDemo::onMouseLeftClick(%this)
 }
 
 //----------------------------------------------------------------------
-// NOTE: stub code
 function TerrainDemo::DropToGround(%this, %obj){
 
     %groundHeight = %this.terrain.getHeight(%obj.position);
