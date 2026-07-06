@@ -4152,6 +4152,10 @@ SetModelShader(modelId, shaderId [, matIndex=0]) */
    float GetMusicTimePlayed( int musicId ) {}
    /*! Set default buffer size for new audio streams (in samples) */
    void SetAudioStreamBufferSizeDefault( int size ) {}
+   /*! Convert Color to float values */
+   Vector4 ColorToVector4( Color col ) {}
+   /*! Convert Color to float values */
+   Color Vector4ToColor( Vector4 vec ) {}
    /*! Begin custom shader drawing using a ShaderID */
    void BeginShaderMode( int shaderId ) {}
    /*! End custom shader drawing and reset to the default Raylib shader */

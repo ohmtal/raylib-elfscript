@@ -10,6 +10,26 @@
 #include "elfResource.h"
 
 using namespace ElfResource;
+
+//-----------------------------------------------------------------------------
+// Color transform for shader values
+DefineEngineFunction( ColorToVector4, Vector4, (Color col), , "Convert Color to float values") {
+    Vector4 result;
+    result.x = col.r / 255.f;
+    result.y = col.g / 255.f;
+    result.z = col.b / 255.f;
+    result.w = col.a / 255.f;
+    return result;
+}
+DefineEngineFunction( Vector4ToColor, Color, (Vector4 vec), , "Convert Color to float values") {
+    Color result;
+    result.r = (U8)vec.x * 255;
+    result.g = (U8)vec.y * 255;
+    result.b = (U8)vec.z * 255;
+    result.a = (U8)vec.w * 255;
+
+    return result;
+}
 //-----------------------------------------------------------------------------
 // RLAPI void BeginShaderMode(Shader shader);                        // Begin custom shader drawing
 DefineEngineFunction( BeginShaderMode, void, (S32 shaderId), , "Begin custom shader drawing using a ShaderID") {

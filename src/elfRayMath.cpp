@@ -11,6 +11,7 @@
 #include <raymath.h>
 
 
+// Vector3
 DefineEngineFunction( Vector3Add, Vector3, (Vector3 v1, Vector3 v2), , "Adds two Vector3 values together.") {
     return ::Vector3Add(v1, v2);
 }
