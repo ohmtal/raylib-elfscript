@@ -167,7 +167,7 @@ inline Material* ElfStorage<Material, UnloadMaterial>::get(S32 id) {
 // Special for animations
 struct ElfAnimationBlock {
     ModelAnimation* anims = nullptr;
-    unsigned int count = 0;
+    S32 count = 0;
 };
 
 

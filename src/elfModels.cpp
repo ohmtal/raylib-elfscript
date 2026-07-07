@@ -136,7 +136,7 @@ DefineEngineFunction( DrawGrid, void, (int slices, float spacing), , "Draw a gri
 // RLAPI Model LoadModel(const char *fileName);                                                // Load model from files (meshes and materials)
 DefineEngineFunction( LoadModel, S32, (String fileName), , "Load model from files (meshes and materials) and return ModelID") {
     Model model = LoadModel(fileName.c_str());
-    if (!IsModelValid(model)) return 0;
+    if (!IsModelValid(model)) return 0; //FIXME this does not work! also if a wrong filename is given!
     return ModelMap.add(model);
 }
 

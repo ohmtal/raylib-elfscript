@@ -4,11 +4,11 @@
 //-----------------------------------------------------------------------------
 
 #include "elfResource.h"
+#include "console/engineAPI.h"
 
 namespace ElfResource {
 
-    void shutDown() {
-        Con::printf("ElfResource shutdown....");
+    void clearAll() {
         ImageMap.clear();
         TextureMap.clear();
         FontMap.clear();
@@ -22,5 +22,13 @@ namespace ElfResource {
         MusicMap.clear();
         ColorsMap.clear();
     }
-
+    //--------------------------------------------------------------------------
+    void shutDown() {
+        Con::printf("ElfResource shutdown....");
+        clearAll();
+    }
+    //--------------------------------------------------------------------------
+    DefineEngineFunction(ClearAllResources, void, (), , "Resource Manager: Unload all resources and clear resource maps.") {
+        ElfResource::clearAll();
+    }
 } // ElfResource
