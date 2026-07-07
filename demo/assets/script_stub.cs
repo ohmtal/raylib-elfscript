@@ -3937,7 +3937,7 @@ This does not create the actual file. It simply creates a random name for a file
    S32 LoadModelFromMesh( int meshId ) {}
    /*! Gets the material count from a model by 
 GetModelMapTexture(modelId, [mapMap=MATERIAL_MAP_DIFFUSE]) */
-   S32 GetModelMatrialCount( int modelId, int mapMap=(S32)MATERIAL_MAP_DIFFUSE ) {}
+   S32 GetModelMaterialCount( int modelId, int mapMap=(S32)MATERIAL_MAP_DIFFUSE ) {}
    /*! Gets the texture ID from a model material map.
 GetModelMapTexture(modelId, [matIndex=0], [mapMap=MATERIAL_MAP_DIFFUSE]) */
    S32 GetModelMapTexture( int modelId, int matIndex=0, int mapMap=(S32)MATERIAL_MAP_DIFFUSE ) {}
@@ -4056,6 +4056,10 @@ SetModelShader(modelId, shaderId [, matIndex=0]) */
    S32 LoadModelAnimations( String fileName ) {}
    /*! Update model animation pose for a specific frame index */
    void UpdateModelAnimation( int modelId, int animBlockId, int animIndex, int frame ) {}
+   /*! Get the FrameCount used by UpdateModelAnimation for a animaton */
+   S32 GetModelAnimationFrameCount( int animBlockId, int animIndex ) {}
+   /*! Get the boneIndex by queryname. used for mounting. Return -1 if not found. */
+   S32 GetModelBoneIndexByName( int modelId, String queryname, bool caseSensitive=true ) {}
    /*! Unload model animation array data from memory */
    void UnloadModelAnimations( int animBlockId ) {}
    /*! Get total number of animations inside an AnimationBlock */

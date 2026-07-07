@@ -155,7 +155,7 @@ DefineEngineFunction( LoadModelFromMesh, S32, (S32 meshId), , "Load model from g
 }
 //------------------------------------------------------------------------------------
 // ElfScript ==> textureId = ModelGetTexture($model [, matIndex=0, mapMap=MATERIAL_MAP_DIFFUSE]);
-DefineEngineFunction( GetModelMatrialCount, S32, (S32 modelId, S32 mapMap), ((S32)MATERIAL_MAP_DIFFUSE),
+DefineEngineFunction( GetModelMaterialCount, S32, (S32 modelId, S32 mapMap), ((S32)MATERIAL_MAP_DIFFUSE),
                       "Gets the material count from a model by \n"
                       "GetModelMapTexture(modelId, [mapMap=MATERIAL_MAP_DIFFUSE])")
 {
@@ -760,6 +760,44 @@ DefineEngineFunction( UpdateModelAnimation, void, (S32 modelId, S32 animBlockId,
 
     UpdateModelAnimation(*model, block->anims[animIndex], frame);
 }
+
+// animations[0].frameCount
+// ElfScript: get the framecount of the animation
+DefineEngineFunction( GetModelAnimationFrameCount, S32, (S32 animBlockId, int animIndex),
+                      , "Get the FrameCount used by UpdateModelAnimation for a animaton") {
+    ElfAnimationBlock* block = ModelAnimationMap.get(animBlockId);
+
+    if (!block || block->anims == nullptr) return 0;
+
+    if (animIndex < 0 || animIndex >= (int)block->count) {
+        Con::errorf("GetModelAnimationFrameCount: Animation index %d out of bounds (Max: %d)", animIndex, block->count - 1);
+        return 0;
+    }
+
+    return block->anims[animIndex].keyframeCount;
+}
+
+// ElfScript: get the framecount of the animation
+DefineEngineFunction( GetModelBoneIndexByName, S32, (S32 modelId, String queryname, bool caseSensitive), (true)
+                      , "Get the boneIndex by queryname. used for mounting. Return -1 if not found.") {
+    Model* model = ModelMap.get(modelId);
+
+    if (!model) {
+        Con::errorf("GetModelBoneIndexByName modelId invalid:%d", modelId);
+        return -1;
+    }
+
+    for (S32 i = 0; i < model->skeleton.boneCount; i++) {
+        String boneName = model->skeleton.bones[i].name;
+        if (queryname.equal(boneName, caseSensitive)) {
+            return i;
+        }
+    }
+    Con::warnf("GetModelBoneIndexByName bone %s not found.", queryname.c_str());
+    return -1;
+}
+
+
 
 // RLAPI void UnloadModelAnimations(ModelAnimation *animations, int animCount);
 DefineEngineFunction( UnloadModelAnimations, void, (S32 animBlockId), , "Unload model animation array data from memory") {
