@@ -89,7 +89,14 @@ int defaultMain(int argc, char* argv[])
         while (!WindowShouldClose())    // Detect window close button or ESC key
         {
             Con::executef("MainLoop");
-            engineGlue::process(GetFrameTime());
+            // bullshit engineGlue::process(GetFrameTime());
+            // ..... time in ms!
+            static F32 timeAccumulator = 0.0f;
+            F32 currentMs = (GetFrameTime() * 1000.0f) + timeAccumulator;
+            U32 dtMs = (U32)currentMs;
+            timeAccumulator = currentMs - (F32)dtMs;
+            engineGlue::process(dtMs);
+            // <<<
             if (gShutDownRequest) break;
         }
 
