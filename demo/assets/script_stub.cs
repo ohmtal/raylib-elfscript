@@ -3485,6 +3485,8 @@ This does not create the actual file. It simply creates a random name for a file
    Vector2 GetGesturePinchVector() {}
    /*! Get gesture pinch angle in degrees */
    float GetGesturePinchAngle() {}
+   /*! Resource Manager: Unload all resources and clear resource maps. */
+   void ClearAllResources() {}
    /*! Load image from file into CPU memory (RAM) and return the ImageID */
    S32 LoadImage( String fileName ) {}
    /*! Unload image from CPU memory (RAM) */
@@ -4056,14 +4058,18 @@ SetModelShader(modelId, shaderId [, matIndex=0]) */
    S32 LoadModelAnimations( String fileName ) {}
    /*! Update model animation pose for a specific frame index */
    void UpdateModelAnimation( int modelId, int animBlockId, int animIndex, int frame ) {}
+   /*! Update model animation pose, blending two animations */
+   bool UpdateModelAnimationEx( int modelId, int animBlockIdA, int animIndexA, float frameA, int animBlockIdB, int animIndexB, float frameB, float blend ) {}
+   /*! Get total number of animations inside an AnimationBlock */
+   int GetModelAnimationCount( int animBlockId ) {}
+   /*! Get animation infomation as field separated: name TAB boneCount TAB keyframeCount */
+   const char* GetModelAnimationData( int animBlockId, int animIndex ) {}
    /*! Get the FrameCount used by UpdateModelAnimation for a animaton */
    S32 GetModelAnimationFrameCount( int animBlockId, int animIndex ) {}
    /*! Get the boneIndex by queryname. used for mounting. Return -1 if not found. */
    S32 GetModelBoneIndexByName( int modelId, String queryname, bool caseSensitive=true ) {}
    /*! Unload model animation array data from memory */
    void UnloadModelAnimations( int animBlockId ) {}
-   /*! Get total number of animations inside an AnimationBlock */
-   int GetModelAnimationCount( int animBlockId ) {}
    /*! Generates a 3D cube model from dimensions and returns its modelId. */
    S32 GenModelCube( float width, float height, float length ) {}
    /*! Generates a 3D sphere model and returns its modelId. */

@@ -728,7 +728,6 @@ DefineEngineFunction( GetRayCollisionQuad, const char*, (Ray ray, Vector3 p1, Ve
 // -----------------------------------------------------------------------------
 // NOTE: Elfscript: Model animations loading/unloading functions
 // -----------------------------------------------------------------------------
-// RLAPI void UpdateModelAnimationEx(Model model, ModelAnimation animA, float frameA, ModelAnimation animB, float frameB, float blend); // Update model animation pose, blending two animations
 
 // RLAPI ModelAnimation *LoadModelAnimations(const char *fileName, int *animCount);
 DefineEngineFunction( LoadModelAnimations, S32, (String fileName), , "Load model animations from file and return an AnimationBlockID") {
@@ -760,6 +759,70 @@ DefineEngineFunction( UpdateModelAnimation, void, (S32 modelId, S32 animBlockId,
 
     UpdateModelAnimation(*model, block->anims[animIndex], frame);
 }
+
+// RLAPI void UpdateModelAnimationEx(Model model,
+// ModelAnimation animA, float frameA,
+// ModelAnimation animB, float frameB,
+// float blend); // Update model animation pose, blending two animations
+DefineEngineFunction( UpdateModelAnimationEx, bool, (
+        S32 modelId,
+        S32 animBlockIdA, S32 animIndexA, F32 frameA,
+        S32 animBlockIdB, S32 animIndexB, F32 frameB,
+        F32 blend
+        ),
+        , "Update model animation pose, blending two animations")
+{
+    Model* model = ModelMap.get(modelId);
+    ElfAnimationBlock* blockA = ModelAnimationMap.get(animBlockIdA);
+    ElfAnimationBlock* blockB = ModelAnimationMap.get(animBlockIdB);
+
+    if (!model) return false;
+    if (!blockA || blockA->anims == nullptr) return false;
+    if (animIndexA < 0 || animIndexA >= blockA->count) {
+        Con::errorf("UpdateModelAnimationEx: Animation A index %d out of bounds (Max: %d)",
+                    animIndexA, blockA->count - 1);
+        return false;
+    }
+    if (!blockB || blockB->anims == nullptr) return false;
+    if (animIndexB < 0 || animIndexB >= blockB->count) {
+        Con::errorf("UpdateModelAnimationEx: Animation B index %d out of bounds (Max: %d)",
+                    animIndexB, blockB->count - 1);
+        return false;
+    }
+
+    UpdateModelAnimationEx(*model,
+        blockA->anims[animIndexA], frameA,
+        blockB->anims[animIndexB], frameB,
+        blend
+    );
+    return true; // validations passed
+}
+
+
+// ElfScript: GetModelAnimationCount
+DefineEngineFunction( GetModelAnimationCount, int, (S32 animBlockId), , "Get total number of animations inside an AnimationBlock") {
+    ElfAnimationBlock* block = ModelAnimationMap.get(animBlockId);
+    if (!block) return 0;
+    return (int)block->count;
+}
+
+// ElfScript: GetModelAnimationData
+DefineEngineFunction( GetModelAnimationData, const char* , (S32 animBlockId, S32 animIndex),
+, "Get animation infomation as field separated: name TAB boneCount TAB keyframeCount")
+{
+    ElfAnimationBlock* block = ModelAnimationMap.get(animBlockId);
+    if ( !block || block->anims == nullptr
+        || animIndex < 0  || animIndex >= block->count ) return "";
+
+    ModelAnimation anim = block->anims[animIndex];
+    static const U32 bufSize = 64;
+    char* returnBuffer = Con::getReturnBuffer(bufSize);
+    dSprintf(returnBuffer, bufSize, "%s\t%d\t%d",
+             anim.name, anim.boneCount, anim.keyframeCount);
+
+    return returnBuffer;
+}
+
 
 // animations[0].frameCount
 // ElfScript: get the framecount of the animation
@@ -804,12 +867,7 @@ DefineEngineFunction( UnloadModelAnimations, void, (S32 animBlockId), , "Unload 
     ModelAnimationMap.remove(animBlockId);
 }
 
-// Helper func
-DefineEngineFunction( GetModelAnimationCount, int, (S32 animBlockId), , "Get total number of animations inside an AnimationBlock") {
-    ElfAnimationBlock* block = ModelAnimationMap.get(animBlockId);
-    if (!block) return 0;
-    return (int)block->count;
-}
+
 // ----------------------
 // WRAPPER FIXME MORE ;)
 // ElfScript ==> %cubeModelId = GenModelCube(2.0, 2.0, 2.0);
