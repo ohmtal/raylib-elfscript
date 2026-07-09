@@ -19,6 +19,23 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
+# -----------------------------------------------------------------------------
+# Web Configurations
+if ("${PLATFORM}" STREQUAL "Web")
+
+
+    add_link_options(
+        # "-sOFFSCREEN_FRAMEBUFFER=1"
+        "-sUSE_WEBGL2=1"
+        "-sALLOW_MEMORY_GROWTH=1"
+        "-sSTACK_SIZE=524288"
+        # for virtual filesystem
+        # "-sFORCE_FILESYSTEM=1"
+        # "-sEXPORTED_RUNTIME_METHODS=['FS', 'ccall']"
+        # "-sEXIT_RUNTIME=1"
+    )
+endif()
+# -----------------------------------------------------------------------------
 
 # include(FetchContent)
 
@@ -105,3 +122,20 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     raylib
 )
 
+# Web Configurations
+if ("${PLATFORM}" STREQUAL "Web")
+
+
+    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html")
+    target_link_options(${PROJECT_NAME} PUBLIC -sUSE_GLFW=3 PUBLIC --preload-file ${ASSET_PATH} PRIVATE "-lidbfs.js")
+
+
+    # ---- Add minshell
+    set(TARGET_NAME ${PROJECT_NAME})
+    set(CUSTOM_SHELL_FILE "${RAYLIB_DIR}/src/minshell.html")
+    if(EXISTS "${CUSTOM_SHELL_FILE}")
+        target_link_options(${TARGET_NAME} PRIVATE "--shell-file" "${CUSTOM_SHELL_FILE}")
+        set_target_properties(${TARGET_NAME} PROPERTIES LINK_DEPENDS "${CUSTOM_SHELL_FILE}")
+    endif()
+
+endif()

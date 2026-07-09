@@ -7,6 +7,9 @@
 #include "console/script.h"
 #include "console/engineAPI.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif
 
 String gScriptFile = "assets/main.cs";
 bool gShutDownRequest = false;
@@ -56,6 +59,19 @@ int argParser(int argc, char* argv[]) {
     return 0;
 }
 
+
+void defaultLoop(void*) {
+    // --------- advance time for scheduler this should be placed in the main loop
+
+    Con::executef("MainLoop");
+    static F32 timeAccumulator = 0.0f;
+    F32 currentMs = (GetFrameTime() * 1000.0f) + timeAccumulator;
+    U32 dtMs = (U32)currentMs;
+    timeAccumulator = currentMs - (F32)dtMs;
+    engineGlue::process(dtMs);
+
+}
+
 int defaultMain(int argc, char* argv[])
 {
     argParser(argc, argv);
@@ -84,21 +100,17 @@ int defaultMain(int argc, char* argv[])
             return 1;
         }
 
-
-        // --------- advance time for scheduler this should be placed in the main loop
+#if defined(PLATFORM_WEB)
+        // emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
+        emscripten_set_main_loop_arg(defaultLoop, nullptr, 0, 1);
+        emscripten_set_main_loop_timing(EM_TIMING_RAF, 1); //force RAF
+#else
         while (!WindowShouldClose())    // Detect window close button or ESC key
         {
-            Con::executef("MainLoop");
-            // bullshit engineGlue::process(GetFrameTime());
-            // ..... time in ms!
-            static F32 timeAccumulator = 0.0f;
-            F32 currentMs = (GetFrameTime() * 1000.0f) + timeAccumulator;
-            U32 dtMs = (U32)currentMs;
-            timeAccumulator = currentMs - (F32)dtMs;
-            engineGlue::process(dtMs);
-            // <<<
+            defaultLoop(nullptr);
             if (gShutDownRequest) break;
         }
+#endif
 
         Con::executef("MainShutdown");
     } // !gNoDefaultCalls

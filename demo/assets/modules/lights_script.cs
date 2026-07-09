@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 // Lights script implementation
 //------------------------------------------------------------------------------
-#define GLSL_VERSION 330
+#define GLSL_VERSION 100
 #define VEC3_ZERO "0 0 0"
 
 #define MAX_LIGHTS 4
