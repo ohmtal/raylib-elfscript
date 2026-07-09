@@ -5,6 +5,8 @@
 //
 // SPDX-License-Identifier: MIT
 //-----------------------------------------------------------------------------
+// NOTE: some of the functions are only inplemented but not tested!!!
+//-----------------------------------------------------------------------------
 #include "raylib.h"
 #include "console/console.h"
 
@@ -17,6 +19,8 @@ StringTableEntry osGetTemporaryDirectory(){
 
 namespace Platform
 {
+
+
    //---------------------------------------------------------------------------
    bool isFile(const char *pFilePath) {
       if (!pFilePath) {
@@ -25,22 +29,108 @@ namespace Platform
       return FileExists(pFilePath);
    }
    //---------------------------------------------------------------------------
+   bool isDirectory(const char *pDirPath)
+   {
+     return DirectoryExists(pDirPath);
+   }
+   //---------------------------------------------------------------------------
    U64 getTime( void )
    {
-      return GetTime();  // Get elapsed time in seconds since InitWindow()
+      return (U64)GetTime();  //double: Get elapsed time in seconds since InitWindow()
    }
    //---------------------------------------------------------------------------
    U64 getRealMilliseconds( void )
    {
-     Con::warnf("%s not implemented", __func__);
-     return 0;
+      return (U64)(GetTime() * 1000.f);  //double: Get elapsed time in seconds since InitWindow()
+   }
+   //---------------------------------------------------------------------------
+   void postQuitMessage(const S32 in_quitVal)
+   {
+     gShutDownRequest = true;
+   }
+
+   void forceShutdown(S32 returnValue)
+   {
+     gShutDownRequest = true;
+   }
+   //---------------------------------------------------------------------------
+   StringTableEntry getExecutablePath()
+   {
+     return StringTable->insert(GetApplicationDirectory());
    }
 
    //---------------------------------------------------------------------------
+   StringTableEntry getUserHomeDirectory()
+   {
+     char path[512] = { 0 };
+
+     #if defined(_WIN32)
+     const char* appData = getenv("USERPROFILE");
+     if (appData) snprintf(path, sizeof(path), "%s", appData);
+
+     #elif defined(__ANDROID__)
+     snprintf(path, sizeof(path), "%s", GetAndroidAppDirectory());
+
+     #elif defined(__EMSCRIPTEN__)
+     snprintf(path, sizeof(path), "%s",  "/home/web_user");
+
+     #elif defined(__unix__)
+     const char* home = getenv("HOME");
+     if (home) snprintf(path, sizeof(path), "%s", home);
+
+     #elif defined(__APPLE__)
+     const char* home = getenv("HOME");
+     if (home) snprintf(path, sizeof(path), "%s", home);
+     #endif
+
+     return StringTable->insert(path);
+   }
    //---------------------------------------------------------------------------
-   //TODO: ... lot of ... just in time :P ...
+   StringTableEntry getUserDataDirectory()
+   {
+     char path[512] = { 0 };
+
+     #if defined(_WIN32)
+     const char* appData = getenv("APPDATA");
+     if (appData) snprintf(path, sizeof(path), "%s", appData);
+
+     #elif defined(__ANDROID__)
+     snprintf(path, sizeof(path), "%s", GetAndroidAppDirectory());
+
+     #elif defined(__EMSCRIPTEN__)
+     snprintf(path, sizeof(path), "%s",  "/home/web_user");
+
+     #elif defined(__unix__)
+     const char* home = getenv("HOME");
+     if (home) snprintf(path, sizeof(path), "%s/.local/share", home);
+
+     #elif defined(__APPLE__)
+     const char* home = getenv("HOME");
+     if (home) snprintf(path, sizeof(path), "%s/Library/Application Support", home);
+     #endif
+
+     return StringTable->insert(path);
+   }
+
    //---------------------------------------------------------------------------
-   void init()
+   bool setClipboard(const char* text)
+   {
+     SetClipboardText(text);
+     return true;
+   }
+
+   const char* getClipboard() {
+     return GetClipboardText();
+   }
+   //---------------------------------------------------------------------------
+   void sleep(U32 ms)
+   {
+     WaitTime((F32)ms / 1000.f);
+   }
+//---------------------------------------------------------------------------
+//TODO: ... lot of ... just in time :P ...
+//---------------------------------------------------------------------------
+void init()
 {
    Con::warnf("%s not implemented", __func__);
 }
@@ -56,38 +146,12 @@ void shutdown()
   // Con::warnf("%s not implemented", __func__);
 }
 
-void sleep(U32 ms)
-{
-   Con::warnf("%s not implemented", __func__);
-}
+
 
 void restartInstance()
 {
    Con::warnf("%s not implemented", __func__);
 }
-
-void postQuitMessage(const S32 in_quitVal)
-{
-   gShutDownRequest = true;
-}
-
-void forceShutdown(S32 returnValue)
-{
-   gShutDownRequest = true;
-}
-
-StringTableEntry getUserHomeDirectory()
-{
-   Con::warnf("%s not implemented", __func__);
-   return nullptr;
-}
-
-StringTableEntry getUserDataDirectory()
-{
-   Con::warnf("%s not implemented", __func__);
-   return nullptr;
-}
-
 
 
 U64 getVirtualMilliseconds( void )
@@ -136,13 +200,9 @@ void outputDebugString(const char *string, ...) {
 StringTableEntry getExecutableName()
 {
    Con::warnf("%s not implemented", __func__);
-   return StringTable->insert("");
+   return StringTable->EmptyString();
 }
 
-StringTableEntry getExecutablePath()
-{
-   return StringTable->insert(GetApplicationDirectory());
-}
 
 
 bool dumpPath(const char *in_pBasePath, Vector<FileInfo>& out_rFileVector, S32 recurseDepth )
@@ -177,12 +237,7 @@ S32  getFileSize(const char *pFilePath)
 
 }
 
-bool isDirectory(const char *pDirPath)
-{
-   Con::warnf("%s not implemented", __func__);
-   return false;
-}
-
+//---------------------------------------------------------------------------
 bool isSubDirectory(const char *pParent, const char *pDir)
 {
    Con::warnf("%s not implemented", __func__);
@@ -223,17 +278,8 @@ void debugBreak()
 {
    Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);
 }
-bool setClipboard(const char* text)
-{
-   Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);
-   return false;
-}
 
-const char* getClipboard() {
-   Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);
-   return nullptr;
-}
-
+//
 void AlertOK(const char *windowTitle, const char *message) {
    Con::warnf(" %s not implemented (%s:%d)", __func__, __FILE__, __LINE__);
 
