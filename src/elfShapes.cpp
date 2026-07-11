@@ -20,11 +20,19 @@
 // NOTE: It can be useful when using basic shapes and one single font,
 // defining a font char white rectangle would allow drawing everything in a single draw call
 // RLAPI void SetShapesTexture(Texture2D texture, Rectangle source); // Set texture and rectangle to be used on shapes drawing
-DefineEngineFunction( SetShapesTexture, void, (S32 textureId, Rectangle source), , "Set texture and source rectangle to be used on shapes drawing") {
+DefineEngineFunction( SetShapesTexture, void, (S32 textureId, Rectangle source),
+                      , "Set texture and source rectangle to be used on shapes drawing") {
     Texture2D* tex = ElfResource::TextureMap.get(textureId);
     if (!tex) return;
 
     SetShapesTexture(*tex, source);
+}
+
+// Elfscript .. this is missing ??!
+DefineEngineFunction( ResetShapesTexture, void, (),
+                      , "back to white texture (default)")
+{
+    SetShapesTexture((Texture2D){ 1, 1, 1, 1, 7 }, (Rectangle){ 0.0f, 0.0f, 1.0f, 1.0f });
 }
 
 // RLAPI Texture2D GetShapesTexture(void);                 // Get texture that is used for shapes drawing

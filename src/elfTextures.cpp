@@ -742,6 +742,17 @@ namespace ElfTextures {
         return returnBuffer;
     }
     // NOTE ELFSCRIPT wrapper
+    DefineEngineFunction( getTextureRect, Rectangle, (S32 textureId), ,
+                          "get the texture size  as rectangle : int width int height") {
+        Texture* tex = TextureMap.get(textureId);
+        Rectangle result = {0.f,0.f,0.f,0.f};
+        if (!tex) return result;
+
+        result.width = tex->width;
+        result.height = tex->height;
+        return result;
+    }
+    // NOTE ELFSCRIPT wrapper
     DefineEngineFunction( getTextureWidth, S32, (S32 textureId), , "get the texture width ") {
         Texture2D* tex = TextureMap.get(textureId);
         if (!tex) return 0;
