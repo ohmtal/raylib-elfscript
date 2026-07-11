@@ -153,6 +153,27 @@ DefineEngineFunction( LoadModelFromMesh, S32, (S32 meshId), , "Load model from g
 
     return ModelMap.add(model);
 }
+
+//------------------------------------------------------------------------------------
+// ElfScript ==> ResetModelMaterial(S32 modelId, S32 matIndex)
+DefineEngineFunction( ResetModelMaterial, bool, (S32 modelId, S32 matIndex), ,
+                      "reset the model material to cleanup shader settings."
+                     )
+{
+    Model* model = ModelMap.get(modelId);
+    if (!model) {
+        Con::errorf("ResetModelMaterial: Invalid modelID: %d", modelId);
+        return false;
+    }
+
+    if (matIndex < 0 || matIndex >= model->materialCount) {
+        Con::errorf("ResetModelMaterial: matIndex %d out of bounds (model has %d materials)", matIndex, model->materialCount);
+        return false;
+    }
+    model->materials[matIndex] = *MaterialsMap.get(0);
+
+    return true;
+}
 //------------------------------------------------------------------------------------
 // ElfScript ==> textureId = ModelGetTexture($model [, matIndex=0, mapMap=MATERIAL_MAP_DIFFUSE]);
 DefineEngineFunction( GetModelMaterialCount, S32, (S32 modelId, S32 mapMap), ((S32)MATERIAL_MAP_DIFFUSE),

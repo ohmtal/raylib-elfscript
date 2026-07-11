@@ -14,7 +14,7 @@
 #define ELFSCRIPT_FASTPATH_FLD
 
 // Autodelete objects on shutdown - this can slowdown delete on many objects
-// #define ELFSCRIPT_GARBAGECOLLECTION
+#define ELFSCRIPT_GARBAGECOLLECTION
 
 // make slots type save but same slotname always have the same type
 // #define ELFSCRIPT_STRICT_SLOT_TYPE

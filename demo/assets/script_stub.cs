@@ -335,7 +335,31 @@ class  ScriptObject : public SimObject {
    /*! */
    /// @}
 };
-class  LightsDemo : public ScriptObject {
+class  Eyes : public ScriptObject {
+  public:
+   Script render( string this )...) {}
+   Script onAdd( string this )...) {}
+};
+class  textures_mouse_painting {
+  public:
+   Script render( string this )...) {}
+   Script onRemove( string this )...) {}
+   Script onAdd( string this )...) {}
+   Script clear( string this )...) {}
+};
+class  DeltaTime {
+  public:
+   Script render( string this )...) {}
+   Script onAdd( string this )...) {}
+   Script onRemove( string this )...) {}
+};
+class  RenderMap {
+  public:
+   Script render( string this )...) {}
+   Script onRemove( string this )...) {}
+   Script onAdd( string this )...) {}
+};
+class  LightsDemo {
   public:
    Script render( string this )...) {}
    Script toggleLight( string this, string id )...) {}
@@ -1744,6 +1768,10 @@ class  Camera3DObject : public SimObject {
    int projection;
 };
 namespace Global {
+   Script createEyes()...) {}
+   Script createtextures_mouse_painting()...) {}
+   Script CreateDeltaTime()...) {}
+   Script createRenderMap()...) {}
    Script CreateLight( string type, string position, string target, string color, string shader )...) {}
    Script UpdateLightValues( string light )...) {}
    Script createlights_script()...) {}
@@ -1752,6 +1780,8 @@ namespace Global {
    Script MainLoop()...) {}
    Script MainShutDown()...) {}
    Script MainInit()...) {}
+   /*! return the OS where it was compiled.Win64 | Win32 | Linux | OpenBSD | FreeBSD | MacOSX | Android | Emscripten */
+   String getOS() {}
    /*! @name Clipboard
    
    Miscellaneous functions to control the clipboard and clear the console.
@@ -3649,6 +3679,8 @@ This does not create the actual file. It simply creates a random name for a file
    bool IsTextureValid( int textureId ) {}
    /*! get the texture size int width int height */
    String getTextureSize( int textureId ) {}
+   /*! get the texture size  as rectangle : int width int height */
+   Rectangle getTextureRect( int textureId ) {}
    /*! get the texture width  */
    S32 getTextureWidth( int textureId ) {}
    /*! get the texture height  */
@@ -3753,6 +3785,8 @@ This does not create the actual file. It simply creates a random name for a file
    void EndMode3D() {}
    /*! Set texture and source rectangle to be used on shapes drawing */
    void SetShapesTexture( int textureId, Rectangle source ) {}
+   /*! back to white texture (default) */
+   void ResetShapesTexture() {}
    /*! Get texture ID currently used for shapes drawing */
    S32 GetShapesTexture() {}
    /*! Get texture source rectangle that is used for shapes drawing */
@@ -3937,6 +3971,8 @@ This does not create the actual file. It simply creates a random name for a file
    S32 LoadModel( String fileName ) {}
    /*! Load model from generated mesh (default material) and return ModelID */
    S32 LoadModelFromMesh( int meshId ) {}
+   /*! reset the model material to cleanup shader settings. */
+   bool ResetModelMaterial( int modelId, int matIndex ) {}
    /*! Gets the material count from a model by 
 GetModelMapTexture(modelId, [mapMap=MATERIAL_MAP_DIFFUSE]) */
    S32 GetModelMaterialCount( int modelId, int mapMap=(S32)MATERIAL_MAP_DIFFUSE ) {}
