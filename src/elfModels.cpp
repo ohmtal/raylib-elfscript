@@ -12,6 +12,7 @@
 #include "console/engineAPI.h"
 
 #include "raymath.h"
+#include <rlgl.h>
 
 using namespace ElfResource;
 using namespace ElfTools;
@@ -155,22 +156,29 @@ DefineEngineFunction( LoadModelFromMesh, S32, (S32 meshId), , "Load model from g
 }
 
 //------------------------------------------------------------------------------------
-// ElfScript ==> ResetModelMaterial(S32 modelId, S32 matIndex)
-DefineEngineFunction( ResetModelMaterial, bool, (S32 modelId, S32 matIndex), ,
-                      "reset the model material to cleanup shader settings."
+// ElfScript ==> ResetModelMaterialShader(S32 modelId, S32 matIndex)
+// ,,, this cause a double free exception when model is unloaded ... to bad
+DefineEngineFunction( ResetModelMaterialShader, bool, (S32 modelId, S32 matIndex), ,
+                      "reset the model material shader settings."
                      )
 {
     Model* model = ModelMap.get(modelId);
     if (!model) {
-        Con::errorf("ResetModelMaterial: Invalid modelID: %d", modelId);
+        Con::errorf("ResetModelMaterialShader: Invalid modelID: %d", modelId);
         return false;
     }
 
     if (matIndex < 0 || matIndex >= model->materialCount) {
-        Con::errorf("ResetModelMaterial: matIndex %d out of bounds (model has %d materials)", matIndex, model->materialCount);
+        Con::errorf("ResetModelMaterialShader: matIndex %d out of bounds (model has %d materials)", matIndex, model->materialCount);
         return false;
     }
-    model->materials[matIndex] = *MaterialsMap.get(0);
+    // bad cause double free exception:
+    // model->materials[matIndex] = *MaterialsMap.get(0);
+
+
+    model->materials[matIndex].shader.id = rlGetShaderIdDefault();
+    model->materials[matIndex].shader.locs = rlGetShaderLocsDefault();
+
 
     return true;
 }
