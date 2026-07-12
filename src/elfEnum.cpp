@@ -54,7 +54,6 @@ void registerRaylibColors() {
 
 
     for (std::size_t i = 0; i < colors.size(); ++i) {
-        // 1. Namen zusammenbauen
         String fullName = prefix + colors[i].first;
         Color value = static_cast<Color>(colors[i].second);
         ConsoleBaseType* type = ConsoleBaseType::getType(TypeColor);
