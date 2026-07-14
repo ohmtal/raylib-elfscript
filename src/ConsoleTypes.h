@@ -18,6 +18,12 @@
 
 #include "raylib.h"
 
+// Map some Types for code compat with ohmFlux:
+typedef Vector2 Point2F ;
+typedef Vector3 Point3F ;
+typedef Vector4 Point4F ;
+typedef Rectangle RectF ;
+
 DECLARE_STRUCT(Color);
 DefineConsoleType( TypeColor, Color )
 
