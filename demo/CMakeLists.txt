@@ -96,6 +96,11 @@ if(NOT EXISTS ${RAYELF_CMAKE})
   )
 else()
   message( STATUS "\n Include: " ${RAYELF_CMAKE} )
+
+  set(BUILD_EXAMPLES OFF CACHE BOOL "Build raylib examples" FORCE)
+  set(BUILD_GAMES    OFF CACHE BOOL "Build raylib games"    FORCE)
+  set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
+
   include(${RAYELF_CMAKE})
 endif()
 

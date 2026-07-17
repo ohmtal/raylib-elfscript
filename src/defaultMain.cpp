@@ -81,7 +81,7 @@ int defaultMain(int argc, char* argv[])
 
 
 
-    if (!Con::executeFile(gScriptFile.c_str())) { //fixme with command line
+    if (!Con::executeFile(gScriptFile.c_str())) {
         Con::errorf("main script not found.");
         return 1;
     }
