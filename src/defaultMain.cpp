@@ -11,7 +11,7 @@
 #include <emscripten/emscripten.h>
 #endif
 
-String gScriptFile = "assets/main.cs";
+String gScriptFile = "assets/main.elf";
 bool gShutDownRequest = false;
 bool gNoDefaultCalls  = false;
 bool gEnableConsole = false;
@@ -48,7 +48,7 @@ int argParser(int argc, char* argv[]) {
                 gScriptFile= argv[++i];
                 dPrintf("Custom Script File: %s\n", gScriptFile.c_str());
             } else {
-                dPrintf("--script but no file parameter usage: --script myFile.cs\n");
+                dPrintf("--script but no file parameter usage: --script myFile.elf\n");
                 return 1;
             }
             continue;
