@@ -17,6 +17,14 @@
 #include "console/consoleExtras.h" // registerEnum
 #include <format>
 
+// need more colors ;)
+
+#define SLATEGRAY  (Color){45, 45, 45, 255}
+#define SEABLUE    (Color){20, 20, 50, 255}
+#define NEONPINK   (Color){255, 0, 128, 255}
+#define ACIDGREEN  (Color){128, 255, 0, 255}
+
+
 // -----------------------------------------------------------------------------
 // CONST
 // -----------------------------------------------------------------------------
@@ -49,7 +57,12 @@ void registerRaylibColors() {
         {"BLACK", BLACK},
         {"BLANK", BLANK},
         {"MAGENTA", MAGENTA},
-        {"RAYWHITE", RAYWHITE}
+        {"RAYWHITE", RAYWHITE},
+
+        {"SLATEGRAY", SLATEGRAY},
+        {"SEABLUE", SEABLUE},
+        {"NEONPINK", NEONPINK},
+        {"ACIDGREEN", ACIDGREEN}
     };
 
 
