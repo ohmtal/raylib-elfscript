@@ -164,6 +164,10 @@ DefineEngineFunction(SetWindowFocused, void, (), , "Set window focused"){
 //     return GetWindowHandle();
 // }
 
+// elfScript
+DefineEngineFunction(GetScreenSize, Vector2, (), , "Get current screen size"){
+    return {(F32)GetScreenWidth(), (F32)GetScreenHeight()};
+}
 
 // RLAPI int GetScreenWidth(void);                                   // Get current screen width
 DefineEngineFunction(GetScreenWidth, int, (), , "Get current screen width"){

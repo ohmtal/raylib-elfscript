@@ -389,6 +389,11 @@ DefineEngineFunction( CheckCollisionCircleLine, bool, (Vector2 center, float rad
     return CheckCollisionCircleLine(center, radius, p1, p2);
 }
 
+// ElfScript
+DefineEngineFunction( PointInRect, bool, (Vector2 point, Rectangle rec), , "Check if point is inside rectangle") {
+    return CheckCollisionPointRec(point, rec);
+}
+
 // RLAPI bool CheckCollisionPointRec(Vector2 point, Rectangle rec);                                         // Check if point is inside rectangle
 DefineEngineFunction( CheckCollisionPointRec, bool, (Vector2 point, Rectangle rec), , "Check if point is inside rectangle") {
     return CheckCollisionPointRec(point, rec);
