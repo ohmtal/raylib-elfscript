@@ -146,7 +146,16 @@ DefineEngineFunction( GetDirectoryFileCountEx, int, (String basePath, String fil
 }
 
 // -----------------------------------------------------------------------------
+// RLAPI const char *GetWorkingDirectory(void);                        // Get current working directory (uses static string)
+DefineEngineFunction(GetWorkingDirectory, String, (), , "") { return GetWorkingDirectory(); }
+// RLAPI const char *GetApplicationDirectory(void);                    // Get the directory of the running application (uses static string)
+DefineEngineFunction(GetApplicationDirectory, String, (), , "") { return GetApplicationDirectory(); }
+// RLAPI bool ChangeDirectory(const char *dirPath);                    // Change working directory, return true on success
+DefineEngineFunction(ChangeDirectory, bool, (const char* dirPath), , "") { return ChangeDirectory(dirPath); }
 
+ 
+ 
+// FIXME !!
 // RLAPI int FileRename(const char *fileName, const char *fileRename); // Rename file (if exists)
 // RLAPI int FileRemove(const char *fileName);                         // Remove file (if exists)
 // RLAPI int FileCopy(const char *srcPath, const char *dstPath);       // Copy file from one path to another, dstPath created if it doesn't exist
@@ -163,10 +172,7 @@ DefineEngineFunction( GetDirectoryFileCountEx, int, (String basePath, String fil
 // RLAPI const char *GetFileNameWithoutExt(const char *filePath);      // Get filename string without extension (uses static string)
 // RLAPI const char *GetDirectoryPath(const char *filePath);           // Get full path for a given fileName with path (uses static string)
 // RLAPI const char *GetPrevDirectoryPath(const char *dirPath);        // Get previous directory path for a given path (uses static string)
-// RLAPI const char *GetWorkingDirectory(void);                        // Get current working directory (uses static string)
-// RLAPI const char *GetApplicationDirectory(void);                    // Get the directory of the running application (uses static string)
 // RLAPI int MakeDirectory(const char *dirPath);                       // Create directories (including full path requested), returns 0 on success
-// RLAPI bool ChangeDirectory(const char *dirPath);                    // Change working directory, return true on success
 // RLAPI bool IsPathFile(const char *path);                            // Check if a given path is a file or a directory
 // RLAPI bool IsFileNameValid(const char *fileName);                   // Check if fileName is valid for the platform/OS
 // RLAPI FilePathList LoadDirectoryFiles(const char *dirPath);         // Load directory filepaths, files and directories, no subdirs scan
