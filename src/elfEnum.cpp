@@ -19,10 +19,10 @@
 
 // need more colors ;)
 
-#define SLATEGRAY  (Color){45, 45, 45, 255}
-#define SEABLUE    (Color){20, 20, 50, 255}
-#define NEONPINK   (Color){255, 0, 128, 255}
-#define ACIDGREEN  (Color){128, 255, 0, 255}
+#define SLATEGRAY  Color{45, 45, 45, 255}
+#define SEABLUE    Color{20, 20, 50, 255}
+#define NEONPINK   Color{255, 0, 128, 255}
+#define ACIDGREEN  Color{128, 255, 0, 255}
 
 
 // -----------------------------------------------------------------------------

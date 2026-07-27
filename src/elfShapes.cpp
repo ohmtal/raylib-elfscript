@@ -32,7 +32,7 @@ DefineEngineFunction( SetShapesTexture, void, (S32 textureId, Rectangle source),
 DefineEngineFunction( ResetShapesTexture, void, (),
                       , "back to white texture (default)")
 {
-    SetShapesTexture((Texture2D){ 1, 1, 1, 1, 7 }, (Rectangle){ 0.0f, 0.0f, 1.0f, 1.0f });
+    SetShapesTexture(Texture2D{ 1, 1, 1, 1, 7 }, Rectangle{ 0.0f, 0.0f, 1.0f, 1.0f });
 }
 
 // RLAPI Texture2D GetShapesTexture(void);                 // Get texture that is used for shapes drawing
