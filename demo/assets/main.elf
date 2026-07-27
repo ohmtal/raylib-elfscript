@@ -3,7 +3,8 @@ $MODULES = "lights_script models_first_person_maze textures_sprite_animation tex
 $MODULES = $MODULES SPC "textures_mouse_painting";
 $MODULES = $MODULES SPC "DeltaTime";
 $MODULES = $MODULES SPC "RenderMap";
-// $MODULES = $MODULES SPC "looptest blank shapes_starfield_effect";
+$MODULES = $MODULES SPC "shapes_starfield_effect";
+// $MODULES = $MODULES SPC "looptest blank ";
 
 
 function Main::init(%this) {
