@@ -59,9 +59,9 @@ set(ELFSCRIPT_PATH "/opt/ElfScript" CACHE PATH "Path to ElfScript")
 set(ELF_MODULE ${ELFSCRIPT_PATH}/ElfScript)
 set(ELF_CMAKE ${ELF_MODULE}/ElfScript.cmake)
 
-# fallback to Version 0.1 if not found/configured
+# fallback to Version 0.3 if not found/configured
 if(NOT EXISTS ${ELF_CMAKE})
-  set(ELF_MODULE "${CMAKE_CURRENT_LIST_DIR}/../lib/ElfScript_v0dot1")
+  set(ELF_MODULE "${CMAKE_CURRENT_LIST_DIR}/../lib/ElfScript_v0dot3")
   set(ELF_CMAKE ${ELF_MODULE}/ElfScript.cmake)
 endif()
 

@@ -12,6 +12,7 @@
 *   Copyright (c) 2019-2025 Ramon Santamaria (@raysan5)
 *
 *   Ported to raylib ElfScript 2026 XXTH
+*   No idea why mid and back jitter
 *
 ********************************************************************************************/
 function createtextures_background_scrolling() {
@@ -70,16 +71,19 @@ function textures_background_scrolling::Render(%this) {
     ClearBackground(%this.bgColor);
     // Draw background image twice
     // NOTE: Texture is scaled twice its size
-    DrawTextureEx(%this.background, %this.scrollingBack SPC 20 , 0.0, 2.0, WHITE);
-    DrawTextureEx(%this.background, (%this.backgroundWidth2 + %this.scrollingBack) SPC 20 , 0.0, 2.0, WHITE);
+    DrawTextureEx(%this.background, { %this.scrollingBack , 20 }, 0.0, 2.0, WHITE);
+    DrawTextureEx(%this.background, { %this.backgroundWidth2 + %this.scrollingBack,  20} , 0.0, 2.0, WHITE);
 
     // Draw midground image twice
-    DrawTextureEx(%this.midground, %this.scrollingMid SPC 20 , 0.0, 2.0, WHITE);
-    DrawTextureEx(%this.midground, %this.midgroundWidth2 + %this.scrollingMid SPC 20 , 0.0, 2.0, WHITE);
+    DrawTextureEx(%this.midground, { %this.scrollingMid , 20} , 0.0, 2.0, WHITE);
+    DrawTextureEx(%this.midground, { %this.midgroundWidth2 + %this.scrollingMid, 20 } , 0.0, 2.0, WHITE);
 
     // Draw foreground image twice
-    DrawTextureEx(%this.foreground, %this.scrollingFore SPC 70 , 0.0, 2.0, WHITE);
-    DrawTextureEx(%this.foreground, %this.foregroundWidth2 + %this.scrollingFore SPC 70, 0.0, 2.0, WHITE);
+    DrawTextureEx(%this.foreground, { %this.scrollingFore, 70} , 0.0, 2.0, WHITE);
+    DrawTextureEx(%this.foreground, { %this.foregroundWidth2 + %this.scrollingFore, 70}, 0.0, 2.0, WHITE);
+
+    // DrawText("%this.scrollingBack = " SPC %this.scrollingBack, 10 ,50);
+
 
     DrawText("BACKGROUND SCROLLING & PARALLAX", 10, 10, 20, RED);
     DrawText("(c) Cyberpunk Street Environment by Luis Zuno (@ansimuz)", GetScreenWidth() - 330, GetScreenHeight() - 20, 10, RAYWHITE);
