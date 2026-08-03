@@ -4,6 +4,8 @@ $MODULES = $MODULES SPC "textures_mouse_painting";
 $MODULES = $MODULES SPC "DeltaTime";
 $MODULES = $MODULES SPC "RenderMap";
 $MODULES = $MODULES SPC "shapes_starfield_effect";
+// FIXME enable this when updated to ElfScript 0.4 ==>
+// $MODULES = $MODULES SPC "shapes_starfield_effect_v4";
 // $MODULES = $MODULES SPC "looptest blank ";
 
 
