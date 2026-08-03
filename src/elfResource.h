@@ -14,6 +14,11 @@
 #include <console/console.h>
 // #include "elfObjects.h"
 
+#ifdef ELFSCRIPT_VERSION_0_4
+#include "resourceManager/ElfResource.h"
+#endif
+
+
 namespace ElfResource {
 
     // for LoadImageColors ---------------------------- >
@@ -37,60 +42,65 @@ namespace ElfResource {
 // - remove() remove a item from the Storage
 // - clear() unload all resouces and reset storage
 // -------------------------------------------------------------------------
-template <typename T, void (*UnloadFunc)(T)>
-struct ElfStorage {
-    S32 mId = 0;
-    std::unordered_map<S32, T> mMap;
 
-    // -------------------------------------------------------------------------
-    S32 add(T item) {
-        mMap[++mId] = item;
-        return mId;
-    }
-    // -------------------------------------------------------------------------
-    T* get(S32 id) {
-        auto it = mMap.find(id);
-        if (it != mMap.end()) {
-            return &it->second;
-        }
-        return nullptr;
-    }
-    // -------------------------------------------------------------------------
-    std::vector<T> getList(Vector<S32> ids) {
-        std::vector<T> objects;
-        for (S32 i =0; i < ids.size(); i++) {
-            auto obj  = get(ids[i]);
-            if (obj) objects.push_back(*obj);
-        }
-        return objects;
-    }
-    // -------------------------------------------------------------------------
-    bool remove(S32 id) {
-        auto it = mMap.find(id);
-        if (it == mMap.end()) return false;
+// NOTE: added to ElfScript  (resourceManager/ElfResource.h) since 0.4 ....
+#ifndef ELFSCRIPT_VERSION_0_4
 
-        UnloadFunc(it->second);
+            template <typename T, void (*UnloadFunc)(T)>
+            struct ElfStorage {
+                S32 mId = 0;
+                std::unordered_map<S32, T> mMap;
 
-        mMap.erase(it);
-        return true;
-    }
-    // -------------------------------------------------------------------------
-    bool removeId(S32 id) {
-        auto it = mMap.find(id);
-        if (it == mMap.end()) return false;
-        mMap.erase(it);
-        return true;
-    }
-    // -------------------------------------------------------------------------
-    void clear() {
-        for (auto& [key, val] : mMap) {
-            UnloadFunc(val);
-        }
-        mMap.clear();
-        mId = 0;
-    }
+                // -------------------------------------------------------------------------
+                S32 add(T item) {
+                    mMap[++mId] = item;
+                    return mId;
+                }
+                // -------------------------------------------------------------------------
+                T* get(S32 id) {
+                    auto it = mMap.find(id);
+                    if (it != mMap.end()) {
+                        return &it->second;
+                    }
+                    return nullptr;
+                }
+                // -------------------------------------------------------------------------
+                std::vector<T> getList(Vector<S32> ids) {
+                    std::vector<T> objects;
+                    for (S32 i =0; i < ids.size(); i++) {
+                        auto obj  = get(ids[i]);
+                        if (obj) objects.push_back(*obj);
+                    }
+                    return objects;
+                }
+                // -------------------------------------------------------------------------
+                bool remove(S32 id) {
+                    auto it = mMap.find(id);
+                    if (it == mMap.end()) return false;
 
-};
+                    UnloadFunc(it->second);
+
+                    mMap.erase(it);
+                    return true;
+                }
+                // -------------------------------------------------------------------------
+                bool removeId(S32 id) {
+                    auto it = mMap.find(id);
+                    if (it == mMap.end()) return false;
+                    mMap.erase(it);
+                    return true;
+                }
+                // -------------------------------------------------------------------------
+                void clear() {
+                    for (auto& [key, val] : mMap) {
+                        UnloadFunc(val);
+                    }
+                    mMap.clear();
+                    mId = 0;
+                }
+
+            };
+#endif // #ifndef ELFSCRIPT_VERSION_0_4
 // -------------------------------------------------------------------------
 // Special for texture check already added
 // -------------------------------------------------------------------------
