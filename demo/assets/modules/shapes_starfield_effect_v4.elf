@@ -37,6 +37,7 @@ function shapes_starfield_effect::UpdateSize(%this) {
 }
 // -----------------------------------------------------------------------------
 function shapes_starfield_effect::OnAdd(%this) {
+    // SetWindowSize(800,450);
     %this.bgColor = ColorLerp( DARKBLUE, BLACK, 0.69);
     %this.updateSize();
 
@@ -88,47 +89,49 @@ function shapes_starfield_effect::Render(%this) {
     %startDiv = 1.0 / 32.0;
     %drawLines = %this.drawLines;
 
+    %localStarPoints = starPoints.getId();
+
     for ( %i = 0; %i < STAR_COUNT; %i++)
     {
-        starPoints.popPoint(%i); // This writes from the point storage to .x,.y,.z
+        %localStarPoints.popPoint(%i); // This writes from the point storage to .x,.y,.z
 
         // >>>>>>>>>>>>>>>> update point
-         starPoints.z -= %dt * $speed;
+         %localStarPoints.z -= %dt * $speed;
 
         // Calculate the screen position
-        %invZ = 1.0 /  starPoints.z;
-        %screenPos_X = $hW + (starPoints.x * %invZ);
-        %screenPos_Y = $hH + (starPoints.y * %invZ);
+        %invZ = 1.0 /  %localStarPoints.z;
+        %screenPos_X = $hW + (%localStarPoints.x * %invZ);
+        %screenPos_Y = $hH + (%localStarPoints.y * %invZ);
 
-        if ( starPoints.z < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0
+        if ( %localStarPoints.z < 0.0 || %screenPos_X < 0.0 || %screenPos_Y < 0.0
              || %screenPos_X > $screenWidth || %screenPos_Y > $screenHeight)
         {
 
-            starPoints.setPos(GetRandomValue($minH, $maxH), GetRandomValue($minH, $maxH), 1.0);
-            %screenPos_X = $hW +  starPoints.x;
-            %screenPos_Y = $hH +  starPoints.y;
+            %localStarPoints.setPos(GetRandomValue($minH, $maxH), GetRandomValue($minH, $maxH), 1.0);
+            %screenPos_X = $hW +  %localStarPoints.x;
+            %screenPos_Y = $hH +  %localStarPoints.y;
         }
         // <<<<<<<<<<<<<<<<<<<<<
         if (%drawLines)
         {
-            %t = mClampF(starPoints.z + %startDiv , 0.0 , 1.0 );
+            %t = mClampF(%localStarPoints.z + %startDiv , 0.0 , 1.0 );
 
-            if ( (%t - starPoints.z) > 1e-3)
+            if ( (%t - %localStarPoints.z) > 1e-3)
             {
                 %invT = 1.0 / %t;
-                %startX = $hW + ( starPoints.x * %invT);
-                %startY = $hH + (  starPoints.y * %invT);
+                %startX = $hW + ( %localStarPoints.x * %invT);
+                %startY = $hH + (  %localStarPoints.y * %invT);
 
                 DrawLine(%startX, %startY, %screenPos_X, %screenPos_Y, RAYWHITE);
             }
         }
         else
         {
-            %radius = mLerp(3.0, 1.0, starPoints.z);
+            %radius = mLerp(3.0, 1.0, %localStarPoints.z);
             DrawCircle(%screenPos_X, %screenPos_Y, %radius, RAYWHITE);
         }
 
-        starPoints.pushPoint(%i); //this update the point storage from .x,.y,.z
+        %localStarPoints.pushPoint(%i); //this update the point storage from .x,.y,.z
     }
 
 
