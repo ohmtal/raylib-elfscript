@@ -93,7 +93,7 @@ function shapes_starfield_effect::Render(%this) {
 
     for ( %i = 0; %i < STAR_COUNT; %i++)
     {
-        %localStarPoints.popPoint(%i); // This writes from the point storage to .x,.y,.z
+        %localStarPoints.fetchPoint(%i); // This writes from the point storage to .x,.y,.z
 
         // >>>>>>>>>>>>>>>> update point
          %localStarPoints.z -= %dt * $speed;
@@ -131,7 +131,7 @@ function shapes_starfield_effect::Render(%this) {
             DrawCircle(%screenPos_X, %screenPos_Y, %radius, RAYWHITE);
         }
 
-        %localStarPoints.pushPoint(%i); //this update the point storage from .x,.y,.z
+        %localStarPoints.storePoint(%i); //this update the point storage from .x,.y,.z
     }
 
 
