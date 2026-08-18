@@ -1,12 +1,13 @@
 # ElfScript Source Files definition
 
 add_compile_definitions(ELFSCRIPT_VERSION_0_4)
+add_compile_definitions(ELFSCRIPT_VERSION_0_5)
 
 option(ELF_ENABLE_ZIP "ElfScript: Enable the ZIP Support" OFF)
 option(ELF_ENABLE_CONSOLE_VECTOR "ElfScript: Enable variable vector support" ON)
 
-option(ELF_ENABLE_GARBAGECOLLECTION "ElfScript: Auto Garbage Collection - not recommended when using lot of objects" OFF)
 option(ELF_ENABLE_EXEC_OVERWRITE "ElfScript: Disable the default exec to overwrite it with custom function" OFF)
+option(ELF_ENABLE_GARBAGECOLLECTION "ElfScript: Auto Garbage Collection - not recommended when using lot of objects" OFF)
 option(ELF_ENABLE_DSO_GENERATION "ElfScript: Enable generation of byte code dso files" OFF)
 
 set(ELF_FILE_EXTENSION "elf" CACHE STRING "ElfScript: File extension")
@@ -280,7 +281,7 @@ set(ELFSCRIPT_SRC
 )
 
 if (ELF_ENABLE_CONSOLE_VECTOR)
-     add_compile_definitions(ELF_ENABLE_CONSOLE_VECTOR)
+     add_compile_definitions(ENABLE_CONSOLE_VECTOR)
 endif()
 
 if (ELF_ENABLE_ZIP)
