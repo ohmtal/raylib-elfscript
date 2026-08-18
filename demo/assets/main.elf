@@ -3,9 +3,8 @@ $MODULES = "lights_script models_first_person_maze textures_sprite_animation tex
 $MODULES = $MODULES SPC "textures_mouse_painting";
 $MODULES = $MODULES SPC "DeltaTime";
 $MODULES = $MODULES SPC "RenderMap";
-$MODULES = $MODULES SPC "shapes_starfield_effect";
-// FIXME enable this when updated to ElfScript 0.4 ==>
-// $MODULES = $MODULES SPC "shapes_starfield_effect_v4";
+// $MODULES = $MODULES SPC "shapes_starfield_effect";
+$MODULES = $MODULES SPC "shapes_starfield_effect_v4";
 // $MODULES = $MODULES SPC "looptest blank ";
 
 

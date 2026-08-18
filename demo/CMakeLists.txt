@@ -61,7 +61,7 @@ set(ELF_CMAKE ${ELF_MODULE}/ElfScript.cmake)
 
 # fallback to Version 0.3 if not found/configured
 if(NOT EXISTS ${ELF_CMAKE})
-  set(ELF_MODULE "${CMAKE_CURRENT_LIST_DIR}/../lib/ElfScript_v0dot3")
+  set(ELF_MODULE "${CMAKE_CURRENT_LIST_DIR}/../lib/ElfScript_v0dot5")
   set(ELF_CMAKE ${ELF_MODULE}/ElfScript.cmake)
 endif()
 
