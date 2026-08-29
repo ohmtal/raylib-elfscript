@@ -319,7 +319,7 @@ ConsoleSetType(TypeBoundingBox)
     }
     else if(argc == 6)
     {
-        // Wenn als 6 Einzelfelder übergeben
+
         ((BoundingBox *) dptr)->min.x = dAtof(argv[0]);
         ((BoundingBox *) dptr)->min.y = dAtof(argv[1]);
         ((BoundingBox *) dptr)->min.z = dAtof(argv[2]);
