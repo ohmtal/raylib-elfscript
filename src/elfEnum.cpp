@@ -69,33 +69,21 @@ void registerRaylibColors() {
     for (std::size_t i = 0; i < colors.size(); ++i) {
         String fullName = prefix + colors[i].first;
         Color value = static_cast<Color>(colors[i].second);
-        ConsoleBaseType* type = ConsoleBaseType::getType(TypeColor);
 
-        if (type) {
-            const char* colorStrP = type->getData(&value, nullptr, 0);
-            std::string colorString = std::format("\"{}\"", colorStrP);
-            Con::setScriptConstant(fullName.c_str(), colorString );
-            // Con::printf("DEBUG key value: %s => %s", fullName.c_str(), colorString.c_str());
-        }
+         std::string colorString = std::format("{{ {},{},{},{} }}", value.r, value.g, value.b, value.a);
+         Con::setScriptConstant(fullName.c_str(), colorString );
+         Con::printf("DEBUG key value: %s => %s", fullName.c_str(), colorString.c_str());
+
+        // ConsoleBaseType* type = ConsoleBaseType::getType(TypeColor);
+        //
+        // if (type) {
+        //     const char* colorStrP = type->getData(&value, nullptr, 0);
+        //     std::string colorString = std::format("\"{}\"", colorStrP);
+        //     Con::setScriptConstant(fullName.c_str(), colorString );
+        //     Con::printf("DEBUG key value: %s => %s", fullName.c_str(), colorString.c_str());
+        // }
     }
 
-
-    // static std::vector<Color> storedColors;
-    // storedColors.resize(colors.size());
-
-    // for (std::size_t i = 0; i < colors.size(); ++i) {
-    //     // storedColors[i] = colors[i].second;
-    //     String fullName = prefix + colors[i].first;
-    //
-    //     Color value = static_cast<Color>(colors[i].second);
-    //     Con::setScriptConstant(fullName.c_str(), ConsoleTypeTypeColor::getData(....)); ///opt/raylib-elfscript/src/interface/elfEnum.cpp:63:50: error: ‘ConsoleTypeTypeColor’ has not been declared
-    //     // Con::addConstant(
-    //     //     fullName.c_str(),
-    //     //                  TypeColor,
-    //     //                  &storedColors[i],
-    //     //                  ""
-    //     // );
-    // }
 }
 
 
