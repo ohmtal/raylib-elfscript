@@ -70,9 +70,9 @@ void registerRaylibColors() {
         String fullName = prefix + colors[i].first;
         Color value = static_cast<Color>(colors[i].second);
 
-         std::string colorString = std::format("{{ {},{},{},{} }}", value.r, value.g, value.b, value.a);
+         std::string colorString = std::format("{{ {}, {}, {}, {} }}", value.r, value.g, value.b, value.a);
          Con::setScriptConstant(fullName.c_str(), colorString );
-         Con::printf("DEBUG key value: %s => %s", fullName.c_str(), colorString.c_str());
+         // Con::printf("DEBUG key value: %s => %s", fullName.c_str(), colorString.c_str());
 
         // ConsoleBaseType* type = ConsoleBaseType::getType(TypeColor);
         //
