@@ -121,6 +121,7 @@ function LightsDemo::onAdd(%this) {
         "assets/shaders/glsl" @ GLSL_VERSION @ "/lighting.vs",
         "assets/shaders/glsl" @ GLSL_VERSION @ "/lighting.fs"
     );
+    //TODO ElfScript 0.7: echo can be replaced by printf
     echo("** Loader shaderId:" SPC %this.shader);
 
     %this.viewPosLoc = GetShaderLocation(%this.shader, "viewPos");
