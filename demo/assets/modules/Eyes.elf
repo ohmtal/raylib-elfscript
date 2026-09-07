@@ -1,12 +1,12 @@
 function createEyes() {
     %eyes = new ScriptObject() {
         class = "Eyes";
-        TypeVector2 mScleraLeftPosition = "0 0";
-        TypeVector2 mScleraRightPosition = "0 0";
+        TypeVector mScleraLeftPosition = {0};
+        TypeVector mScleraRightPosition = {0};
         TypeF32 mScleraRadius = 60;
 
-        TypeVector2 mIrisLeftPosition = "0 0";
-        TypeVector2 mIrisRightPosition = "0 0";
+        TypeVector mIrisLeftPosition = {0};
+        TypeVector mIrisRightPosition = {0};
         TypeF32 mIrisRadius = 24;
 
         TypeF32 mIrisAngle = 0.0;
@@ -21,8 +21,8 @@ function createEyes() {
 
 
 function Eyes::OnAdd(%this) {
-    %this.mScleraLeftPosition  =  GetScreenWidth() - 200.0 SPC GetScreenHeight() - 100.0;
-    %this.mScleraRightPosition =  GetScreenWidth() - 60.0  SPC GetScreenHeight() - 100.0;
+    %this.mScleraLeftPosition  =  { GetScreenWidth() - 200.0, GetScreenHeight() - 100.0 };
+    %this.mScleraRightPosition =  { GetScreenWidth() - 60.0, GetScreenHeight() - 100.0 };
 
     %this.mIrisLeftPosition = %this.mScleraLeftPosition;
     %this.mIrisRightPosition = %this.mScleraRightPosition;
@@ -33,8 +33,8 @@ function Eyes::OnAdd(%this) {
 function Eyes::Render(%this) {
 
     if (IsWindowResized()) {
-        %this.mScleraLeftPosition  =  GetScreenWidth() - 200.0 SPC GetScreenHeight() - 100.0;
-        %this.mScleraRightPosition =  GetScreenWidth() - 60.0  SPC GetScreenHeight() - 100.0;
+        %this.mScleraLeftPosition  =  { GetScreenWidth() - 200.0, GetScreenHeight() - 100.0 };
+        %this.mScleraRightPosition =  { GetScreenWidth() - 60.0, GetScreenHeight() - 100.0 };
     }
     // if (%customPos !$= "") %this.mIrisLeftPosition = %this.mIrisRightPosition = %customPos;
     // else

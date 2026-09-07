@@ -3,6 +3,8 @@
  *  BeginTextureMode(target);
  *  EndTextureMode();
  *   DrawTextureRec(target.texture, (Rectangle){ 0, 0, (float)target.texture.width, (float)-target.texture.height }, (Vector2){ 0, 0 }, WHITE);
+ *
+ *  TODO: Update to ElfScript 0.7 when released - we not longer use strings for data.
 */
 #define _BATCH_COUNT_ 10000
 #define _RECT_SIZE_ 50.0

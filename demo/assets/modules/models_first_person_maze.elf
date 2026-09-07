@@ -1,15 +1,25 @@
 function createmodels_first_person_maze() {
     %obj = new ScriptObject() {
         class = "models_first_person_maze";
+
+        TypeS64 cubicMap = 0;
+        TypeF64 mapWidth = 0.0;
+        TypeF64 mapHeight = 0.0;
+        TypeS64 mesh    = 0;
+        TypeS64 model   = 0;
+        TypeS64 texture   = 0;
+        TypeS64 mapPixels   = 0;
+        TypeVector mapPosition = {0};
+
     };
     %this = %obj; // map to %this
 
     // ---- Camera
 
     %this.camera = new Camera3DObject() {
-        position = "0.2 0.4 0.2";    // Camera position
-        target = "0.185 0.4 0.0";      // Camera looking at point
-        up = "0.0 1.0 0.0";          // Camera up vector (rotation towards target)
+        position = {0.2, 0.4, 0.2};    // Camera position
+        target = {0.185, 0.4, 0.0};      // Camera looking at point
+        up = {0.0, 1.0, 0.0};          // Camera up vector (rotation towards target)
         fovy = 45.0;                  // Camera field-of-view Y
         projection = CAMERA_PERSPECTIVE;  // Camera projection type
     };
@@ -18,7 +28,7 @@ function createmodels_first_person_maze() {
     %this.cubicMap = LoadTextureFromImage(%imMap);
     %this.mapWidth = getTextureWidth(%this.cubicMap);
     %this.mapHeight = getTextureHeight(%this.cubicMap);
-    %this.mesh = GenMeshCubicmap( %imMap, "1.0 1.0 1.0");
+    %this.mesh = GenMeshCubicmap( %imMap, {1.0, 1.0, 1.0});
     %this.model = LoadModelFromMesh(%this.mesh);
 
     %this.texture = LoadTexture("assets/texture/cubicmap_atlas.png");
@@ -30,7 +40,7 @@ function createmodels_first_person_maze() {
     UnloadImage(%imMap);             // Unload image from RAM
 
 
-    %this.mapPosition = "-16.0 0.0 -8.0";
+    %this.mapPosition = {-16.0, 0.0, -8.0};
 
 
 
@@ -62,14 +72,13 @@ function models_first_person_maze::Render(%this) {
     %cam.update(CAMERA_FIRST_PERSON);
 
     // Check player collision (we simplify to 2D collision detection)
-    %playerPos = %cam.position.x SPC %cam.position.z;
+    %playerPos = { %cam.position.x, %cam.position.z};
     %playerRadius = 0.1;
 
     %mapPosition = %this.mapPosition;
     %playerCellX = mFloor( %playerPos.x - %mapPosition.x + 0.5 );
     %playerCellY = mFloor( %playerPos.y - %mapPosition.z + 0.5 );
 
-    // echo("%playerCellX:" SPC %playerCellX SPC "%playerCellY" SPC %playerCellY);
 
     %mW = %this.mapWidth;
     %mH = %this.mapHeight;
@@ -97,7 +106,7 @@ function models_first_person_maze::Render(%this) {
             %color = GetImageColorsColor(%this.mapPixels, %y * %mW + %x);
             if (%color.r != 255) continue;
 
-            %colRect = %mapPosition.x - 0.5 + %x * 1.0 SPC %mapPosition.z - 0.5 + %y * 1.0 SPC 1.0 SPC 1.0;
+            %colRect = {%mapPosition.x - 0.5 + %x * 1.0,  %mapPosition.z - 0.5 + %y * 1.0,  1.0, 1.0};
             if (!CheckCollisionCircleRec(%playerPos, %playerRadius, %colRect)) continue;
 
             %cam.position = %oldCamPos;
@@ -105,26 +114,7 @@ function models_first_person_maze::Render(%this) {
         }
     }
 
-    // for (%y = %playerCellY - 1; %y <= %playerCellY + 1; %y++)
-    // {
-    //     // Avoid map accessing out of bounds
-    //     if ((%y >= 0) && (%y < %mH))
-    //     {
-    //         for (%x = %playerCellX - 1; %x <= %playerCellX + 1; %x++)
-    //         {
-    //             // NOTE: Collision: Only checking R channel for white pixel
-    //             if ( %x < 0 ) continue;
-    //             if ( %x >= %mW ) continue;
-    //             %color = GetImageColorsColor( %this.mapPixels, %y * %mW + %x);
-    //             if (%color.r != 255) continue;
-    //             %colRect =%mapPosition.x - 0.5 + %x * 1.0 SPC %mapPosition.z - 0.5 + %y * 1.0 SPC  1.0 SPC 1.0;
-    //             if (!CheckCollisionCircleRec(%playerPos, %playerRadius,%colRect)) continue;
-    //
-    //             // Collision detected, reset camera position
-    //             %cam.position = %oldCamPos;
-    //         }
-    //     }
-    // }
+
     // ----- Render
     ClearBackground(RAYWHITE);
 
@@ -133,7 +123,7 @@ function models_first_person_maze::Render(%this) {
     EndMode3D();
 
     %mw4 = %this.mapWidth * 4;
-    DrawTextureEx( %this.cubicmap,  (GetScreenWidth() - %mw4 - 20 SPC  20.0 ), 0.0, 4.0, WHITE);
+    DrawTextureEx( %this.cubicmap,  { GetScreenWidth() - %mw4 - 20.0,  20.0 }, 0.0, 4.0, WHITE);
     DrawRectangleLines(GetScreenWidth() - %mw4 - 20, 20, %mw4, %this.mapHeight * 4, GREEN);
 
     // Draw player position radar

@@ -17,6 +17,13 @@
 function createtextures_sprite_animation() {
     %obj = new ScriptObject() {
         class = "textures_sprite_animation";
+
+        TypeS64     scarfy = 0;
+        TypeVector  position =  {350.0 ,280.0};
+        TypeVector  frameRec =  {0};
+        TypeS64     currentFrame = 0;
+        TypeS64     framesCounter = 0;
+        TypeF64     framesSpeed = 8;
     };
 
     %this = %obj;
@@ -24,12 +31,9 @@ function createtextures_sprite_animation() {
     %this.scarfy = LoadTexture("assets/texture/scarfy.png");        // Texture loading
     if (%this.scarfy == 0 ) return false;
 
-    %this.position =  "350.0 280.0";
-    %this.frameRec =  "0 0" SPC getTextureWidth(%this.scarfy) / 6.0 SPC getTextureHeight(%this.scarfy);
-    %this.currentFrame = 0;
+    %this.frameRec.width   =  getTextureWidth(%this.scarfy) / 6.0 ;
+    %this.frameRec.height  =  getTextureHeight(%this.scarfy);
 
-    %this.framesCounter = 0;
-    %this.framesSpeed = 8;            // Number of spritesheet frames shown by second
 
 
     return %obj;
@@ -79,7 +83,6 @@ function textures_sprite_animation::Render(%this) {
     DrawRectangleLines(15 + %this.frameRec.x, 40 + %this.frameRec.y, %this.frameRec.width, %this.frameRec.height, RED);
 
 
-    // DrawRectangleLines(15 + frameRec.x SPC 40 + frameRec.y SPC frameRec.z SPC frameRec.w, RED);
 
     DrawText("FRAME SPEED: ", 165, 210, 10, DARKGRAY);
     DrawText(strFormat("%02i FPS", %this.framesSpeed), 575, 210, 10, DARKGRAY);

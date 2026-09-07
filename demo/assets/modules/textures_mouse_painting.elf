@@ -15,6 +15,10 @@
 *
 *   Ported to raylib ElfScript 2026 XXTH
 *
+*   TODO: Update to ElfScript 0.7 when released - we not longer use strings for data.
+*       - Add colors to Array
+*       - remove getFields calls
+*
 ********************************************************************************************/
 function createtextures_mouse_painting() {
     %obj = new ScriptObject() {
