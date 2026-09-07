@@ -33,6 +33,10 @@ function textures_mouse_painting::clear(%this) {
     %this.target.EndTextureMode();
 }
 //----------------------------------------------------------------------
+function textures_mouse_painting::addColorVec(%this, %vec) {
+    %this.colorFields = trim( %this.colorFields TAB %vec );
+}
+//----------------------------------------------------------------------
 function textures_mouse_painting::onAdd(%this) {
     // Testing elfScript "string" array:
     // Colors to choose from
@@ -42,11 +46,40 @@ function textures_mouse_painting::onAdd(%this) {
     //     "SKYBLUE BLUE DARKBLUE PURPLE VIOLET DARKPURPLE BEIGE BROWN DARKBROWN" SPC
     //     "LIGHTGRAY GRAY DARKGRAY BLACK";
 
-    // SO i use TAB separated :D
-    %this.colorFields =
-    RAYWHITE TAB YELLOW TAB GOLD TAB ORANGE TAB PINK TAB RED TAB MAROON TAB GREEN TAB LIME TAB DARKGREEN TAB
-    SKYBLUE TAB BLUE TAB DARKBLUE TAB PURPLE TAB VIOLET TAB DARKPURPLE TAB BEIGE TAB BROWN TAB DARKBROWN TAB
-    LIGHTGRAY TAB GRAY TAB DARKGRAY TAB BLACK;
+    // %this.colorFields =
+    // RAYWHITE TAB YELLOW TAB GOLD TAB ORANGE TAB PINK TAB RED TAB MAROON TAB GREEN TAB LIME TAB DARKGREEN TAB
+    // SKYBLUE TAB BLUE TAB DARKBLUE TAB PURPLE TAB VIOLET TAB DARKPURPLE TAB BEIGE TAB BROWN TAB DARKBROWN TAB
+    // LIGHTGRAY TAB GRAY TAB DARKGRAY TAB BLACK;
+    //
+    // // i changed the color define's to ConsoleVector. I would use an Array for
+    // // the colorFields now
+    // // but this is available in 0.7 and iam on 0.5 here.
+
+
+    %this.colorFields = "";
+    %this.addColorVec(RAYWHITE);
+    %this.addColorVec(YELLOW);
+    %this.addColorVec(GOLD);
+    %this.addColorVec(ORANGE);
+    %this.addColorVec(PINK);
+    %this.addColorVec(RED);
+    %this.addColorVec(MAROON);
+    %this.addColorVec(GREEN);
+    %this.addColorVec(LIME);
+    %this.addColorVec(DARKGREEN);
+    %this.addColorVec(SKYBLUE);
+    %this.addColorVec(BLUE);
+    %this.addColorVec(DARKBLUE);
+    %this.addColorVec(PURPLE);
+    %this.addColorVec(DARKPURPLE);
+    %this.addColorVec(BEIGE);
+    %this.addColorVec(BROWN);
+    %this.addColorVec(DARKBROWN);
+    %this.addColorVec(LIGHTGRAY);
+    %this.addColorVec(GRAY);
+    %this.addColorVec(DARKGRAY);
+    %this.addColorVec(BLACK);
+
 
 
     echo("Color count is:" SPC getFieldCount(%this.colorFields));
