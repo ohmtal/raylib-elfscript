@@ -1,0 +1,200 @@
+//------------------------------------------------------------------------------
+// Lights script implementation
+// status updated to ElfScript 0.5 (TODO small changes for ElfScript 0.7)
+//------------------------------------------------------------------------------
+#define GLSL_VERSION 100
+#define VEC3_ZERO { 0.0, 0.0, 0.0 }
+
+#define MAX_LIGHTS 4
+#define LIGHT_DIRECTIONAL 0
+#define LIGHT_POINT 1
+
+//----------------------------------------------------------------------
+function createlights_script() {
+    %obj = new Group() {
+        class = "LightsDemo";
+        TypeS32 lightsCount = 0;
+        TypeS32 l0 = 0;
+        TypeS32 l1 = 0;
+        TypeS32 l2 = 0;
+        TypeS32 l3 = 0;
+    };
+    return %obj;
+}
+//----------------------------------------------------------------------
+//----------------------------------------------------------------------
+function Light::UpdateLightValues(%this)
+{
+
+    %light = %this;
+
+    // Send to shader light enabled state and type
+    %shader = %light.shader;
+
+    SetShaderValue(%shader, %light.enabledLoc, %light.enabled, SHADER_UNIFORM_INT);
+    SetShaderValue(%shader, %light.typeLoc, %light.type, SHADER_UNIFORM_INT);
+
+    // Send to shader light position values
+    // float position[3] = { %light.position.x, %light.position.y, %light.position.z };
+    SetShaderValue(%shader, %light.positionLoc, %light.position, SHADER_UNIFORM_VEC3);
+
+    // Send to shader light target position values
+    // float target[3] = { %light.target.x, %light.target.y, %light.target.z };
+    SetShaderValue(%shader, %light.targetLoc, %light.target, SHADER_UNIFORM_VEC3);
+
+    // Send to shader light color values
+    // float color[4] = { (float)%light.color.r/(float)255, (float)%light.color.g/(float)255,
+    //     (float)%light.color.b/(float)255, (float)%light.color.a/(float)255 };
+
+    %color = {0, 0, 0, 0};
+    %color.r = %light.color.r / 255;
+    %color.g = %light.color.g / 255;
+    %color.b = %light.color.b / 255;
+    %color.a = %light.color.a / 255;
+
+    SetShaderValue(%shader, %light.colorLoc, %color, SHADER_UNIFORM_VEC4);
+}
+//----------------------------------------------------------------------
+function LightsDemo::CreateLight(
+        %this
+        /*int*/     ,%type
+        /*Vector3*/ ,%position
+        /*Vector3*/ ,%target
+        /*Color*/   ,%color
+        /*String*/  ,%caption
+)
+{
+    if (%this.lightsCount >= MAX_LIGHTS) return 0;
+
+    %shader = %this.shader;
+
+    %this.add( %light = new Object() {
+        class = Light;
+        // Dynamic:
+        TypeBool    enabled     = true;
+        TypeS32     type        = %type;
+        TypeVector  position    = %position;
+        TypeVector  target      = %target;
+        TypeVector  color       = %color;
+        TypeS32     shader      = %shader;
+
+        TypeS32     enabledLoc  = 0;
+        TypeS32     typeLoc     = 0;
+        TypeS32     positionLoc = 0;
+        TypeS32     targetLoc   = 0;
+        TypeS32     colorLoc    = 0;
+
+        TypeString  caption     = %caption;
+    });
+
+    // NOTE: Lighting shader naming must be the provided ones
+    // TODO ElfScript 0.7 ==> strFormat can be replaced with sPrintf
+    %light.enabledLoc   = GetShaderLocation(%shader, strFormat("lights[%i].enabled" , %this.lightsCount));
+    %light.typeLoc      = GetShaderLocation(%shader, strFormat("lights[%i].type"    , %this.lightsCount));
+    %light.positionLoc  = GetShaderLocation(%shader, strFormat("lights[%i].position", %this.lightsCount));
+    %light.targetLoc    = GetShaderLocation(%shader, strFormat("lights[%i].target"  , %this.lightsCount));
+    %light.colorLoc     = GetShaderLocation(%shader, strFormat("lights[%i].color"   , %this.lightsCount));
+
+    %light.UpdateLightValues();
+
+    %this.lightsCount++;
+
+    return %light;
+}
+//----------------------------------------------------------------------
+//----------------------------------------------------------------------
+function LightsDemo::onAdd(%this) {
+    // ---- camera
+    %this.add( %this.camera = new Camera3DObject() {
+        position  = { 2.0, 4.0, 6.0 };    // Camera position
+        target    = { 0.0, 0.5, 0.0 };    // Camera looking at point
+        up = { 0.0, 1.0, 0.0 };           // Camera up vector (rotation towards target)
+        fovy = 45.0;                      // Camera field-of-view Y
+        projection = CAMERA_PERSPECTIVE;  // Camera projection type
+    });
+
+
+    // ---- shader
+    // Load basic lighting shader
+
+    %this.shader = LoadShader(
+        "assets/shaders/glsl" @ GLSL_VERSION @ "/lighting.vs",
+        "assets/shaders/glsl" @ GLSL_VERSION @ "/lighting.fs"
+    );
+    //TODO ElfScript 0.7: echo can be replaced by printf
+    echo("** Loader shaderId:" SPC %this.shader);
+
+    %this.viewPosLoc = GetShaderLocation(%this.shader, "viewPos");
+    SetShaderLocation(%this.shader, SHADER_LOC_VECTOR_VIEW, %this.viewPosLoc);
+
+    // Ambient light level (some basic lighting)
+    %this.ambientLoc = GetShaderLocation(%this.shader, "ambient");
+    %ambient = { 0.1, 0.1, 0.1, 1.0 };
+    SetShaderValue(%this.shader, %this.ambientLoc, %ambient, SHADER_UNIFORM_VEC4);
+
+    // ---- lights
+    %this.lightsCount = 0;
+
+    %this.l0 = %this.CreateLight(LIGHT_POINT, { -2, 1, -2 } , VEC3_ZERO, ORANGE, "O");
+    %this.l1 = %this.CreateLight(LIGHT_POINT, {  2, 1,  2 } , VEC3_ZERO, RED   , "R");
+    %this.l2 = %this.CreateLight(LIGHT_POINT, { -2, 1,  2 } , VEC3_ZERO, GREEN , "G");
+    %this.l3 = %this.CreateLight(LIGHT_POINT, {  2, 1, -2 } , VEC3_ZERO, BLUE  , "B");
+
+    // check lights loaded:
+    for (%i = 0; %i < MAX_LIGHTS; %i++)
+    {
+        %light = %this.l[%i];
+        //TODO ElfScript 0.7: echo can be replaced by printf
+        echo("LIGHT #" @ %i SPC (isObject(%light) ? "OK" : "FAILED"));
+    }
+
+
+    return true;
+}
+//----------------------------------------------------------------------
+function LightsDemo::OnRemove(%this) {
+
+    UnloadShader(%this.shader);
+}
+//----------------------------------------------------------------------
+function LightsDemo::toggleLight(%this, %id){
+   %light = %this.l[%id];
+   if (!isObject(%light)) return;
+   %light.enabled = !%light.enabled;
+   %light.UpdateLightValues();
+}
+//----------------------------------------------------------------------
+function LightsDemo::Render(%this) {
+    ClearBackground({ 10, 10, 40, 255 });
+    %cam = %this.camera;
+    %shader =  %this.shader;
+    %camPos = %this.camera.position;
+    %locIndex = %this.viewPosLoc;
+    SetShaderValue(%shader, %locIndex, %camPos, SHADER_UNIFORM_VEC3);
+
+    %cam.update(CAMERA_ORBITAL);
+    BeginMode3D(%cam);
+    BeginShaderMode( %shader );
+    DrawPlane(VEC3_ZERO, { 10.0, 10.0}, WHITE);
+    DrawSphere( { 0.0, 1.0, 0.0 }, 1.0, WHITE);
+    EndShaderMode();
+    // Draw spheres to show where the lights are
+    for (%i = 0; %i < MAX_LIGHTS; %i++)
+    {
+        %light = %this.l[%i];
+        if (!isObject(%light)) continue;
+        if (%light.enabled) DrawSphereEx(%light.position, 0.2, 8, 8, %light.color);
+        else DrawSphereWires( %light.position, 0.2, 8, 8, ColorAlpha( %light.color, 0.3));
+    }
+    DrawGrid(10, 1.0);
+    EndMode3D();
+
+    // TODO ElfScript 0.7 use sPrintf instead SPC
+    DrawText("Lights and Gui Demo GLSL" SPC GLSL_VERSION, 10,10, 20, WHITE , true);
+    DrawText("Press 1..4 to enable/disable light" SPC GLSL_VERSION, 10,30, 20, GRAY , true);
+    if (IsKeyPressed(KEY_ONE))   %this.toggleLight(0);
+    if (IsKeyPressed(KEY_TWO))   %this.toggleLight(1);
+    if (IsKeyPressed(KEY_THREE)) %this.toggleLight(2);
+    if (IsKeyPressed(KEY_FOUR))  %this.toggleLight(3);
+
+}

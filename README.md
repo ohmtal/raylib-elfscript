@@ -5,17 +5,17 @@ This is an MIT-licensed ElfScript (aka TorqueScript) binding for Raylib 6.0.
 - [ElfScript](https://github.com/ohmtal/ElfScript)
 - [raylib](https://github.com/raysan5/raylib)
 
-This is the base which will be used in:
-
-- [ElfFlux](https://github.com/ohmtal/ElfFlux)
-
-
 ## Build and Run: 
+```
+cmake -S . -B build 
+cmake --build build 
+./raylib-elfscript
+```
 
-    cd demo
-    cmake -S . -B build 
-    cmake --build build 
-    ./raylib-elfscript
+## Version 0.8
+
+- moved Bindings to [ElfScript/addons/raylib/](https://github.com/ohmtal/ElfScript/tree/main/ElfScript/addons/raylib)
+- Removed Events. Main loop is now like in C with `while (!WindowShouldClose()) ...` 
 
 
     
@@ -29,49 +29,40 @@ If you wonder why the the script file ends with .cs. This is not CSharp it's CSc
 
 ![Basic Window](./docu/Screenshot_2026-06-16_02-47-32.png)
 
-There are three functions called from the C Code to get it working:
-
-    - function MainInit() { return true;}
-    - function MainLoop() {}
-    - function MainShutDown() {}
-    
-The Script is:
+The Script (called with: ./raylib-elfscript  assets/hello.elf):
 
 ```
-function MainInit() {
-    // Initialization
-    //--------------------------------------------------------------------------------------
-    $screenWidth = 800;
-    $screenHeight = 450;
+// Initialization
+//--------------------------------------------------------------------------------------
+%screenWidth    = 800;
+%screenHeight   = 450;
 
-    InitWindow($screenWidth, $screenHeight, "raylib [core] example - basic window");
+InitWindow(%screenWidth, %screenHeight, "raylib [core] example - basic window");
 
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
 
-    return true;
-}
+%text       = "Congrats! You created your first window!";
+%fontSize   = 30;
+%textWidth  = MeasureText(%text,%fontSize);
+%x = %screenWidth  / 2 - %textWidth / 2;
+%y = %screenHeight / 2 - %fontSize  / 2;
 
-function MainShutDown() {
-    // De-Initialization
-    //--------------------------------------------------------------------------------------
-    CloseWindow();        // Close window and OpenGL context
-    //--------------------------------------------------------------------------------------
-}
-
-function MainLoop()
+while (!WindowShouldClose())
 {
-    // Update
-    //----------------------------------------------------------------------------------
-    // nothing todo here ;)
-    
-    // Draw
-    //----------------------------------------------------------------------------------
-    BeginDrawing();
-      ClearBackground("20 60 20");
-      DrawText("Congrats! You created your first window!", 190, 200, 20, "200 200 200 255");
-    EndDrawing();
+    // Update --------
 
+    // Draw ----------
+    BeginDrawing();
+
+    ClearBackground("30 20 60");
+    DrawFPS(10, 10);
+    DrawText(%text, %x, %y, %fontsize, LIGHTGRAY, true, BLACK);
+
+    EndDrawing();
 }
+
+// De-Initialization
+CloseWindow();        // Close window and OpenGL context
 
 ```
     
