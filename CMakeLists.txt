@@ -24,41 +24,39 @@ if ("${PLATFORM}" STREQUAL "Web")
 
 
     add_link_options(
-        # "-sOFFSCREEN_FRAMEBUFFER=1"
         "-sUSE_WEBGL2=1"
         "-sALLOW_MEMORY_GROWTH=1"
         "-sSTACK_SIZE=524288"
-        # for virtual filesystem
-        # "-sFORCE_FILESYSTEM=1"
-        # "-sEXPORTED_RUNTIME_METHODS=['FS', 'ccall']"
-        # "-sEXIT_RUNTIME=1"
+        "-sASYNCIFY"
+        "-sASYNCIFY_STACK_SIZE=65536"
     )
 endif()
 # -----------------------------------------------------------------------------
 
-# include(FetchContent)
-
-# ------------- RayLib
-# set(PLATFORM "SDL" CACHE STRING "raylib platform" FORCE)
-set(RAYLIB_DIR "${CMAKE_CURRENT_LIST_DIR}/../lib/raylib" CACHE PATH "Path to RayLib 6.0")
-message( STATUS "\n Set Raylib to: " ${RAYLIB_DIR} )
-
-if(NOT EXISTS "${RAYLIB_DIR}/CMakeLists.txt")
-  message(FATAL_ERROR
-    "\n" ${RAYLIB_DIR}
-    "\n ********** RayLib not found! *************"
-  )
-else()
-  add_subdirectory("${RAYLIB_DIR}" "${CMAKE_BINARY_DIR}/raylib_build")
-endif()
+include(FetchContent)
 
 # ----------- Elf/TorqueScript
 set(ELFSCRIPT_PATH "/opt/ElfScript" CACHE PATH "Path to ElfScript")
 set(ELF_MODULE ${ELFSCRIPT_PATH}/ElfScript)
-# FIXME lib does not work correctly - a lot of functions are not bound
-# set(ELF_CMAKE ${ELF_MODULE}/ElfScriptLib.cmake)
 set(ELF_CMAKE ${ELF_MODULE}/ElfScript.cmake)
 set(RAYELF_CMAKE ${ELF_MODULE}/addons/raylib/raylib-elfscript.cmake)
+
+if(NOT EXISTS ${ELF_CMAKE})
+    set(BUILD_ELFSCRIPT OFF CACHE BOOL "" FORCE)
+
+    FetchContent_Declare(
+        elfscript
+        GIT_REPOSITORY https://github.com/ohmtal/ElfScript.git
+        GIT_TAG        main
+    )
+    FetchContent_MakeAvailable(elfscript)
+
+  set(ELF_MODULE "${elfscript_SOURCE_DIR}/ElfScript")
+  message("ELF_MODULE PATH IS:" ${ELF_MODULE})
+  set(ELF_CMAKE ${ELF_MODULE}/ElfScript.cmake)
+  set(RAYELF_CMAKE ${ELF_MODULE}/addons/raylib/raylib-elfscript.cmake)
+
+endif()
 
 if(NOT EXISTS ${ELF_CMAKE})
     message(FATAL_ERROR
@@ -83,6 +81,11 @@ else()
 
  include(${ELF_CMAKE})
  include(${RAYELF_CMAKE})
+
+ set (ELFSCRIPT_INCLUDES
+   ${ELF_MODULE}
+   ${ELF_MODULE}/addons/raylib/
+ )
 endif()
 
 # # first try to get the current source
@@ -149,13 +152,12 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SRC}
     ${ELFSCRIPT_SRC}
     ${RAYLIB_ELFSCRIPT_SRC}
-    ${RAYELF_DIR}/defaultMain.cpp
+
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/src/
     ${ELFSCRIPT_INCLUDES}
-    ${RAYELF_DIR}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
