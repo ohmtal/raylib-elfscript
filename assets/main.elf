@@ -125,8 +125,7 @@ function Main() {
     %Main = new ScriptObject() {
         class = "Main";
         // dynamic fields:
-        // TypeString caption = "raylib-elfScript Demo Loader";
-        TypeString caption = "raylib-ElfScript Demo Loader";
+        TypeString caption = "raylib-elfScript Demo Loader";
         TypeS32 screenWidth = 800;
         TypeS32 screenHeight = 450;
         TypeS32 currentFps = 60;

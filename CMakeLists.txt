@@ -67,6 +67,7 @@ if(NOT EXISTS ${ELF_CMAKE})
 else()
 
  set(RAYLIB_FETCH ON)
+ set(RAYLIB_GIT_MASTER ON)
  set(RAYELF_DEFAULTMAIN ON)
  set(RAYELF_DKCONSOLE ON)
  set(ELF_ENABLE_CONSOLE_VECTOR ON)
@@ -87,64 +88,6 @@ else()
    ${ELF_MODULE}/addons/raylib/
  )
 endif()
-
-# # first try to get the current source
-# set(ELFSCRIPT_PATH "/opt/ElfScript" CACHE PATH "Path to ElfScript")
-# set(ELF_MODULE ${ELFSCRIPT_PATH}/ElfScript)
-# set(ELF_CMAKE ${ELF_MODULE}/ElfScript.cmake)
-#
-# # fallback to Version 0.3 if not found/configured
-# if(NOT EXISTS ${ELF_CMAKE})
-#   set(ELF_MODULE "${CMAKE_CURRENT_LIST_DIR}/../lib/ElfScript_v0dot51")
-#   set(ELF_CMAKE ${ELF_MODULE}/ElfScript.cmake)
-# endif()
-#
-# # this should not happen ....
-# if(NOT EXISTS ${ELF_CMAKE})
-#     message(FATAL_ERROR
-#         "\n ElfScript path is not set! "
-#         "\n Please provide the path using: "
-#         "\n cmake -B build -DELFSCRIPT_PATH=/path/to/ElfScript"
-#     )
-# else()
-#
-#  set(ELF_APP_NAME "raylib-elfscript" CACHE STRING "ElfScript: App-Name used in scripts" FORCE)
-#  set(ELF_APP_VERSION "500" CACHE STRING "ElfScript: App-Version used in scripts" FORCE)
-#  set(ELF_APP_VERSION_STRING "Version 26.08" CACHE STRING "ElfScript: App-Version String used in scripts" FORCE)
-#
-#  # set(ELF_ENABLE_DOC_EXPORTER ON CACHE BOOL "ElfScript: Enable the Doc Exporter addon" FORCE)
-#
-#
-#
-#   message( STATUS "\n Using ElfScript: " ${ELF_CMAKE} )
-#   include(${ELF_CMAKE})
-#
-#   set (ELFSCRIPT_INCLUDES
-#    ${ELF_MODULE}
-#   )
-#
-#   list(APPEND ELFSCRIPT_SRC ${ELF_MODULE}/addons/console/consoleDocExporter.cpp)
-#
-# endif()
-#
-# # ------------- rayLib-elfScript
-# set(RAYELF_DIR "${CMAKE_CURRENT_LIST_DIR}/../src" CACHE PATH "Path to RayLib-ElfScript")
-# message( STATUS "\n Ray-ElfScript directory is: " ${RAYELF_DIR} )
-# set(RAYELF_CMAKE "${RAYELF_DIR}/raylib-elfscript.cmake")
-# if(NOT EXISTS ${RAYELF_CMAKE})
-#   message(FATAL_ERROR
-#     "\n" ${RAYELF_DIR}
-#     "\n ********** RayLib-ElfScript not found! *************"
-#   )
-# else()
-#   message( STATUS "\n Include: " ${RAYELF_CMAKE} )
-#
-#   set(BUILD_EXAMPLES OFF CACHE BOOL "Build raylib examples" FORCE)
-#   set(BUILD_GAMES    OFF CACHE BOOL "Build raylib games"    FORCE)
-#   set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
-#
-#   include(${RAYELF_CMAKE})
-# endif()
 
 
 # ------------- Main

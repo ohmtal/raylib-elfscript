@@ -12,12 +12,15 @@
 *   Copyright (c) 2019-2025 Ramon Santamaria (@raysan5)
 *
 *   Ported to raylib ElfScript 2026 XXTH
-*   No idea why mid and back jitter
 *
 ********************************************************************************************/
 function createtextures_background_scrolling() {
     %obj = new ScriptObject() {
         class = "textures_background_scrolling";
+
+        TypeF64 scrollingBack = 0.0;
+        TypeF64 scrollingMid = 0.0;
+        TypeF64 scrollingFore = 0.0;
     };
     %this = %obj;
 
@@ -28,9 +31,7 @@ function createtextures_background_scrolling() {
     %this.foreground = LoadTexture("assets/texture/cyberpunk_street_foreground.png");
     %this.foregroundWidth2 = getTextureWidth(%this.foreground) * 2.0;
 
-    %this.scrollingBack = 0.0;
-    %this.scrollingMid = 0.0;
-    %this.scrollingFore = 0.0;
+
 
     %this.bgColor = GetColor(0x052c46ff);
 
@@ -56,14 +57,14 @@ function textures_background_scrolling::Render(%this) {
     // Update
     //------------------------------------------------------------------
     %ft = GetFrameTime();
-    %this.scrollingBack -= 10 * %ft;
-    %this.scrollingMid  -= 50 * %ft;
-    %this.scrollingFore -= 100 * %ft;
+    %this.scrollingBack -= 17.0 * %ft;
+    %this.scrollingMid  -= 47.0 * %ft;
+    %this.scrollingFore -= 97.0 * %ft;
 
     // NOTE: Texture is scaled twice its size, so it sould be considered on scrolling
-    if (%this.scrollingBack <= -%this.backgroundWidth2 ) %this.scrollingBack = 0;
-    if (%this.scrollingMid  <= -%this.midgroundWidth2 ) %this.scrollingMid = 0;
-    if (%this.scrollingFore <= -%this.foregroundWidth2 ) %this.scrollingFore = 0;
+    if (%this.scrollingBack <= -%this.backgroundWidth2 ) %this.scrollingBack = 0.0;
+    if (%this.scrollingMid  <= -%this.midgroundWidth2 ) %this.scrollingMid = 0.0;
+    if (%this.scrollingFore <= -%this.foregroundWidth2 ) %this.scrollingFore = 0.0;
     //------------------------------------------------------------------
     // Draw
     //------------------------------------------------------------------
@@ -81,8 +82,6 @@ function textures_background_scrolling::Render(%this) {
     // Draw foreground image twice
     DrawTextureEx(%this.foreground, { %this.scrollingFore, 70} , 0.0, 2.0, WHITE);
     DrawTextureEx(%this.foreground, { %this.foregroundWidth2 + %this.scrollingFore, 70}, 0.0, 2.0, WHITE);
-
-    // DrawText("%this.scrollingBack = " SPC %this.scrollingBack, 10 ,50);
 
 
     DrawText("BACKGROUND SCROLLING & PARALLAX", 10, 10, 20, RED);

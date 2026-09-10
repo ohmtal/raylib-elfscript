@@ -1,3 +1,6 @@
+// -----------------------------------------------------------------------------
+// First Persion Maze
+// -----------------------------------------------------------------------------
 function createmodels_first_person_maze() {
     %obj = new ScriptObject() {
         class = "models_first_person_maze";
@@ -99,9 +102,9 @@ function models_first_person_maze::Render(%this) {
     %minX = (%playerCellX - 1 < 0) ? 0 : %playerCellX - 1;
     %maxX = (%playerCellX + 1 >= %mW) ? %mW - 1 : %playerCellX + 1;
 
-    for (%y = %minY; %y <= %maxY; %y++)
+    for ( %y in %minY .. %maxY)
     {
-        for (%x = %minX; %x <= %maxX; %x++)
+        for ( %x in %minX .. %maxX )
         {
             %color = GetImageColorsColor(%this.mapPixels, %y * %mW + %x);
             if (%color.r != 255) continue;

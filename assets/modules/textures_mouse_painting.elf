@@ -15,14 +15,16 @@
 *
 *   Ported to raylib ElfScript 2026 XXTH
 *
-*   TODO: Update to ElfScript 0.7 when released - we not longer use strings for data.
-*       - Add colors to Array
-*       - remove getFields calls
-*
 ********************************************************************************************/
 function createtextures_mouse_painting() {
-    %obj = new ScriptObject() {
+    %obj = new Group() {
         class = "textures_mouse_painting";
+
+
+        TypeS32 colors = 0;
+        TypeS32 target = 0;
+        TypeS32 colorSelected = 0;
+
     };
 
 
@@ -37,73 +39,51 @@ function textures_mouse_painting::clear(%this) {
     %this.target.EndTextureMode();
 }
 //----------------------------------------------------------------------
-function textures_mouse_painting::addColorVec(%this, %vec) {
-    %this.colorFields = trim( %this.colorFields TAB %vec );
-}
-//----------------------------------------------------------------------
 function textures_mouse_painting::onAdd(%this) {
-    // Testing elfScript "string" array:
-    // Colors to choose from
-    // ... gee .. my preprocessor kill this
-    // %this.colors =
-    //     "RAYWHITE YELLOW GOLD ORANGE PINK RED MAROON GREEN LIME DARKGREEN" SPC
-    //     "SKYBLUE BLUE DARKBLUE PURPLE VIOLET DARKPURPLE BEIGE BROWN DARKBROWN" SPC
-    //     "LIGHTGRAY GRAY DARKGRAY BLACK";
 
-    // %this.colorFields =
-    // RAYWHITE TAB YELLOW TAB GOLD TAB ORANGE TAB PINK TAB RED TAB MAROON TAB GREEN TAB LIME TAB DARKGREEN TAB
-    // SKYBLUE TAB BLUE TAB DARKBLUE TAB PURPLE TAB VIOLET TAB DARKPURPLE TAB BEIGE TAB BROWN TAB DARKBROWN TAB
-    // LIGHTGRAY TAB GRAY TAB DARKGRAY TAB BLACK;
-    //
-    // // i changed the color define's to ConsoleVector. I would use an Array for
-    // // the colorFields now
-    // // but this is available in 0.7 and iam on 0.5 here.
+    %this.add( %this.colors = new Array() );
 
-
-    %this.colorFields = "";
-    %this.addColorVec(RAYWHITE);
-    %this.addColorVec(YELLOW);
-    %this.addColorVec(GOLD);
-    %this.addColorVec(ORANGE);
-    %this.addColorVec(PINK);
-    %this.addColorVec(RED);
-    %this.addColorVec(MAROON);
-    %this.addColorVec(GREEN);
-    %this.addColorVec(LIME);
-    %this.addColorVec(DARKGREEN);
-    %this.addColorVec(SKYBLUE);
-    %this.addColorVec(BLUE);
-    %this.addColorVec(DARKBLUE);
-    %this.addColorVec(PURPLE);
-    %this.addColorVec(DARKPURPLE);
-    %this.addColorVec(BEIGE);
-    %this.addColorVec(BROWN);
-    %this.addColorVec(DARKBROWN);
-    %this.addColorVec(LIGHTGRAY);
-    %this.addColorVec(GRAY);
-    %this.addColorVec(DARKGRAY);
-    %this.addColorVec(BLACK);
+    %this.colors.push_back(RAYWHITE);
+    %this.colors.push_back(YELLOW);
+    %this.colors.push_back(GOLD);
+    %this.colors.push_back(ORANGE);
+    %this.colors.push_back(PINK);
+    %this.colors.push_back(RED);
+    %this.colors.push_back(MAROON);
+    %this.colors.push_back(GREEN);
+    %this.colors.push_back(LIME);
+    %this.colors.push_back(DARKGREEN);
+    %this.colors.push_back(SKYBLUE);
+    %this.colors.push_back(BLUE);
+    %this.colors.push_back(DARKBLUE);
+    %this.colors.push_back(PURPLE);
+    %this.colors.push_back(DARKPURPLE);
+    %this.colors.push_back(BEIGE);
+    %this.colors.push_back(BROWN);
+    %this.colors.push_back(DARKBROWN);
+    %this.colors.push_back(LIGHTGRAY);
+    %this.colors.push_back(GRAY);
+    %this.colors.push_back(DARKGRAY);
+    %this.colors.push_back(BLACK);
 
 
 
-    echo("Color count is:" SPC getFieldCount(%this.colorFields));
+    printf("Color count is: %d ",%this.colors.size());
 
-    %rf = "";
-    for (%i = 0; %i < MAX_COLORS_COUNT; %i++)
-    {
-        %r = 10 + 30 * %i + 2 * %i SPC 10 SPC 30 SPC 30;
-        %rf = %rf TAB %r;
+    %this.add( %this.colorRects = new Array() );
+    for (%i in Range %this.colors.size()) {
+        %x =  10 + 30 * %i + 2.0 * %i;
+        %this.colorRects.push_back( {%x, 10, 30, 30} );
     }
 
-    %this.colorRectFields = trim(%rf);
-    echo("Rect count is:" SPC getFieldCount(%this.colorRectFields) SPC "max:" SPC MAX_COLORS_COUNT);
+    printf("Rect count is: %d", %this.colorRects.size());
 
     %this.colorSelected = 1;
     %this.colorSelectedPrev = %this.colorMouseHover = 0;
     %this.brushSize = 20.0;
     %this.mouseWasPressed = false;
 
-    %this.btnSaveRec =  750 SPC 10 SPC 40 SPC 30;
+    %this.btnSaveRec =  { 750, 10, 40, 30 };
     %this.btnSaveMouseHover = false;
     %this.showSaveMessage = false;
     %this.saveMessageCounter = 0;
@@ -136,13 +116,13 @@ function textures_mouse_painting::Render(%this) {
     else if (IsKeyPressed(KEY_LEFT)) %this.colorSelected--;
 
     // different to C demo, i wrap around
-    if (%this.colorSelected >= MAX_COLORS_COUNT) %this.colorSelected = 0;
-    else if (%this.colorSelected < 0) %this.colorSelected = MAX_COLORS_COUNT - 1;
+    if (%this.colorSelected >= %this.colors.size()) %this.colorSelected = 0;
+    else if (%this.colorSelected < 0) %this.colorSelected = %this.colors.size() - 1;
 
     // Choose color with mouse
-    for (%i = 0; %i < MAX_COLORS_COUNT; %i++)
+    for (%i in Range %this.colors.size())
     {
-        if (CheckCollisionPointRec(%mousePos, getField(%this.colorRectFields, %i)))
+        if (CheckCollisionPointRec(%mousePos, %this.colorRects.at(%i)))
         {
             %this.colorMouseHover = %i;
             break;
@@ -178,7 +158,7 @@ function textures_mouse_painting::Render(%this) {
                 %mousePos.x,
                 %mousePos.y,
                 %this.brushSize,
-                getField(%this.colorFields, %this.colorSelected)
+                %this.colors.at(%this.colorSelected)
             );
         }
         %this.target.EndTextureMode();
@@ -245,10 +225,10 @@ function textures_mouse_painting::Render(%this) {
     ClearBackground(GRAY);
 
     // NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
-    %rect = "0 0" SPC %this.target.width SPC - %this.target.height;
+    %rect = {0, 0, %this.target.width, -%this.target.height};
     DrawTextureRec(%this.target.texture
         , %rect
-        , "0 0"
+        , {0, 0}
         , WHITE );
     DrawRectangleLinesEx(%rect, 2, BLACK);
 
@@ -259,7 +239,7 @@ function textures_mouse_painting::Render(%this) {
             DrawCircleLines( mousePos.x, mousePos.y, %this.brushSize, GRAY);
         } else {
             DrawCircle(GetMouseX(), GetMouseY(), %this.brushSize
-            , getField( %this.colorFields, %this.colorSelected)
+            , %this.colors.at(%this.colorSelected)
             );
         }
     }
@@ -269,21 +249,21 @@ function textures_mouse_painting::Render(%this) {
     DrawLine(0, 50, GetScreenWidth(), 50, LIGHTGRAY);
 
     // Draw color selection rectangles
-    for (%i = 0; %i < MAX_COLORS_COUNT; %i++) {
+    for (%i in range %this.colors.size()) {
         // DrawRectangleRec(colorsRecs[i], colors[i]);
         DrawRectangleRec(
-            getField(%this.colorRectFields, %i)
-            ,getField(%this.colorFields, %i)
+            %this.colorRects.at(%i)
+            , %this.colors.at(%i)
         );
     }
     DrawRectangleLines(10, 10, 30, 30, LIGHTGRAY);
 
     if (%this.colorMouseHover >= 0) {
         // DrawRectangleRec(colorsRecs[colorMouseHover], Fade(WHITE, 0.6f));
-        DrawRectangleRec( getField(%this.colorRectFields, %this.colorMouseHover) , Fade(WHITE, 0.6));
+        DrawRectangleRec( %this.colorRects.at(%this.colorMouseHover), Fade(WHITE, 0.6));
     }
-    %rect = getField(%this.colorRectFields, %this.colorSelected);
-    DrawRectangleLinesEx(%rect.x - 2 SPC %rect.y - 2 SPC %rect.width + 4 SPC %rect.height + 4, 2, BLACK);
+    %rect =%this.colorRects.at(%this.colorSelected);
+    DrawRectangleLinesEx({%rect.x - 2, %rect.y - 2, %rect.width + 4, %rect.height + 4}, 2, BLACK);
 
 
     // Draw save image button
@@ -296,12 +276,10 @@ function textures_mouse_painting::Render(%this) {
     {
         DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(RAYWHITE, 0.8));
         DrawRectangle(0, 150, GetScreenWidth(), 80, BLACK);
-        DrawText("IMAGE" SPC %this.exportFile SPC "SAVED!", 150, 180, 20, RAYWHITE);
+        DrawText(sprintf( "IMAGE: %s SAVED",%this.exportFile), 150, 180, 20, RAYWHITE);
     }
 
 }
 
 
-// Number of colors available
-#define MAX_COLORS_COUNT 23
 

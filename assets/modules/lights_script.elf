@@ -1,6 +1,5 @@
 //------------------------------------------------------------------------------
 // Lights script implementation
-// status updated to ElfScript 0.5 (TODO small changes for ElfScript 0.7)
 //------------------------------------------------------------------------------
 #define GLSL_VERSION 100
 #define VEC3_ZERO { 0.0, 0.0, 0.0 }
@@ -88,12 +87,11 @@ function LightsDemo::CreateLight(
     });
 
     // NOTE: Lighting shader naming must be the provided ones
-    // TODO ElfScript 0.7 ==> strFormat can be replaced with sPrintf
-    %light.enabledLoc   = GetShaderLocation(%shader, strFormat("lights[%i].enabled" , %this.lightsCount));
-    %light.typeLoc      = GetShaderLocation(%shader, strFormat("lights[%i].type"    , %this.lightsCount));
-    %light.positionLoc  = GetShaderLocation(%shader, strFormat("lights[%i].position", %this.lightsCount));
-    %light.targetLoc    = GetShaderLocation(%shader, strFormat("lights[%i].target"  , %this.lightsCount));
-    %light.colorLoc     = GetShaderLocation(%shader, strFormat("lights[%i].color"   , %this.lightsCount));
+    %light.enabledLoc   = GetShaderLocation(%shader, sPrintf("lights[%i].enabled" , %this.lightsCount));
+    %light.typeLoc      = GetShaderLocation(%shader, sPrintf("lights[%i].type"    , %this.lightsCount));
+    %light.positionLoc  = GetShaderLocation(%shader, sPrintf("lights[%i].position", %this.lightsCount));
+    %light.targetLoc    = GetShaderLocation(%shader, sPrintf("lights[%i].target"  , %this.lightsCount));
+    %light.colorLoc     = GetShaderLocation(%shader, sPrintf("lights[%i].color"   , %this.lightsCount));
 
     %light.UpdateLightValues();
 
@@ -121,8 +119,7 @@ function LightsDemo::onAdd(%this) {
         "assets/shaders/glsl" @ GLSL_VERSION @ "/lighting.vs",
         "assets/shaders/glsl" @ GLSL_VERSION @ "/lighting.fs"
     );
-    //TODO ElfScript 0.7: echo can be replaced by printf
-    echo("** Loader shaderId:" SPC %this.shader);
+    printf("** Loader shaderId: %s", %this.shader);
 
     %this.viewPosLoc = GetShaderLocation(%this.shader, "viewPos");
     SetShaderLocation(%this.shader, SHADER_LOC_VECTOR_VIEW, %this.viewPosLoc);
@@ -141,11 +138,10 @@ function LightsDemo::onAdd(%this) {
     %this.l3 = %this.CreateLight(LIGHT_POINT, {  2, 1, -2 } , VEC3_ZERO, BLUE  , "B");
 
     // check lights loaded:
-    for (%i = 0; %i < MAX_LIGHTS; %i++)
+    for ( %i in range MAX_LIGHTS)
     {
         %light = %this.l[%i];
-        //TODO ElfScript 0.7: echo can be replaced by printf
-        echo("LIGHT #" @ %i SPC (isObject(%light) ? "OK" : "FAILED"));
+        printf("LIGHT #%d %s",%i, (isObject(%light) ? "OK" : "FAILED"));
     }
 
 
@@ -179,7 +175,7 @@ function LightsDemo::Render(%this) {
     DrawSphere( { 0.0, 1.0, 0.0 }, 1.0, WHITE);
     EndShaderMode();
     // Draw spheres to show where the lights are
-    for (%i = 0; %i < MAX_LIGHTS; %i++)
+    for (%i in range MAX_LIGHTS)
     {
         %light = %this.l[%i];
         if (!isObject(%light)) continue;
@@ -189,7 +185,6 @@ function LightsDemo::Render(%this) {
     DrawGrid(10, 1.0);
     EndMode3D();
 
-    // TODO ElfScript 0.7 use sPrintf instead SPC
     DrawText("Lights and Gui Demo GLSL" SPC GLSL_VERSION, 10,10, 20, WHITE , true);
     DrawText("Press 1..4 to enable/disable light" SPC GLSL_VERSION, 10,30, 20, GRAY , true);
     if (IsKeyPressed(KEY_ONE))   %this.toggleLight(0);

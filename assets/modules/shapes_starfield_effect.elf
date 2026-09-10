@@ -39,7 +39,7 @@ function shapes_starfield_effect::OnAdd(%this) {
 
     %this.add(%this.starPoints = new Array());
 
-    for ( %i = 0; %i < STAR_COUNT; %i++)
+    for ( %i in Range STAR_COUNT )
     {
         %this.starPoints.push_back(
             {
@@ -71,7 +71,7 @@ function shapes_starfield_effect::Render(%this) {
     // Toggle lines / points with space bar
     if (IsKeyPressed(KEY_SPACE)) {
         %this.drawLines = !%this.drawLines;
-        echo("SPACE pressed new drawlines is: " SPC %this.drawLines );
+        print("SPACE pressed new drawlines is: " SPC %this.drawLines );
     }
     if (IsKeyPressed(KEY_U)) {
         SetTargetFPS(0);

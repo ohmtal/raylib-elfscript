@@ -88,7 +88,7 @@ function textures_sprite_animation::Render(%this) {
     DrawText(strFormat("%02i FPS", %this.framesSpeed), 575, 210, 10, DARKGRAY);
     DrawText("PRESS RIGHT/LEFT KEYS to CHANGE SPEED!", 290, 240, 10, DARKGRAY);
 
-    for (%i = 0; %i < MAX_FRAME_SPEED; %i++)
+    for ( %i in range MAX_FRAME_SPEED )
     {
         if (%i < %this.framesSpeed) DrawRectangle(250 + 21 * %i, 205, 20, 20, RED);
         DrawRectangleLines(250 + 21 * %i, 205, 20, 20, MAROON);
